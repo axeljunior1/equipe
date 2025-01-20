@@ -77,7 +77,7 @@ class ProduitService {
 
     /**
      * Met à jour un produit existant (partiellement) via son ID.
-     * @param {number} id - L'ID de l'produit à mettre à jour.
+     * @param {String} id - L'ID de l'produit à mettre à jour.
      * @param {Object} produit - Les données à mettre à jour.
      * @returns {Promise} Une promesse contenant les données mises à jour.
      */
