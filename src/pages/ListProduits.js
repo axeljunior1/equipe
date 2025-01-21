@@ -5,6 +5,7 @@ import ProduitService from "../services/produitService";
 import HeaderBtnElement from "../components/HeaderBtnElement";
 import {useNavigate} from "react-router-dom";
 import {Accordion, Button, Col, Container, Form, Row} from "react-bootstrap";
+import QRCodeScanner from "../components/QRCodeScanner";
 
 const ListProduit = () => {
     const [produits, setProduits] = useState([]);
@@ -130,6 +131,9 @@ const ListProduit = () => {
                 <Accordion.Item eventKey="0">
                     <Accordion.Header> Filtre de recherche</Accordion.Header>
                     <Accordion.Body>
+                        <QRCodeScanner />
+
+
                         <Form onSubmit={handleSubmitFilter} className='my-3'>
 
                             <Container>
@@ -183,7 +187,7 @@ const ListProduit = () => {
                                             name='stockInitialMin'
                                             className="my-1 "
                                         />
-                                    </Col>
+                                    </Col>N
                                     <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
                                         <Form.Control
                                             type="text"
