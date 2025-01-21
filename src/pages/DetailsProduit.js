@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import ProduitService from "../services/produitService";
+import produitService from "../services/produitService";
 
 const ProduitDetail = () => {
     const { id } = useParams(); // Récupère l'ID depuis l'URL
@@ -13,8 +14,10 @@ const ProduitDetail = () => {
 
     // Fonction pour récupérer les données d'un produit
     const fetchProduit = useCallback( async () => {
+        setLoading(true);
         try {
-            const data = await ProduitService.getProduitsById(id).then();
+            const data =  await produitService.getProduitsById(id)
+            console.log(data)
             setProduit(data);
             setFormData(data);
         } catch (error) {
@@ -41,7 +44,7 @@ const ProduitDetail = () => {
 
     useEffect(() => {
        fetchProduit()// Appel de la fonction asynchrone
-    }, [fetchProduit]);
+    }, []);
 
     if (loading) {
         return <h1>Chargement en cours...</h1>;

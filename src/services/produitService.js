@@ -7,13 +7,17 @@ class ProduitService {
      * Récupère la liste des produit.
      * @returns {Promise} Une promesse contenant les données des produit.
      */
-    getProduit() {
-        return axios.get(BASE_URL)
-            .then(response => response.data)
-            .catch(error => {
-                console.error("Erreur lors de la récupération des produit :", error);
-                throw error;
-            });
+    async getProduit() {
+        try {
+            let response = await axios.get(BASE_URL);
+            return response.data
+        }catch (error) {
+            console.error("Erreur lors de la récupération des produit :", error);
+            throw error;
+        }finally {
+
+        }
+
     }
 
     /**
@@ -22,15 +26,9 @@ class ProduitService {
      * @returns {Promise} Une promesse contenant les données de l'produit spécifique.
      */
     async getProduitsById(id) {
-        // return axios.get(`${BASE_URL}/${id}`)
-        //     .then(response => response.data)
-        //     .catch(error => {
-        //         console.error(`Erreur lors de la récupération de l'produit avec l'ID ${id} :`, error);
-        //         throw error;
-        //     });
         try {
-            const produit = await axios.get(`${BASE_URL}/${id}`);
-            return produit;
+            let axiosResponse = await axios.get(`${BASE_URL}/${id}`);
+            return axiosResponse.data;
         }catch(err) {
             throw err;
         }
