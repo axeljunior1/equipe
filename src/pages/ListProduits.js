@@ -1,11 +1,10 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
-import {Link} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import ProduitService from "../services/produitService";
 import HeaderBtnElement from "../components/HeaderBtnElement";
-import {useNavigate} from "react-router-dom";
 import {Accordion, Button, Col, Container, Form, Row} from "react-bootstrap";
-import QRCodeScanner from "../components/QRCodeScanner";
+import {usePanier} from "../context/PanierContext";
 
 const ListProduit = () => {
     const [produits, setProduits] = useState([]);
@@ -18,19 +17,21 @@ const ListProduit = () => {
         prixUnitaireMin: "",
         prixUnitaireMax: "",
     });
-
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0); // Page actuelle
+    const [pageSize, setPageSize] = useState(5); // Taille de la page
+    const [totalPages, setTotalPages] = useState(0); // Nombre total de pages
     const navigate = useNavigate();
+    const {  ajouterAuPanier } = usePanier();
 
-    // Fonction pour récupérer les produits depuis l'API
+    // Fonction pour récupérer les produits avec pagination
     const fetchProduits = async () => {
         setLoading(true);
         try {
-            let data = await ProduitService.getProduit();
-            setProduits(data);
-            setLoading(false);
-
+            let data = await ProduitService.getProduit(currentPage, pageSize);
+            setProduits(data.content);  // Assuming 'content' is the array of products
+            setTotalPages(data.totalPages); // Assuming 'totalPages' is the total page count
         } catch (error) {
             setError(error);
         } finally {
@@ -59,7 +60,7 @@ const ListProduit = () => {
 
     useEffect(() => {
         fetchProduits();
-    }, []);
+    }, [currentPage, pageSize]);
 
     if (loading) {
         return <h1>Chargement en cours...</h1>;
@@ -70,8 +71,8 @@ const ListProduit = () => {
     }
 
     const handleInputChange = (e) => {
-        const {name, value} = e.target;
-        setFilters({...filters, [name]: value});
+        const { name, value } = e.target;
+        setFilters({ ...filters, [name]: value });
     };
 
     const handleSubmitFilter = async (e) => {
@@ -102,36 +103,47 @@ const ListProduit = () => {
         fetchProduitByMotCle(searchInput).then(r => console.log(r));
     }
 
+    const handleAjouterAuPanier = (produit) => {
+        ajouterAuPanier({ ...produit, quantite: 1 });
+    };
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const handlePageSizeChange = (e) => {
+        setPageSize(Number(e.target.value));
+        setCurrentPage(0); // Reset to first page whenever page size changes
+    };
+
     return (
         <div>
-            <h1><strong> Produit </strong></h1>
+            <h1><strong>Produit</strong></h1>
             <HeaderBtnElement titreFil='' variant='outline-primary' onClick={() => navigate('/creer-produit')}
-                              valueBtn='Creer produit'/>
+                              valueBtn='Creer produit' />
 
-
-            <Form className='my-3' onSubmit={handleSubmitSearch}>
+            <form className='my-3' onSubmit={handleSubmitSearch}>
                 <Row>
                     <Col xs="auto">
-                        <Form.Control
-                            type="text" value={searchInput} onChange={(e) => {
-                            SetSearchInput(e.target.value)
-                        }}
+                        <input
+                            type="text"
+                            value={searchInput}
+                            onChange={(e) => SetSearchInput(e.target.value)}
                             placeholder="Recherche"
-                            className=" mr-sm-2"
+                            className="form-control mr-sm-2"
                         />
                     </Col>
                     <Col xs="auto">
                         <Button type="submit">Recherche</Button>
                     </Col>
                 </Row>
-
-            </Form>
+            </form>
 
             <Accordion className='my-3'>
                 <Accordion.Item eventKey="0">
                     <Accordion.Header> Filtre de recherche</Accordion.Header>
                     <Accordion.Body>
-                        <QRCodeScanner />
+                        {/*<QRCodeScanner />*/}
 
 
                         <Form onSubmit={handleSubmitFilter} className='my-3'>
@@ -187,7 +199,7 @@ const ListProduit = () => {
                                             name='stockInitialMin'
                                             className="my-1 "
                                         />
-                                    </Col>N
+                                    </Col>
                                     <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
                                         <Form.Control
                                             type="text"
@@ -217,27 +229,62 @@ const ListProduit = () => {
             <Table striped bordered hover>
                 <thead>
                 <tr>
-                    <th></th>
                     <th>Nom</th>
                     <th>Description</th>
                     <th>Stock initial</th>
-                    <th>prix Unitaire</th>
+                    <th>Prix Unitaire</th>
+                    <th>Add to Cart 🛒</th>
                 </tr>
                 </thead>
                 <tbody>
                 {produits.map((produit, index) => (
                     <tr key={produit.id}>
-                        <td>{index + 1}</td>
-                        <td>
-                            <Link to={`/produits/${produit.id}`} className='text-decoration-none'>{produit.nom}</Link>
-                        </td>
+                        <td>{produit.nom}</td>
                         <td>{produit.description}</td>
                         <td>{produit.stockInitial}</td>
                         <td>{produit.prixUnitaire}</td>
+                        <td><Button
+                            variant="" className={'w-100 text-primary fw-bold'}
+                            onClick={() => handleAjouterAuPanier(produit)} >
+                            Ajouter au panier 🧺
+                        </Button></td>
                     </tr>
                 ))}
                 </tbody>
             </Table>
+
+            {/* Pagination controls */}
+            <div className="d-flex justify-content-between">
+                <Button
+                    disabled={currentPage === 0}
+                    onClick={() => handlePageChange(currentPage - 1)}>
+                    Précédent
+                </Button>
+
+                <div>
+                    Page {currentPage + 1} sur {totalPages}
+                </div>
+
+                <Button
+                    disabled={currentPage === totalPages - 1}
+                    onClick={() => handlePageChange(currentPage + 1)}>
+                    Suivant
+                </Button>
+            </div>
+
+            {/* Page size selection */}
+            <div className="my-3">
+                <label htmlFor="pageSize">Produits par page:</label>
+                <select
+                    id="pageSize"
+                    value={pageSize}
+                    onChange={handlePageSizeChange}
+                    className="ml-2">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                </select>
+            </div>
         </div>
     );
 };

@@ -7,9 +7,20 @@ class ProduitService {
      * Récupère la liste des produit.
      * @returns {Promise} Une promesse contenant les données des produit.
      */
-    async getProduit() {
+    async getProduit(page = 0 ,size = 5, sortCriteria) {
         try {
-            let response = await axios.get(BASE_URL);
+            // Créer une chaîne de tri basée sur `sortCriteria`, qui est un tableau d'objets
+            const sortString = sortCriteria ? sortCriteria.map(criterion => `${criterion.field},${criterion.direction}`)
+                .join(',') : '';
+
+
+            const response = await axios.get(BASE_URL, {
+                params: {
+                    page: page, // Le numéro de la page (indexé à partir de 0)
+                    size: size, // Nombre d'éléments par page
+                    sort: sortString, // Champ et direction de tri
+                }
+            });
             return response.data
         }catch (error) {
             console.error("Erreur lors de la récupération des produit :", error);
@@ -79,14 +90,25 @@ class ProduitService {
      * @param {Object} produit - Les données à mettre à jour.
      * @returns {Promise} Une promesse contenant les données mises à jour.
      */
-    updateProduit(id, produit) {
-        return axios.patch(`${BASE_URL}/${id}`, produit)
-            .then(response => response.data)
-            .catch(error => {
-                console.error(`Erreur lors de la mise à jour de l'produit avec l'ID ${id} :`, error);
-                throw error;
-            });
+    async updateProduit(id, produit) {
+        try {
+            // Appel de la requête PATCH
+            let updateReponse = await axios.patch(`${BASE_URL}/${id}`, produit);
+            return updateReponse.data; // Retour des données mises à jour
+        } catch (error) {
+            console.error(`Erreur lors de la mise à jour du produit avec l'ID ${id} :`, error);
+
+            // Différenciation des erreurs pour une meilleure gestion
+            if (error.response && error.response.status === 404) {
+                throw new Error(`Produit avec l'ID ${id} introuvable.`);
+            } else if (error.response && error.response.status === 400) {
+                throw new Error(`Erreur de validation : ${error.response.data.message || 'Données invalides.'}`);
+            } else {
+                throw new Error('Erreur réseau ou serveur.');
+            }
+        }
     }
+
 
     /**
      * Supprime un produit via son ID.

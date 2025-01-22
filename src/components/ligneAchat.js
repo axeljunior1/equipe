@@ -27,19 +27,6 @@ const LigneAchat = ({LignesAchat}) => {
         )
     };
 
-    // Fonction pour mettre à jour un produit (PATCH)
-    const updateProduit = async () => {
-
-        ProduitService.updateProduit(LigneAchat.id, formData).then(data => {
-            setLigneAchat(data);
-            setFormData(data);
-            setIsEditing(false);
-        }).catch(error => {
-            setError(error);
-        }).finally(
-            () => setLoading(false),
-        )
-    };
 
 
     useEffect(() => {

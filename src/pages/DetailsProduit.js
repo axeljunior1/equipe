@@ -2,9 +2,12 @@ import React, {useCallback, useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import ProduitService from "../services/produitService";
 import produitService from "../services/produitService";
+import {usePanier} from "../context/PanierContext";
 
 const ProduitDetail = () => {
-    const { id } = useParams(); // Récupère l'ID depuis l'URL
+    const {id} = useParams(); // Récupère l'ID depuis l'URL
+    const {panier, ajouterAuPanier} = usePanier();
+
 
     const [produit, setProduit] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -13,11 +16,12 @@ const ProduitDetail = () => {
     const [formData, setFormData] = useState({}); // État pour stocker les modifications
 
     // Fonction pour récupérer les données d'un produit
-    const fetchProduit = useCallback( async () => {
+    const fetchProduit = useCallback(async () => {
+        console.log(panier)
         setLoading(true);
         try {
-            const data =  await produitService.getProduitsById(id)
-            console.log(data)
+            const data = await produitService.getProduitsById(id)
+            // console.log(data)
             setProduit(data);
             setFormData(data);
         } catch (error) {
@@ -29,21 +33,25 @@ const ProduitDetail = () => {
 
     // Fonction pour mettre à jour un produit (PATCH)
     const updateProduit = async () => {
-
-        ProduitService.updateProduit(id, formData).then(data => {
+        setLoading(true);
+        setError(null);
+        try {
+            let data = await ProduitService.updateProduit(id, formData)
             setProduit(data);
             setFormData(data);
             setIsEditing(false);
-        }).catch(error => {
+            console.log(data)
+        } catch (error) {
+            setLoading(false);
             setError(error);
-        }).finally(
-            () => setLoading(false),
-        )
+        } finally {
+            setLoading(false);
+        }
     };
 
 
     useEffect(() => {
-       fetchProduit()// Appel de la fonction asynchrone
+        fetchProduit()// Appel de la fonction asynchrone
     }, []);
 
     if (loading) {
@@ -51,7 +59,8 @@ const ProduitDetail = () => {
     }
 
     if (error) {
-        return <h1>{error}</h1>;
+        console.log('error545');
+        return <h1> Une erruer {error}</h1>;
     }
 
     if (!produit) {
@@ -60,8 +69,13 @@ const ProduitDetail = () => {
 
     // Fonction pour gérer les modifications dans le formulaire
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        const {name, value} = e.target;
+        setFormData({...formData, [name]: value});
+    };
+
+    const handleAjouterAuPanier = (produit) => {
+        // console.log(produit)
+        ajouterAuPanier({...produit, quantite: 1});
     };
 
     return (
@@ -81,7 +95,7 @@ const ProduitDetail = () => {
                                 <img
                                     src={`data:image/png;base64,${produit.qrCode}`}
                                     alt="QR Code"
-                                    style={{ width: "150px", height: "150px", objectFit: "cover" }}
+                                    style={{width: "150px", height: "150px", objectFit: "cover"}}
                                 />
                             </div>
                         )}
@@ -92,6 +106,12 @@ const ProduitDetail = () => {
                             onClick={() => setIsEditing(true)}
                         >
                             Modifier
+                        </button>
+                        <button
+                            className="btn btn-primary me-2"
+                            onClick={() => handleAjouterAuPanier(produit)}
+                        >
+                            Ajouter au panier
                         </button>
                     </div>
                 </div>
@@ -149,7 +169,7 @@ const ProduitDetail = () => {
                         <div className="mb-3">
                             <label htmlFor="stockInitial" className="form-label">Stock Initial :</label>
                             <input
-                                type="number"
+                                type="text"
                                 id="stockInitial"
                                 name="stockInitial"
                                 className="form-control"
