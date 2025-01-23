@@ -5,7 +5,7 @@ import {usePanier} from "../../context/PanierContext";
 // import produitService from "../../services/produitService";
 
 const Panier = () => {
-    const { panier, ajouterAuPanier, retirerDuPanier, calculerTotal } = usePanier();
+    const { panier, retirerDuPanier, calculerTotal } = usePanier();
 
 
 

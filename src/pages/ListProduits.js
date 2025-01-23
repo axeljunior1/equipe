@@ -5,6 +5,7 @@ import ProduitService from "../services/produitService";
 import HeaderBtnElement from "../components/HeaderBtnElement";
 import {Accordion, Button, Col, Container, Form, Row} from "react-bootstrap";
 import {usePanier} from "../context/PanierContext";
+import {useTheme} from "../context/ThemeContext";
 
 const ListProduit = () => {
     const [produits, setProduits] = useState([]);
@@ -24,6 +25,7 @@ const ListProduit = () => {
     const [totalPages, setTotalPages] = useState(0); // Nombre total de pages
     const navigate = useNavigate();
     const {  ajouterAuPanier } = usePanier();
+    const {theme, toggleTheme} = useTheme();
 
     // Fonction pour récupérer les produits avec pagination
     const fetchProduits = async () => {
@@ -119,6 +121,8 @@ const ListProduit = () => {
     return (
         <div>
             <h1><strong>Produit</strong></h1>
+
+
             <HeaderBtnElement titreFil='' variant='outline-primary' onClick={() => navigate('/creer-produit')}
                               valueBtn='Creer produit' />
 
@@ -274,16 +278,20 @@ const ListProduit = () => {
 
             {/* Page size selection */}
             <div className="my-3">
-                <label htmlFor="pageSize">Produits par page:</label>
-                <select
-                    id="pageSize"
-                    value={pageSize}
-                    onChange={handlePageSizeChange}
-                    className="ml-2">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="15">15</option>
-                </select>
+                <Row>
+                    <Col xs="auto">
+                        <label htmlFor="pageSize">Produits par page:</label>
+                        <select
+                            id="pageSize"
+                            value={pageSize}
+                            onChange={handlePageSizeChange}
+                            className="ml-2 form-control">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                        </select>
+                    </Col>
+                </Row>
             </div>
         </div>
     );

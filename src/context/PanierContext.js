@@ -42,7 +42,7 @@ export const PanierProvider = ({ children }) => {
 
     // Fonction pour calculer le total du panier
     const calculerTotal = () => {
-        return panier.reduce((total, item) => total + item.prixInitial * item.quantite, 0).toFixed(2);
+        return panier.reduce((total, item) => Number(total) + Number(item.prixUnitaire) * Number(item.quantite), 0).toFixed(2);
     };
 
     return (
