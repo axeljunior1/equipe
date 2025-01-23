@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import ProduitService from "../services/produitService";
 import HeaderBtnElement from "../components/HeaderBtnElement";
 import {Accordion, Button, Col, Container, Form, Row} from "react-bootstrap";
 import {usePanier} from "../context/PanierContext";
-import {useTheme} from "../context/ThemeContext";
 
 const ListProduit = () => {
     const [produits, setProduits] = useState([]);
@@ -24,8 +23,7 @@ const ListProduit = () => {
     const [pageSize, setPageSize] = useState(5); // Taille de la page
     const [totalPages, setTotalPages] = useState(0); // Nombre total de pages
     const navigate = useNavigate();
-    const {  ajouterAuPanier } = usePanier();
-    const {theme, toggleTheme} = useTheme();
+    const {  ajouterAuPanier, dejaPresent, nombreDansPanier } = usePanier();
 
     // Fonction pour récupérer les produits avec pagination
     const fetchProduits = async () => {
@@ -243,15 +241,17 @@ const ListProduit = () => {
                 <tbody>
                 {produits.map((produit, index) => (
                     <tr key={produit.id}>
-                        <td>{produit.nom}</td>
+                        <td>
+                            <Link to={`/produits/${produit.id}`} className='text-decoration-none'>{produit.nom}</Link>
+                        </td>
                         <td>{produit.description}</td>
                         <td>{produit.stockInitial}</td>
                         <td>{produit.prixUnitaire}</td>
                         <td><Button
                             variant="" className={'w-100 text-primary fw-bold'}
                             onClick={() => handleAjouterAuPanier(produit)} >
-                            Ajouter au panier 🧺
-                        </Button></td>
+                            {dejaPresent(produit) ? ( <span> Ajouter (1) au panier 🧺 <span className={'text-danger'}> { nombreDansPanier(produit)} </span> </span> ):( <span>Ajouter au panier 🧺 </span>)}
+                        </Button> </td>
                     </tr>
                 ))}
                 </tbody>

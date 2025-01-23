@@ -3,6 +3,7 @@ import {useParams} from "react-router-dom";
 import ProduitService from "../services/produitService";
 import produitService from "../services/produitService";
 import {usePanier} from "../context/PanierContext";
+import ProduitDetailComp from "../components/ProduitDetailComp";
 
 const ProduitDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
@@ -78,43 +79,20 @@ const ProduitDetail = () => {
         ajouterAuPanier({...produit, quantite: 1});
     };
 
+    function handeIsEditing() {
+        console.log('isEditing')
+        setIsEditing(true);
+    }
+
     return (
 
-        <div className="container mt-5">
+        <div className="">
+
+            <h1><strong>Details du Produit</strong></h1>
+
             {!isEditing ? (
-                <div className="card p-4 shadow">
-                    <h3 className="card-title text-center">{produit.nom}</h3>
-                    <div className="card-body">
-                        <p><strong>Prix :</strong> {produit.prixUnitaire} €</p>
-                        <p><strong>Description :</strong> {produit.description}</p>
-                        <p><strong>Catégorie :</strong> {produit.categorie}</p>
-                        <p><strong>Stock initial :</strong> {produit.stockInitial}</p>
-                        {produit.qrCode && (
-                            <div>
-                                <p><strong>QR Code :</strong></p>
-                                <img
-                                    src={`data:image/png;base64,${produit.qrCode}`}
-                                    alt="QR Code"
-                                    style={{width: "150px", height: "150px", objectFit: "cover"}}
-                                />
-                            </div>
-                        )}
-                    </div>
-                    <div className="d-flex justify-content-center">
-                        <button
-                            className="btn btn-primary me-2"
-                            onClick={() => setIsEditing(true)}
-                        >
-                            Modifier
-                        </button>
-                        <button
-                            className="btn btn-primary me-2"
-                            onClick={() => handleAjouterAuPanier(produit)}
-                        >
-                            Ajouter au panier
-                        </button>
-                    </div>
-                </div>
+
+                <ProduitDetailComp id ={id} isEditing={handeIsEditing}  />
             ) : (
                 <div className="card p-4 shadow bg-light">
                     <h3 className="text-center mb-4">Modifier le produit</h3>

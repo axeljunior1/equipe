@@ -20,6 +20,17 @@ export const PanierProvider = ({ children }) => {
         localStorage.setItem("panier", JSON.stringify(panier));
     }, [panier]);
 
+    const dejaPresent = (produit) =>{
+        const index = panier.findIndex(item => item.id === produit.id);
+        return index > -1;
+
+    }
+    const nombreDansPanier = (produit) =>{
+        const index = panier.findIndex(item => item.id === produit.id);
+        return panier[index].quantite;
+
+    }
+
     // Fonction pour ajouter un produit au panier
     const ajouterAuPanier = (produit) => {
         console.log(produit)
@@ -46,7 +57,7 @@ export const PanierProvider = ({ children }) => {
     };
 
     return (
-        <PanierContext.Provider value={{ panier, ajouterAuPanier, retirerDuPanier, calculerTotal }}>
+        <PanierContext.Provider value={{ panier, ajouterAuPanier, retirerDuPanier, calculerTotal, dejaPresent, nombreDansPanier }}>
             {children}
         </PanierContext.Provider>
     );

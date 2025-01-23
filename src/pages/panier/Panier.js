@@ -1,19 +1,23 @@
 import React from 'react';
 
-import {Button, Table} from 'react-bootstrap';
+import {Button, Col, Row, Table} from 'react-bootstrap';
 import {usePanier} from "../../context/PanierContext";
+import QRCodeScanner from "../../components/QRCodeScanner";
 // import produitService from "../../services/produitService";
 
 const Panier = () => {
-    const { panier, retirerDuPanier, calculerTotal } = usePanier();
+    const {panier, ajouterAuPanier ,  retirerDuPanier, calculerTotal} = usePanier();
 
 
+    const handleAjouterAuPanier = (produit) => {
+        ajouterAuPanier({ ...produit, quantite: 1 });
+    };
 
     return (
         <div>
             <h2>Panier</h2>
             {panier.length === 0 ? (
-                    <p>Votre panier est vide.</p>
+                <p>Votre panier est vide.</p>
 
             ) : (
                 <Table striped bordered hover>
@@ -31,7 +35,19 @@ const Panier = () => {
                         <tr key={item.id || `${item.nom}-${item.prixUnitaire}`}>
                             <td>{item.nom}</td>
                             <td>{item.prixUnitaire}€</td>
-                            <td>{item.quantite}</td>
+                            <td>
+                                <Row>
+                                    <Col xs={"2"}>{item.quantite}</Col>
+                                    <Col xs={"10"}>
+                                        <Button
+                                            variant="outline-secondary" className='w-100 text-primary fw-bold '
+                                            onClick={() => handleAjouterAuPanier(item)}
+                                        >
+                                            ➕
+                                        </Button>
+                                    </Col>
+                                </Row>
+                                 </td>
                             <td>{(item.prixUnitaire * item.quantite).toFixed(2)}€</td>
                             <td>
                                 <Button
@@ -50,7 +66,9 @@ const Panier = () => {
             )}
             <h3>Total: {calculerTotal()}€</h3>
 
-
+            <div className={'mt-3'}>
+                <QRCodeScanner scanAndAdd={true}/>
+            </div>
         </div>
     );
 };
