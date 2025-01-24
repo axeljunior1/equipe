@@ -7,13 +7,14 @@ class AchatService {
      * Récupère la liste des achats.
      * @returns {Promise} Une promesse contenant les données des achats.
      */
-    getAchats() {
-        return axios.get(BASE_URL)
-            .then(response => response.data)
-            .catch(error => {
-                console.error("Erreur lors de la récupération des achats :", error);
-                throw error;
-            });
+    async getAchats() {
+        try {
+            let response = await axios.get(BASE_URL)
+            return response.data;
+        } catch (error) {
+            console.error("Erreur lors de la récupération des achats :", error);
+            throw error;
+        }
     }
 
     /**
@@ -21,13 +22,27 @@ class AchatService {
      * @param {number} id - L'ID de l'achat.
      * @returns {Promise} Une promesse contenant les données de l'achat spécifique.
      */
-    getAchatById(id) {
-        return axios.get(`${BASE_URL}/${id}`)
-            .then(response => response.data)
-            .catch(error => {
-                console.error(`Erreur lors de la récupération de l'achat avec l'ID ${id} :`, error);
-                throw error;
-            });
+    async getAchatById(id) {
+        try {
+            let response = await axios.get(`${BASE_URL}/${id}`)
+            return response.data;
+        } catch (error) {
+            console.error(`Erreur lors de la récupération de l'achat avec l'ID ${id} :`, error);
+            throw error;
+        }
+
+    }
+
+
+    async getAchatLines(id) {
+        try {
+            let response = await axios.get(`${BASE_URL}/${id}/lignes`)
+            return response.data;
+        } catch (error) {
+            console.error(`Erreur lors de la récupération des lignes de l'achat avec l'ID ${id} :`, error);
+            throw error;
+        }
+
     }
 
     /**
@@ -35,13 +50,14 @@ class AchatService {
      * @param {Object} achat - Les données de l'achat à créer.
      * @returns {Promise} Une promesse contenant les données de l'achat créé.
      */
-    createAchat(achat) {
-        return axios.post(BASE_URL, achat)
-            .then(response => response.data)
-            .catch(error => {
-                console.error("Erreur lors de la création de l'achat :", error);
-                throw error;
-            });
+    async createAchat(achat) {
+        try {
+            let response = await axios.post(`${BASE_URL}`, achat);
+            return response.data;
+        } catch (error) {
+            console.error("Erreur lors de la création de l'achat :", error);
+            throw error;
+        }
     }
 
     /**
@@ -64,13 +80,15 @@ class AchatService {
      * @param {number} id - L'ID de l'achat à supprimer.
      * @returns {Promise} Une promesse confirmant la suppression.
      */
-    deleteAchat(id) {
-        return axios.delete(`${BASE_URL}/${id}`)
-            .then(response => response.data)
-            .catch(error => {
-                console.error(`Erreur lors de la suppression de l'achat avec l'ID ${id} :`, error);
-                throw error;
-            });
+    async deleteAchat(id) {
+        try {
+            let response = await axios.delete(`${BASE_URL}/${id}`)
+            return response.data;
+        } catch (error) {
+            console.error(`Erreur lors de la suppression de l'achat avec l'ID ${id} :`, error);
+            throw error;
+        }
+
     }
 }
 

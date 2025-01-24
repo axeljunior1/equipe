@@ -5,6 +5,10 @@ import ProduitService from "../services/produitService";
 import HeaderBtnElement from "../components/HeaderBtnElement";
 import {Accordion, Button, Col, Container, Form, Row} from "react-bootstrap";
 import {usePanier} from "../context/PanierContext";
+import Pagination from "../components/Pagination";
+import * as PropTypes from "prop-types";
+import SearchProduitCritere from "../components/SearchProduitCritere";
+
 
 const ListProduit = () => {
     const [produits, setProduits] = useState([]);
@@ -59,7 +63,7 @@ const ListProduit = () => {
 
 
     useEffect(() => {
-        fetchProduits();
+        fetchProduits().then(r => null );
     }, [currentPage, pageSize]);
 
     if (loading) {
@@ -116,117 +120,29 @@ const ListProduit = () => {
         setCurrentPage(0); // Reset to first page whenever page size changes
     };
 
+    const handleSearchInput = (e)=>{
+        SetSearchInput(e.target.value);
+    }
+
     return (
         <div>
             <h1><strong>Produit</strong></h1>
 
 
             <HeaderBtnElement titreFil='' variant='outline-primary' onClick={() => navigate('/creer-produit')}
-                              valueBtn='Creer produit' />
-
-            <form className='my-3' onSubmit={handleSubmitSearch}>
-                <Row>
-                    <Col xs="auto">
-                        <input
-                            type="text"
-                            value={searchInput}
-                            onChange={(e) => SetSearchInput(e.target.value)}
-                            placeholder="Recherche"
-                            className="form-control mr-sm-2"
-                        />
-                    </Col>
-                    <Col xs="auto">
-                        <Button type="submit">Recherche</Button>
-                    </Col>
-                </Row>
-            </form>
-
-            <Accordion className='my-3'>
-                <Accordion.Item eventKey="0">
-                    <Accordion.Header> Filtre de recherche</Accordion.Header>
-                    <Accordion.Body>
-                        {/*<QRCodeScanner />*/}
+                              valueBtn='Créer produit' />
 
 
-                        <Form onSubmit={handleSubmitFilter} className='my-3'>
 
-                            <Container>
-                                <Row className="">
-                                    <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                                        <Form.Control
-                                            type="text"
-                                            value={filters.nom}
-                                            onChange={handleInputChange}
-                                            placeholder="Nom"
-                                            name='nom'
-                                            className="my-1"
-                                        />
-                                    </Col>
-                                    <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                                        <Form.Control
-                                            type="text"
-                                            value={filters.description}
-                                            onChange={handleInputChange}
-                                            placeholder="Description"
-                                            name='description'
-                                            className="my-1 "
-                                        />
-                                    </Col>
-                                    <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                                        <Form.Control
-                                            type="text"
-                                            value={filters.prixUnitaireMin}
-                                            onChange={handleInputChange}
-                                            placeholder="Prix Unitaire Min"
-                                            name='prixUnitaireMin'
-                                            className="my-1 "
-                                        />
-                                    </Col>
-                                    <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                                        <Form.Control
-                                            type="text"
-                                            value={filters.prixUnitaireMax}
-                                            onChange={handleInputChange}
-                                            placeholder="Prix Unitaire Max"
-                                            name='prixUnitaireMax'
-                                            className="my-1 "
-                                        />
-                                    </Col>
-                                    <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                                        <Form.Control
-                                            type="text"
-                                            value={filters.stockInitialMin}
-                                            onChange={handleInputChange}
-                                            placeholder="Stock Initial Min"
-                                            name='stockInitialMin'
-                                            className="my-1 "
-                                        />
-                                    </Col>
-                                    <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                                        <Form.Control
-                                            type="text"
-                                            value={filters.stockInitialMax}
-                                            onChange={handleInputChange}
-                                            placeholder="Stock Initial Max"
-                                            name='stockInitialMax'
-                                            className="my-1 "
-                                        />
-                                    </Col>
-                                </Row>
+            <SearchProduitCritere
+                handleSubmitSearch={handleSubmitSearch}
+                searchInput={searchInput}
+                handleSearchInput={handleSearchInput}
+                handleSubmitFilter={handleSubmitFilter}
+                filters={filters}
+                handleInputChange={handleInputChange}
 
-
-                                <Row className="justify-content-end">
-                                    <Col xs={12} sm={12} md={6} lg={4} xxl={3} >
-                                        <Button type="submit" variant='secondary' className={'my-2 w-100'}>Filtrer</Button>
-                                    </Col>
-                                </Row>
-                            </Container>
-                        </Form>
-
-                    </Accordion.Body>
-                </Accordion.Item>
-            </Accordion>
-
+            />
 
             <Table striped bordered hover>
                 <thead>
@@ -258,41 +174,15 @@ const ListProduit = () => {
             </Table>
 
             {/* Pagination controls */}
-            <div className="d-flex justify-content-between">
-                <Button
-                    disabled={currentPage === 0}
-                    onClick={() => handlePageChange(currentPage - 1)}>
-                    Précédent
-                </Button>
 
-                <div>
-                    Page {currentPage + 1} sur {totalPages}
-                </div>
+            <Pagination
+                currentPage = {currentPage}
+                handlePageChange = {handlePageChange}
+                totalPages = {totalPages}
+                pageSize = {pageSize}
+                handlePageSizeChange = {handlePageSizeChange}
 
-                <Button
-                    disabled={currentPage === totalPages - 1}
-                    onClick={() => handlePageChange(currentPage + 1)}>
-                    Suivant
-                </Button>
-            </div>
-
-            {/* Page size selection */}
-            <div className="my-3">
-                <Row>
-                    <Col xs="auto">
-                        <label htmlFor="pageSize">Produits par page:</label>
-                        <select
-                            id="pageSize"
-                            value={pageSize}
-                            onChange={handlePageSizeChange}
-                            className="ml-2 form-control">
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="15">15</option>
-                        </select>
-                    </Col>
-                </Row>
-            </div>
+            />
         </div>
     );
 };

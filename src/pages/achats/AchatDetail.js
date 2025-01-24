@@ -1,40 +1,46 @@
 import React, {useEffect, useState} from "react";
-import {Link, useParams} from "react-router-dom";
+import {Await, Link, useNavigate, useParams} from "react-router-dom";
 import AchatService from "../../services/AchatService";
 import Table from "react-bootstrap/Table";
 import LigneAchatService from "../../services/LigneAchatService";
+import {Button, Col, Container, Form, FormControl, FormGroup, FormLabel, Modal, Row} from "react-bootstrap";
+import achatService from "../../services/AchatService";
+import InputGroup from "react-bootstrap/InputGroup";
+import SearchProduitPopup from "../test/SearchProduitPopup";
 
 const AchatDetail = () => {
-    const { id } = useParams(); // Récupère l'ID depuis l'URL
+    const {id} = useParams(); // Récupère l'ID depuis l'URL
     const [achat, setAchat] = useState(null);
-    const [ligneAchatIds, setLigneAchatIds] = useState([]);
+    const [lignesAchats, setLignesAchats] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isEditing, setIsEditing] = useState(false); // État pour le mode édition
     const [formData, setFormData] = useState({}); // État pour stocker les données du formulaire
+    const navigate = useNavigate();
+    const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
+
+    let initFormAddLigne = {
+        "prixAchatUnitaire": 0,
+        "quantite": 0,
+        "achatId": id,
+        "produitId": 0
+    }
+    const [formAddLigne, setFormAddLigne] = useState(initFormAddLigne);
 
 
     // Fonction pour récupérer les données de l'employé
     const fetchAchat = async () => {
-        AchatService.getAchatById(id)
-            .then(data => {
-                // let lignes  = []
-                // if (data && data.ligneAchats.length > 0 ) {
-                //     data.ligneAchats.forEach((ligneAchat) => {
-                //         LigneAchatService.getLigneAchatById(ligneAchat.id).then(data => {
-                //             lignes.push(data)
-                //         }).catch(error => console.log(error));
-                //     })
-                // }
-                // setLigneAchatIds(lignes)
-                // console.log(lignes)
-
-                setAchat(data)
-                fetchLigneAchat(data);
-                setFormData(data); // Pré-remplit le formulaire
-            })
-            .catch(err => setError(err))
-            .finally(() => setLoading(false));
+        setLoading(true);
+        try {
+            let data = await AchatService.getAchatById(id)
+            setAchat(data)
+            await fetchLigneAchat(data)
+            setFormData(data) // Pré-remplit le formulaire
+        } catch (err) {
+            setError(err);
+        } finally {
+            setIsEditing(false);
+        }
     };
 
     // Fonction pour mettre à jour les données de l'employé
@@ -43,22 +49,18 @@ const AchatDetail = () => {
             setAchat(data)
             setFormData(data);
             setIsEditing(false);
-        }).catch(err => setError('Une erreur est survenue lors de la mise à jour de l\'employé' + err ));
+        }).catch(err => setError('Une erreur est survenue lors de la mise à jour de l\'employé' + err));
 
     };
 
-    const fetchLigneAchat = async (achat) => {
-        let lignes = achat.ligneAchats.map((ligneAchat) => ligneAchat.id);
-        console.log('lignes :', lignes);
 
-        let ligneData = [];
+    const fetchLigneAchat = async () => {
+
+        setLoading(true);
         try {
-            // Utilisation de Promise.all pour attendre toutes les réponses en parallèle
-            ligneData = await Promise.all(
-                lignes.map((id) => LigneAchatService.getLigneAchatById(id))
-            );
-            console.log('ligneData :', ligneData);
-            setLigneAchatIds(ligneData); // Mise à jour de l'état après que toutes les données sont récupérées
+            let data = await achatService.getAchatLines(id);
+            console.log('ligneData :', data);
+            setLignesAchats(data.content); // Mise à jour de l'état après que toutes les données sont récupérées
         } catch (err) {
             setError(err);
         } finally {
@@ -67,14 +69,22 @@ const AchatDetail = () => {
     };
 
 
+    const handleDeleteAchat = async () => {
+        await AchatService.deleteAchat(id);
+        navigate('/achats')
+
+    }
+
+
     useEffect(() => {
         fetchAchat();
     }, [id]);
 
+
     // Gestion des modifications du formulaire
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        const {name, value} = e.target;
+        setFormData({...formData, [name]: value});
     };
 
     // Gestion des états
@@ -94,17 +104,61 @@ const AchatDetail = () => {
     }
 
     if (!achat) {
-        return <h1 className="text-warning">Employé introuvable</h1>;
+        return <h1 className="text-warning">Achat introuvable</h1>;
     }
 
+    const handleInputChange = (e) => {
+        const {name, value} = e.target;
+        setFormAddLigne({...formAddLigne, [name]: value});
+    };
+
+    async function createAchatLine() {
+        setLoading(true)
+        try {
+            await LigneAchatService.createLigneAchat(formAddLigne);
+            let prevForm = {...formAddLigne}
+            prevForm.produitId = 0
+            setFormData(prevForm);
+            await fetchAchat()
+            setLoading(false)
+
+        }catch (error) {
+            setError(error);
+        }finally {
+            setIsEditing(false);
+        }
+    }
+
+    const handleSubmitFormAAddLine = async (e) => {
+        e.preventDefault();
+        await createAchatLine();
+    }
+
+    const handleDeleteLigne = async (e, id) => {
+        e.preventDefault();
+        await LigneAchatService.deleteLigneAchat(id)
+
+        await fetchAchat();
+    }
+
+    // Fonction pour gérer la sélection d'un employé
+    const handleEmployeeSelect = (id) => {
+        console.log(id)
+        setFormAddLigne({...formAddLigne, 'produitId': id});
+        setShowModal(false); // Ferme le modal
+    };
+
     return (
-        <div className="container mt-5">
+        <div className="">
+
+            <h1><strong>Details de l'achat</strong></h1>
             {!isEditing ? (
                 <div className="card p-4 shadow">
                     <h3 className="card-title text-center">{achat.nom}</h3>
                     <div className="card-body">
                         <p><strong>Employé :</strong>
-                            <Link to={`/employe/${achat.employe.id}`} className='text-decoration-none'> {achat.employe.nom} - {achat.employe.prenom}</Link>
+                            <Link to={`/employe/${achat.employe.id}`}
+                                  className='text-decoration-none'> {achat.employe.nom} - {achat.employe.prenom}</Link>
                         </p>
                         <p><strong>Montant :</strong> {achat.montantTotal}</p>
                         <p><strong>Date de Création :</strong> {achat.dateCreation}</p>
@@ -122,25 +176,94 @@ const AchatDetail = () => {
                     <Table striped bordered hover>
                         <thead>
                         <tr>
-                            <th>Numéro </th>
+                            <th>Numéro</th>
                             <th>Id Ligne</th>
                             <th>Produit</th>
+                            <th>Nom Produit</th>
                             <th>Prix unitaire</th>
                             <th>Qte</th>
+                            <th>Delete</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {ligneAchatIds.map((ligneAchat, index) => (
-                            <tr key={ligneAchat}>
+                        {lignesAchats.map((ligne, index) => (
+                            <tr key={ligne.id}>
                                 <td>{index + 1}</td>
-                                <td>{ligneAchat.id}</td>
-                                <td> <Link to={`/produits/${ligneAchat.produitId}`} className='text-decoration-none'>{ligneAchat.produitId}</Link></td>
-                                <td>{ligneAchat.prixAchatUnitaire}</td>
-                                <td>{ligneAchat.quantite}</td>
+                                <td>{ligne.id}</td>
+                                <td><Link to={`/produits/${ligne.produitId}`}
+                                          className='text-decoration-none'>{ligne.produitId}</Link></td>
+                                <td>{ligne.nom}</td>
+                                <td>{ligne.prixAchatUnitaire}</td>
+                                <td>{ligne.quantite}</td>
+                                <td className={'justify-content-center align-items-center'}>
+                                    <Button variant={"outline-danger"} className={'w-100'} onClick={(e)=> {
+                                        handleDeleteLigne(e, ligne.id)
+                                    }}> Supprimer 🚮</Button>
+
+                                </td>
                             </tr>
                         ))}
                         </tbody>
                     </Table>
+                    <Form onSubmit={handleSubmitFormAAddLine} className={"mt-5"}>
+                        <Row className="">
+                            <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
+                                <Form.Group className="mb-3">
+                                    <Form.Label className={'fw-bold'}>Produit ID</Form.Label>
+                                    <InputGroup className="mb-3">
+                                        <Form.Control
+                                            type="number"
+                                            value={formAddLigne.produitId}
+                                            onChange={handleInputChange}
+                                            name='produitId'
+                                            className="my-1"
+                                        />
+                                        <Button variant={"outline-info"} onClick={() => {
+                                            setShowModal(true);
+                                        }
+                                        }>
+                                            🔍Search
+                                        </Button>
+                                    </InputGroup>
+                                </Form.Group>
+                            </Col>
+                            <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
+                                <Form.Label className={'fw-bold'}>Quantité</Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    value={formAddLigne.quantite}
+                                    onChange={handleInputChange}
+                                    placeholder="Quantité"
+                                    name='quantite'
+                                    className="my-1"
+                                />
+                            </Col>
+                            <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
+                                <Form.Label className={'fw-bold'}>Prix Unitaire</Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    value={formAddLigne.prixAchatUnitaire}
+                                    onChange={handleInputChange}
+                                    placeholder="Prix unitaire d'achat"
+                                    name='prixAchatUnitaire'
+                                    className="my-1"
+                                />
+                            </Col>
+                        </Row>
+                        <Row className={'justify-content-end mt-3 '}>
+                            <Col xs={"3"}>
+                                <Button variant={"outline-primary"} type={'submit'} className='w-100' >Ajouter
+                                    la ligne ligne</Button>
+                            </Col>
+                        </Row>
+                    </Form>
+                    <hr/>
+                    <Row className={'justify-content-end mt-3 '}>
+                        <Col xs={"3"}>
+                            <Button variant={"danger"} className='w-100' onClick={handleDeleteAchat}>Supprimmer
+                                l'achat</Button>
+                        </Col>
+                    </Row>
                 </div>
             ) : (
                 <div className="card p-4 shadow bg-light">
@@ -187,7 +310,7 @@ const AchatDetail = () => {
                                 id="dateCreation"
                                 name="dateCreation"
                                 className="form-control"
-                                value={formData.dateCreation ?  formData.dateCreation.split("T")[0] : ""}
+                                value={formData.dateCreation ? formData.dateCreation.split("T")[0] : ""}
                                 onChange={handleChange}
                                 placeholder="Entrez la date de création"
                             />
@@ -209,6 +332,16 @@ const AchatDetail = () => {
                     </form>
                 </div>
             )}
+
+            {/* Modal de recherche d'employé */}
+            <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Rechercher un Produit</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <SearchProduitPopup onSelect={handleEmployeeSelect}/>
+                </Modal.Body>
+            </Modal>
         </div>
     );
 };

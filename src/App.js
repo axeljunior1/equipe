@@ -23,6 +23,7 @@ const {panier} = usePanier()
                                 <Nav.Link href="/produits">Produits</Nav.Link>
                                 {/*<Nav.Link href="/creer-produit">Creer Produits</Nav.Link>*/}
                                 <Nav.Link href="/achats">Achats</Nav.Link>
+                                <Nav.Link href="/entree-en-stock">Entree en stock</Nav.Link>
                                 <Nav.Link href="/employe">Employe</Nav.Link>
                                 <Nav.Link href="/panier">Panier 🛒 {panier && panier.length > 0 && (
                                     <span className={'text-primary'}> {panier.length} </span>)} </Nav.Link>

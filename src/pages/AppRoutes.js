@@ -12,6 +12,7 @@ import QRCodeScanner from "../components/QRCodeScanner";
 import EmployeDetail from "./employe/EmployeDetail";
 import NotFound from "./NotFound";
 import BreadcrumbNav from "../components/Breadcrumb";
+import CreateAchatPage from "./CreateAchatPage";
 
 const AppRoutes = () => {
     useEffect(() => {
@@ -25,6 +26,7 @@ const AppRoutes = () => {
                     <Route path="/" element={<Home/>}/>
                     <Route path="/produits" element={<ListProduits/>}/>
                     <Route path="/creer-produit" element={<CreateProductPage/>}/>
+                    <Route path="/entree-en-stock" element={<CreateAchatPage/>}/>
                     <Route path="/produits/:id" element={<ProduitDetail/>}/>
                     <Route path="/achats" element={<Achats/>}/>
                     <Route path="/achats/:id" element={<AchatDetail/>}/>

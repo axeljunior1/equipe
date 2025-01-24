@@ -47,6 +47,7 @@ class ProduitService {
     }
 
     getProduitByMotCle(motCle) {
+
         return axios.get(`${BASE_URL}/recherche?motCle=${motCle}`)
             .then(response => response.data)
             .catch(error => {

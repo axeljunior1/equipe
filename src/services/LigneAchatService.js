@@ -7,13 +7,15 @@ class LigneAchatService {
      * Récupère la liste des ligneAchats.
      * @returns {Promise} Une promesse contenant les données des ligneAchats.
      */
-    getLigneAchats() {
-        return axios.get(BASE_URL)
-            .then(response => response.data)
-            .catch(error => {
+    getLigneAchats = async () => {
+            try {
+                let res = await axios.get(BASE_URL)
+                return res.data;
+                return res.data;
+            }catch(error) {
                 console.error("Erreur lors de la récupération des ligneAchats :", error);
                 throw error;
-            });
+            }
     }
 
     /**
@@ -21,13 +23,14 @@ class LigneAchatService {
      * @param {number} id - L'ID de l'ligneAchat.
      * @returns {Promise} Une promesse contenant les données de l'ligneAchat spécifique.
      */
-    getLigneAchatById(id) {
-        return axios.get(`${BASE_URL}/${id}`)
-            .then(response => response.data)
-            .catch(error => {
-                console.error(`Erreur lors de la récupération de l'ligneAchat avec l'ID ${id} :`, error);
-                throw error;
-            });
+    getLigneAchatById = async (id) => {
+        try{
+            let res = await axios.get(`${BASE_URL}/${id}`)
+            return res.data
+        }catch (error) {
+            console.error(`Erreur lors de la récupération de l'ligneAchat avec l'ID ${id} :`, error);
+            throw error;
+        }
     }
 
     /**
@@ -35,13 +38,16 @@ class LigneAchatService {
      * @param {Object} ligneAchat - Les données de l'ligneAchat à créer.
      * @returns {Promise} Une promesse contenant les données de l'ligneAchat créé.
      */
-    createLigneAchat(ligneAchat) {
-        return axios.post(BASE_URL, ligneAchat)
-            .then(response => response.data)
-            .catch(error => {
-                console.error("Erreur lors de la création de l'ligneAchat :", error);
-                throw error;
-            });
+     createLigneAchat = async (ligneAchat) => {
+        try {
+            let res =  await axios.post(BASE_URL, ligneAchat)
+            return res.data
+        }catch (error) {
+
+            console.error("Erreur lors de la création de l'ligneAchat :", error);
+            throw error;
+        }
+
     }
 
     /**
@@ -64,13 +70,14 @@ class LigneAchatService {
      * @param {number} id - L'ID de l'ligneAchat à supprimer.
      * @returns {Promise} Une promesse confirmant la suppression.
      */
-    deleteLigneAchat(id) {
-        return axios.delete(`${BASE_URL}/${id}`)
-            .then(response => response.data)
-            .catch(error => {
-                console.error(`Erreur lors de la suppression de l'ligneAchat avec l'ID ${id} :`, error);
-                throw error;
-            });
+    deleteLigneAchat = async (id) => {
+       try {
+           let res = await axios.delete(`${BASE_URL}/${id}`)
+           return res.data
+       }catch(error) {
+           console.error(`Erreur lors de la supp de l'ligneAchat avec l'ID ${id} :`, error);
+           throw error;
+       }
     }
 }
 

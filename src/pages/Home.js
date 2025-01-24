@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
 import {useTheme} from "../context/ThemeContext";
 import {Button} from "react-bootstrap";
+import MainForm from "./test/MainForm";
 
 const Home = () => {
     const {theme, toggleTheme} = useTheme();
@@ -17,6 +18,8 @@ const Home = () => {
             }}>
                 Toggle Theme
             </Button>
+
+            <MainForm/>
         </div>
     );
 };

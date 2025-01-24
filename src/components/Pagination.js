@@ -1,33 +1,49 @@
-import Pagination from 'react-bootstrap/Pagination';
-
-
 import React from 'react';
+import {Button, Col, Row} from "react-bootstrap";
 
-const Pagination = () => {
+const Pagination = ({currentPage,pageSize, handlePageChange, handlePageSizeChange, totalPages}) => {
 
-    let active = 2;
-    let items = [];
-    for (let number = 1; number <= 5; number++) {
-        items.push(
-            <Pagination.Item key={number} active={number === active}>
-                {number}
-            </Pagination.Item>,
-        );
-    }
 
     return (
         <div>
-            <Pagination>{items}</Pagination>
-            <br />
+            {/* Pagination controls */}
+            <div className="d-flex justify-content-between">
+                <Button
+                    disabled={currentPage === 0}
+                    onClick={() => handlePageChange(currentPage - 1)}>
+                    Précédent
+                </Button>
 
-            <Pagination size="lg">{items}</Pagination>
-            <br />
+                <div>
+                    Page {currentPage + 1} sur {totalPages}
+                </div>
 
-            <Pagination size="sm">{items}</Pagination>
+                <Button
+                    disabled={currentPage === totalPages - 1}
+                    onClick={() => handlePageChange(currentPage + 1)}>
+                    Suivant
+                </Button>
+            </div>
+
+            {/* Page size selection */}
+            <div className="my-3">
+                <Row>
+                    <Col xs="auto">
+                        <label htmlFor="pageSize">Produits par page:</label>
+                        <select
+                            id="pageSize"
+                            value={pageSize}
+                            onChange={handlePageSizeChange}
+                            className="ml-2 form-control">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                        </select>
+                    </Col>
+                </Row>
+            </div>
         </div>
     );
 };
 
 export default Pagination;
-
-

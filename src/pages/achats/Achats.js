@@ -7,11 +7,19 @@ function Achats() {
     const [achats, setAchats] = useState([]);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        // Charger les achats au chargement du composant
-        AchatService.getAchats()
-            .then(data => setAchats(data))
-            .catch(err => setError(err));
+    async function fetchAchats() {
+        setError(null);
+
+        try {
+            let data = await AchatService.getAchats()
+            setAchats(data.content)
+        } catch (e) {
+            setError(e.response.data);
+        }
+    }
+
+    useEffect( () => {
+         fetchAchats().then(r => {});
     }, []);
 
     const handleAddAchat = () => {
@@ -44,8 +52,8 @@ function Achats() {
 
     return (
         <div>
-            <h1>Gestion des Achats</h1>
-            <button onClick={handleAddAchat}>Ajouter un achat</button>
+            <h1>Achats </h1>
+
 
             <Table striped bordered hover>
                 <thead>
