@@ -28,6 +28,7 @@ const {panier} = usePanier()
                                 <Nav.Link href="/panier">Panier 🛒 {panier && panier.length > 0 && (
                                     <span className={'text-primary'}> {panier.length} </span>)} </Nav.Link>
                                 <Nav.Link href="/qr-code">Code</Nav.Link>
+                                <Nav.Link href="/categories">Categories</Nav.Link>
                             </Nav>
                         </Navbar.Collapse>
                     </Container>

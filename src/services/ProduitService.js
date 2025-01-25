@@ -76,13 +76,15 @@ class ProduitService {
      * @param {Object} produit - Les données de l'produit à créer.
      * @returns {Promise} Une promesse contenant les données de l'produit créé.
      */
-    createProduit(produit) {
-        return axios.post(BASE_URL, produit)
-            .then(response => response.data)
-            .catch(error => {
-                console.error("Erreur lors de la création de l'produit :", error);
-                throw error;
-            });
+    async createProduit(produit) {
+        try {
+            let response = await axios.post(`${BASE_URL}`, produit);
+            return response.data;
+        }catch (error) {
+            console.error("Erreur lors de la création de l'produit :", error);
+            throw error;
+        }
+
     }
 
     /**
@@ -116,13 +118,14 @@ class ProduitService {
      * @param {number} id - L'ID de l'produit à supprimer.
      * @returns {Promise} Une promesse confirmant la suppression.
      */
-    deleteProduit(id) {
-        return axios.delete(`${BASE_URL}/${id}`)
-            .then(response => response.data)
-            .catch(error => {
-                console.error(`Erreur lors de la suppression de l'produit avec l'ID ${id} :`, error);
-                throw error;
-            });
+    async deleteProduit(id) {
+        try {
+            let response = await axios.delete(`${BASE_URL}/${id}`);
+            return response.data;
+        }catch (error) {
+            console.error(`Erreur lors de la suppression de l'produit avec l'ID ${id} :`, error);
+            throw error;
+        }
     }
 }
 

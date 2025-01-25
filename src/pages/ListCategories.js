@@ -1,17 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
 import {Link, useNavigate} from "react-router-dom";
-import ProduitService from "../services/ProduitService";
+import CategorieService from "../services/CategorieService";
 import HeaderBtnElement from "../components/HeaderBtnElement";
 import {Accordion, Button, Col, Container, Form, Row} from "react-bootstrap";
 import {usePanier} from "../context/PanierContext";
 import Pagination from "../components/Pagination";
-import * as PropTypes from "prop-types";
-import SearchProduitCritere from "../components/SearchProduitCritere";
+import SearchCategorieCritere from "../components/SearchCategorieCritere";
 
 
-const ListProduit = () => {
-    const [produits, setProduits] = useState([]);
+const ListCategories = () => {
+    const [categories, setCategories] = useState([]);
     const [searchInput, SetSearchInput] = useState('');
     const [filters, setFilters] = useState({
         nom: "",
@@ -29,12 +28,13 @@ const ListProduit = () => {
     const navigate = useNavigate();
     const {  ajouterAuPanier, dejaPresent, nombreDansPanier } = usePanier();
 
-    // Fonction pour récupérer les produits avec pagination
-    const fetchProduits = async () => {
+    // Fonction pour récupérer les categories avec pagination
+    const fetchCategories = async () => {
         setLoading(true);
+        console.log("test")
         try {
-            let data = await ProduitService.getProduit(currentPage, pageSize);
-            setProduits(data.content);  // Assuming 'content' is the array of products
+            let data = await CategorieService.getCategories(currentPage, pageSize);
+            setCategories(data.content);  // Assuming 'content' is the array of products
             setTotalPages(data.totalPages); // Assuming 'totalPages' is the total page count
         } catch (error) {
             setError(error);
@@ -43,12 +43,12 @@ const ListProduit = () => {
         }
 
     };
-    // Fonction pour récupérer les produits depuis l'API
-    const fetchProduitByMotCle = async () => {
+    // Fonction pour récupérer les categories depuis l'API
+    const fetchCategorieByMotCle = async () => {
         setLoading(true);
         try {
-            let data = await ProduitService.getProduitByMotCle(searchInput);
-            setProduits(data);
+            let data = await CategorieService.getCategorieByMotCle(searchInput);
+            setCategories(data);
         } catch (error) {
             setError(error);
         } finally {
@@ -58,12 +58,12 @@ const ListProduit = () => {
 
 
     // useEffect(() => {
-    //     fetchProduitByMotCle(searchInput).then(r => console.log(r));
+    //     fetchCategorieByMotCle(searchInput).then(r => console.log(r));
     // }, [searchInput]);
 
 
     useEffect(() => {
-        fetchProduits().then(r => null );
+        fetchCategories().then(r => null );
     }, [currentPage, pageSize]);
 
     if (loading) {
@@ -92,8 +92,8 @@ const ListProduit = () => {
         if (filters.prixUnitaireMin) params.prixUnitaireMin = filters.prixUnitaireMin;
         if (filters.prixUnitaireMax) params.prixUnitaireMax = filters.prixUnitaireMax;
 
-        ProduitService.getProduitDyn(params).then(data => {
-            setProduits(data);
+        CategorieService.getCategorieDyn(params).then(data => {
+            setCategories(data);
         }).catch(error => {
             setError(error);
         }).finally(
@@ -104,11 +104,11 @@ const ListProduit = () => {
 
     function handleSubmitSearch(e) {
         e.preventDefault();
-        fetchProduitByMotCle(searchInput).then(r => console.log(r));
+        fetchCategorieByMotCle(searchInput).then(r => console.log(r));
     }
 
-    const handleAjouterAuPanier = (produit) => {
-        ajouterAuPanier({ ...produit, quantite: 1 });
+    const handleAjouterAuPanier = (categorie) => {
+        ajouterAuPanier({ ...categorie, quantite: 1 });
     };
 
     const handlePageChange = (pageNumber) => {
@@ -126,15 +126,15 @@ const ListProduit = () => {
 
     return (
         <div>
-            <h1><strong>Produit</strong></h1>
+            <h1><strong>Categorie</strong></h1>
 
 
-            <HeaderBtnElement titreFil='' variant='outline-primary' onClick={() => navigate('/creer-produit')}
-                              valueBtn='Créer produit' />
+            <HeaderBtnElement titreFil='' variant='outline-primary' onClick={() => navigate('/creer-categorie')}
+                              valueBtn='Créer categorie' />
 
 
 
-            <SearchProduitCritere
+            <SearchCategorieCritere
                 handleSubmitSearch={handleSubmitSearch}
                 searchInput={searchInput}
                 handleSearchInput={handleSearchInput}
@@ -149,25 +149,15 @@ const ListProduit = () => {
                 <tr>
                     <th>Nom</th>
                     <th>Description</th>
-                    <th>Stock initial</th>
-                    <th>Prix Unitaire</th>
-                    <th>Add to Cart 🛒</th>
                 </tr>
                 </thead>
                 <tbody>
-                {produits.map((produit, index) => (
-                    <tr key={produit.id}>
+                {categories.map((categorie, index) => (
+                    <tr key={categorie.id}>
                         <td>
-                            <Link to={`/produits/${produit.id}`} className='text-decoration-none'>{produit.nom}</Link>
+                            <Link to={`/categories/${categorie.id}`} className='text-decoration-none'>{categorie.nom}</Link>
                         </td>
-                        <td>{produit.description}</td>
-                        <td>{produit.stockInitial}</td>
-                        <td>{produit.prixUnitaire}</td>
-                        <td><Button
-                            variant="" className={'w-100 text-primary fw-bold'}
-                            onClick={() => handleAjouterAuPanier(produit)} >
-                            {dejaPresent(produit) ? ( <span> Ajouter (1) au panier 🧺 <span className={'text-danger'}> { nombreDansPanier(produit)} </span> </span> ):( <span>Ajouter au panier 🧺 </span>)}
-                        </Button> </td>
+                        <td>{categorie.description}</td>
                     </tr>
                 ))}
                 </tbody>
@@ -187,4 +177,4 @@ const ListProduit = () => {
     );
 };
 
-export default ListProduit;
+export default ListCategories;

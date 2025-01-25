@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import productService from '../services/produitService'; // Importer le service
+import productService from '../services/ProduitService'; // Importer le service
 
 const ProductsList = () => {
     const [products, setProducts] = useState([]); // État pour stocker les produits

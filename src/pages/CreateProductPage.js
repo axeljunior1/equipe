@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
-import ProduitService from "../services/produitService";
+import ProduitService from "../services/ProduitService";
 
 const CreateProductPage = () => {
     const [formData, setFormData] = useState({

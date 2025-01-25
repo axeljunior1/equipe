@@ -8,6 +8,7 @@ import QRCodeScanner from "../../components/QRCodeScanner";
 const Panier = () => {
     const {panier, ajouterAuPanier ,  retirerDuPanier, calculerTotal} = usePanier();
 
+    //Todo => lors de la modification d'un article, il faut peut-etre mettre a jour les produit dans le panier
 
     const handleAjouterAuPanier = (produit) => {
         ajouterAuPanier({ ...produit, quantite: 1 });

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {Table, Button, Form, Accordion, Container, Row, Col} from "react-bootstrap";
-import ProduitService from "../../services/produitService";
+import ProduitService from "../../services/ProduitService";
 import {Link, useNavigate} from "react-router-dom";
 import {usePanier} from "../../context/PanierContext";
 import Pagination from "../../components/Pagination";

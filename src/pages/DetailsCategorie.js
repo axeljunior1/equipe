@@ -1,44 +1,47 @@
 import React, {useCallback, useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
-import ProduitService from "../services/ProduitService";
-import produitService from "../services/ProduitService";
+import CategorieService from "../services/CategorieService";
+import categorieService from "../services/CategorieService";
 import {usePanier} from "../context/PanierContext";
-import ProduitDetailComp from "../components/ProduitDetailComp";
+import * as PropTypes from "prop-types";
+import CategorieDetailComp from "../components/CategoriesDetailComp";
 
-const ProduitDetail = () => {
+
+
+const CategorieDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
-    const {panier, ajouterAuPanier, dejaPresent, nombreDansPanier} = usePanier();
+    const {panier, ajouterAuPanier} = usePanier();
 
 
-    const [produit, setProduit] = useState(null);
+    const [categorie, setCategorie] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isEditing, setIsEditing] = useState(false); // État pour basculer en mode édition
     const [formData, setFormData] = useState({}); // État pour stocker les modifications
 
-    // Fonction pour récupérer les données d'un produit
-    const fetchProduit = useCallback(async () => {
+    // Fonction pour récupérer les données d'un categorie
+    const fetchCategorie = useCallback(async () => {
         console.log(panier)
         setLoading(true);
         try {
-            const data = await produitService.getProduitsById(id)
+            const data = await categorieService.getCategoriesById(id)
             // console.log(data)
-            setProduit(data);
+            setCategorie(data);
             setFormData(data);
         } catch (error) {
             setError(error);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [id]);
 
-    // Fonction pour mettre à jour un produit (PATCH)
-    const updateProduit = async () => {
+    // Fonction pour mettre à jour un categorie (PATCH)
+    const updateCategorie = async () => {
         setLoading(true);
         setError(null);
         try {
-            let data = await ProduitService.updateProduit(id, formData)
-            setProduit(data);
+            let data = await CategorieService.updateCategorie(id, formData)
+            setCategorie(data);
             setFormData(data);
             setIsEditing(false);
             console.log(data)
@@ -52,7 +55,7 @@ const ProduitDetail = () => {
 
 
     useEffect(() => {
-        fetchProduit()// Appel de la fonction asynchrone
+        fetchCategorie()// Appel de la fonction asynchrone
     }, []);
 
     if (loading) {
@@ -64,8 +67,8 @@ const ProduitDetail = () => {
         return <h1> Une erruer {error}</h1>;
     }
 
-    if (!produit) {
-        return <h1>Produit introuvable</h1>;
+    if (!categorie) {
+        return <h1>Categorie introuvable</h1>;
     }
 
     // Fonction pour gérer les modifications dans le formulaire
@@ -74,38 +77,33 @@ const ProduitDetail = () => {
         setFormData({...formData, [name]: value});
     };
 
-    const handleAjouterAuPanier = () => {
-        // console.log(produit)
-        ajouterAuPanier({...produit, quantite: 1});
+    const handleAjouterAuPanier = (categorie) => {
+        // console.log(categorie)
+        ajouterAuPanier({...categorie, quantite: 1});
     };
 
     function handeIsEditing() {
         console.log('isEditing')
         setIsEditing(true);
     }
-    const onDejaPresent = () =>{
-        return dejaPresent(produit)
-    }
-    const onNombreDansPanier = () =>{
-        return onNombreDansPanier(produit)
-    }
 
     return (
 
         <div className="">
 
-            <h1><strong>Details du Produit</strong></h1>
+            <h1><strong>Details du Categorie</strong></h1>
 
             {!isEditing ? (
 
-                <ProduitDetailComp id ={id} isEditing={handeIsEditing}  />
+                <CategorieDetailComp id ={id} isEditing={handeIsEditing}  />
+                
             ) : (
                 <div className="card p-4 shadow bg-light">
-                    <h3 className="text-center mb-4">Modifier le produit</h3>
+                    <h3 className="text-center mb-4">Modifier le categorie</h3>
                     <form
                         onSubmit={(e) => {
                             e.preventDefault(); // Empêche le rechargement de la page
-                            updateProduit(); // Appelle la fonction de mise à jour
+                            updateCategorie(); // Appelle la fonction de mise à jour
                         }}
                     >
                         {/* Nom */}
@@ -135,33 +133,8 @@ const ProduitDetail = () => {
                                 placeholder="Entrez la description"
                             />
                         </div>
-                        {/* Prénom */}
-                        <div className="mb-3">
-                            <label htmlFor="categorie" className="form-label">Catègorie :</label>
-                            <input
-                                type="text"
-                                id="categorie"
-                                name="categorie"
-                                className="form-control"
-                                value={formData.categorie}
-                                onChange={handleChange}
-                                placeholder="Entrez la description"
-                            />
-                        </div>
 
-                        {/* Date de Création */}
-                        <div className="mb-3">
-                            <label htmlFor="stockInitial" className="form-label">Stock Initial :</label>
-                            <input
-                                type="text"
-                                id="stockInitial"
-                                name="stockInitial"
-                                className="form-control"
-                                value={formData.stockInitial}
-                                onChange={handleChange}
-                                placeholder="Entrez la date de création"
-                            />
-                        </div>
+
 
                         {/* Boutons */}
                         <div className="d-flex justify-content-between">
@@ -185,4 +158,4 @@ const ProduitDetail = () => {
     );
 };
 
-export default ProduitDetail;
+export default CategorieDetail;

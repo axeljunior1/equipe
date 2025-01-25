@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {usePanier} from "../context/PanierContext";
-import produitService from "../services/produitService";
+import produitService from "../services/ProduitService";
 
 const ProduitDetailComp = (props) => {
     const [produit, setProduit] = useState({});

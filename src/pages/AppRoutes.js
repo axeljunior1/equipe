@@ -13,6 +13,8 @@ import EmployeDetail from "./employe/EmployeDetail";
 import NotFound from "./NotFound";
 import BreadcrumbNav from "../components/Breadcrumb";
 import CreateAchatPage from "./CreateAchatPage";
+import ListCategories from "./ListCategories";
+import CategorieDetail from "./DetailsCategorie";
 
 const AppRoutes = () => {
     useEffect(() => {
@@ -30,10 +32,12 @@ const AppRoutes = () => {
                     <Route path="/produits/:id" element={<ProduitDetail/>}/>
                     <Route path="/achats" element={<Achats/>}/>
                     <Route path="/achats/:id" element={<AchatDetail/>}/>
-                    <Route path="/employe" element={<Employe/>}/>
+                    <Route path="/employes" element={<Employe/>}/>
                     <Route path="/panier" element={<Panier/>}/>
                     <Route path="/qr-code" element={<QRCodeScanner/>}/>
-                    <Route path="/employe/:id" element={<EmployeDetail/>}/>
+                    <Route path="/categories" element={<ListCategories/>}/>
+                    <Route path="/employes/:id" element={<EmployeDetail/>}/>
+                    <Route path="/categories/:id" element={<CategorieDetail/>}/>
                     <Route path="*" element={<NotFound/>}/>
                 </Routes>
 

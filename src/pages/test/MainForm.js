@@ -30,6 +30,7 @@ const MainForm = () => {
                         <Form.Control
                             placeholder="Recipient's username"
                             value={employId}
+                            onChange={e => setEmployId(e.target.value)}
                         />
                         <Button onClick={() => {
                             setShowModal(true);
