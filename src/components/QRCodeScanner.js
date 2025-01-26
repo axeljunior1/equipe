@@ -1,8 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Scanner} from '@yudiel/react-qr-scanner';
 import {Card, Col, Row} from "react-bootstrap";
-import produitService from "../services/ProduitService";
-import DetailsProduit from "../pages/DetailsProduit";
 import ProduitDetailComp from "./ProduitDetailComp";
 
 const QRCodeScanner = (props) => {
