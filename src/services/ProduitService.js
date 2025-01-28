@@ -1,6 +1,7 @@
-import axios from 'axios';
+import axiosInstance from "../context/axiosInstance";
 
-const BASE_URL = 'http://localhost:8089/produit';
+
+const BASE_URL = '/produit';
 
 class ProduitService {
     /**
@@ -14,19 +15,18 @@ class ProduitService {
                 .join(',') : '';
 
 
-            const response = await axios.get(BASE_URL, {
+            const response = await axiosInstance.get(BASE_URL, {
                 params: {
                     page: page, // Le numéro de la page (indexé à partir de 0)
                     size: size, // Nombre d'éléments par page
                     sort: sortString, // Champ et direction de tri
+
                 }
             });
             return response.data
         }catch (error) {
             console.error("Erreur lors de la récupération des produit :", error);
             throw error;
-        }finally {
-
         }
 
     }
@@ -38,7 +38,7 @@ class ProduitService {
      */
     async getProduitsById(id) {
         try {
-            let axiosResponse = await axios.get(`${BASE_URL}/${id}`);
+            let axiosResponse = await axiosInstance.get(`${BASE_URL}/${id}`);
             return axiosResponse.data;
         }catch(err) {
             throw err;
@@ -48,7 +48,7 @@ class ProduitService {
 
     getProduitByMotCle(motCle) {
 
-        return axios.get(`${BASE_URL}/recherche?motCle=${motCle}`)
+        return axiosInstance.get(`${BASE_URL}/recherche?motCle=${motCle}`)
             .then(response => response.data)
             .catch(error => {
                 console.error(`Erreur lors de la récupération de l'produit avec l'ID ${motCle} :`, error);
@@ -63,7 +63,7 @@ class ProduitService {
         if(params.description) str+= '&' + 'description=' + params.description;
 
 
-        return axios.get(`${BASE_URL}/recherche-dynamique${str}`)
+        return axiosInstance.get(`${BASE_URL}/recherche-dynamique${str}`)
             .then(response => response.data)
             .catch(error => {
                 console.error(`Erreur lors de la récupération de l'produit avec l'ID ${params.description} - ${params.nom} :`, error);
@@ -78,7 +78,7 @@ class ProduitService {
      */
     async createProduit(produit) {
         try {
-            let response = await axios.post(`${BASE_URL}`, produit);
+            let response = await axiosInstance.post(`${BASE_URL}`, produit);
             return response.data;
         }catch (error) {
             console.error("Erreur lors de la création de l'produit :", error);
@@ -96,7 +96,7 @@ class ProduitService {
     async updateProduit(id, produit) {
         try {
             // Appel de la requête PATCH
-            let updateReponse = await axios.patch(`${BASE_URL}/${id}`, produit);
+            let updateReponse = await axiosInstance.patch(`${BASE_URL}/${id}`, produit);
             return updateReponse.data; // Retour des données mises à jour
         } catch (error) {
             console.error(`Erreur lors de la mise à jour du produit avec l'ID ${id} :`, error);
@@ -120,7 +120,7 @@ class ProduitService {
      */
     async deleteProduit(id) {
         try {
-            let response = await axios.delete(`${BASE_URL}/${id}`);
+            let response = await axiosInstance.delete(`${BASE_URL}/${id}`);
             return response.data;
         }catch (error) {
             console.error(`Erreur lors de la suppression de l'produit avec l'ID ${id} :`, error);

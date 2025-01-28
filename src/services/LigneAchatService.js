@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axiosInstance from "../context/axiosInstance";
 
-const BASE_URL = 'http://localhost:8089/ligneAchat';
+const BASE_URL = '/ligneAchat';
 
 class LigneAchatService {
     /**
@@ -9,7 +9,7 @@ class LigneAchatService {
      */
     getLigneAchats = async () => {
             try {
-                let res = await axios.get(BASE_URL)
+                let res = await axiosInstance.get(BASE_URL)
                 return res.data;
                 return res.data;
             }catch(error) {
@@ -25,7 +25,7 @@ class LigneAchatService {
      */
     getLigneAchatById = async (id) => {
         try{
-            let res = await axios.get(`${BASE_URL}/${id}`)
+            let res = await axiosInstance.get(`${BASE_URL}/${id}`)
             return res.data
         }catch (error) {
             console.error(`Erreur lors de la récupération de l'ligneAchat avec l'ID ${id} :`, error);
@@ -40,7 +40,7 @@ class LigneAchatService {
      */
      createLigneAchat = async (ligneAchat) => {
         try {
-            let res =  await axios.post(BASE_URL, ligneAchat)
+            let res =  await axiosInstance.post(BASE_URL, ligneAchat)
             return res.data
         }catch (error) {
 
@@ -57,7 +57,7 @@ class LigneAchatService {
      * @returns {Promise} Une promesse contenant les données mises à jour.
      */
     updateLigneAchat(id, ligneAchat) {
-        return axios.patch(`${BASE_URL}/${id}`, ligneAchat)
+        return axiosInstance.patch(`${BASE_URL}/${id}`, ligneAchat)
             .then(response => response.data)
             .catch(error => {
                 console.error(`Erreur lors de la mise à jour de l'ligneAchat avec l'ID ${id} :`, error);
@@ -72,7 +72,7 @@ class LigneAchatService {
      */
     deleteLigneAchat = async (id) => {
        try {
-           let res = await axios.delete(`${BASE_URL}/${id}`)
+           let res = await axiosInstance.delete(`${BASE_URL}/${id}`)
            return res.data
        }catch(error) {
            console.error(`Erreur lors de la supp de l'ligneAchat avec l'ID ${id} :`, error);

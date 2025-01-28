@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axiosInstance from "../context/axiosInstance";
 
-const BASE_URL = 'http://localhost:8089/achat';
+const BASE_URL = '/achat';
 
 class AchatService {
     /**
@@ -9,7 +9,7 @@ class AchatService {
      */
     async getAchats() {
         try {
-            let response = await axios.get(BASE_URL)
+            let response = await axiosInstance.get(BASE_URL)
             return response.data;
         } catch (error) {
             console.error("Erreur lors de la récupération des achats :", error);
@@ -24,7 +24,7 @@ class AchatService {
      */
     async getAchatById(id) {
         try {
-            let response = await axios.get(`${BASE_URL}/${id}`)
+            let response = await axiosInstance.get(`${BASE_URL}/${id}`)
             return response.data;
         } catch (error) {
             console.error(`Erreur lors de la récupération de l'achat avec l'ID ${id} :`, error);
@@ -36,7 +36,7 @@ class AchatService {
 
     async getAchatLines(id) {
         try {
-            let response = await axios.get(`${BASE_URL}/${id}/lignes`)
+            let response = await axiosInstance.get(`${BASE_URL}/${id}/lignes`)
             return response.data;
         } catch (error) {
             console.error(`Erreur lors de la récupération des lignes de l'achat avec l'ID ${id} :`, error);
@@ -52,7 +52,7 @@ class AchatService {
      */
     async createAchat(achat) {
         try {
-            let response = await axios.post(`${BASE_URL}`, achat);
+            let response = await axiosInstance.post(`${BASE_URL}`, achat);
             return response.data;
         } catch (error) {
             console.error("Erreur lors de la création de l'achat :", error);
@@ -67,7 +67,7 @@ class AchatService {
      * @returns {Promise} Une promesse contenant les données mises à jour.
      */
     updateAchat(id, achat) {
-        return axios.patch(`${BASE_URL}/${id}`, achat)
+        return axiosInstance.patch(`${BASE_URL}/${id}`, achat)
             .then(response => response.data)
             .catch(error => {
                 console.error(`Erreur lors de la mise à jour de l'achat avec l'ID ${id} :`, error);
@@ -82,7 +82,7 @@ class AchatService {
      */
     async deleteAchat(id) {
         try {
-            let response = await axios.delete(`${BASE_URL}/${id}`)
+            let response = await axiosInstance.delete(`${BASE_URL}/${id}`)
             return response.data;
         } catch (error) {
             console.error(`Erreur lors de la suppression de l'achat avec l'ID ${id} :`, error);

@@ -15,6 +15,8 @@ import BreadcrumbNav from "../components/Breadcrumb";
 import CreateAchatPage from "./CreateAchatPage";
 import ListCategories from "./ListCategories";
 import CategorieDetail from "./DetailsCategorie";
+import LoginForm from "./LoginForm";
+import Redirect from "../components/Redirect";
 
 const AppRoutes = () => {
     useEffect(() => {
@@ -25,7 +27,8 @@ const AppRoutes = () => {
             <div className="container">
 
                 <Routes className="container">
-                    <Route path="/" element={<Home/>}/>
+                    <Route path="/" element={<Redirect/>}/>
+                    <Route path="/home" element={<Home/>}/>
                     <Route path="/produits" element={<ListProduits/>}/>
                     <Route path="/creer-produit" element={<CreateProductPage/>}/>
                     <Route path="/entree-en-stock" element={<CreateAchatPage/>}/>
@@ -38,6 +41,7 @@ const AppRoutes = () => {
                     <Route path="/categories" element={<ListCategories/>}/>
                     <Route path="/employes/:id" element={<EmployeDetail/>}/>
                     <Route path="/categories/:id" element={<CategorieDetail/>}/>
+                    <Route path="/login" element={<LoginForm/>}/>
                     <Route path="*" element={<NotFound/>}/>
                 </Routes>
 

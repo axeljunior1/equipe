@@ -2,11 +2,14 @@ import React, {useEffect} from 'react';
 import {useTheme} from "../context/ThemeContext";
 import {Button} from "react-bootstrap";
 import MainForm from "./test/MainForm";
+import {useJwt} from "../context/JwtContext";
 
 const Home = () => {
     const {theme, toggleTheme} = useTheme();
+    const {jwt} = useJwt();
 
     useEffect(() => {
+        console.log('jwt : ', jwt)
     }, []);
 
     return (

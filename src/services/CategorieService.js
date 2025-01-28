@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axiosInstance from "../context/axiosInstance";
 
-const BASE_URL = 'http://localhost:8089/categories';
+const BASE_URL = '/categories';
 
 class CategorieService {
     /**
@@ -13,7 +13,7 @@ class CategorieService {
             const sortString = sortCriteria ? sortCriteria.map(criterion => `${criterion.field},${criterion.direction}`)
                 .join(',') : '';
 
-            const response = await axios.get(BASE_URL, {
+            const response = await axiosInstance.get(BASE_URL, {
                 params: {
                     page: page, // Le numéro de la page (indexé à partir de 0)
                     size: size, // Nombre d'éléments par page
@@ -37,8 +37,8 @@ class CategorieService {
      */
     async getCategoriesById(id) {
         try {
-            let axiosResponse = await axios.get(`${BASE_URL}/${id}`);
-            return axiosResponse.data;
+            let axiosInstanceResponse = await axiosInstance.get(`${BASE_URL}/${id}`);
+            return axiosInstanceResponse.data;
         }catch(err) {
             throw err;
         }
@@ -47,7 +47,7 @@ class CategorieService {
 
     getCategorieByMotCle(motCle) {
 
-        return axios.get(`${BASE_URL}/recherche?motCle=${motCle}`)
+        return axiosInstance.get(`${BASE_URL}/recherche?motCle=${motCle}`)
             .then(response => response.data)
             .catch(error => {
                 console.error(`Erreur lors de la récupération de l'categorie avec l'ID ${motCle} :`, error);
@@ -62,7 +62,7 @@ class CategorieService {
         if(params.description) str+= '&' + 'description=' + params.description;
 
 
-        return axios.get(`${BASE_URL}/recherche-dynamique${str}`)
+        return axiosInstance.get(`${BASE_URL}/recherche-dynamique${str}`)
             .then(response => response.data)
             .catch(error => {
                 console.error(`Erreur lors de la récupération de l'categorie avec l'ID ${params.description} - ${params.nom} :`, error);
@@ -77,7 +77,7 @@ class CategorieService {
      */
     async createCategorie(categorie) {
         try {
-            let response = await axios.post(`${BASE_URL}`, categorie);
+            let response = await axiosInstance.post(`${BASE_URL}`, categorie);
             return response.data;
         }catch (error) {
             console.error("Erreur lors de la création de la categorie :", error);
@@ -95,7 +95,7 @@ class CategorieService {
     async updateCategorie(id, categorie) {
         try {
             // Appel de la requête PATCH
-            let updateReponse = await axios.patch(`${BASE_URL}/${id}`, categorie);
+            let updateReponse = await axiosInstance.patch(`${BASE_URL}/${id}`, categorie);
             return updateReponse.data; // Retour des données mises à jour
         } catch (error) {
             console.error(`Erreur lors de la mise à jour du categorie avec l'ID ${id} :`, error);
@@ -119,7 +119,7 @@ class CategorieService {
      */
     async deleteCategorie(id) {
         try {
-            let response = await axios.delete(`${BASE_URL}/${id}`);
+            let response = await axiosInstance.delete(`${BASE_URL}/${id}`);
             return response.data;
         }catch (error) {
             console.error(`Erreur lors de la suppression de l'categorie avec l'ID ${id} :`, error);

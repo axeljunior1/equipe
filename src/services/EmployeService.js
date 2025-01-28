@@ -1,6 +1,7 @@
-import axios from 'axios';
+import axiosInstance from "../context/axiosInstance";
 
-const BASE_URL = 'http://localhost:8089/employe';
+
+const BASE_URL = '/employe';
 
 class EmployeService {
     /**
@@ -8,7 +9,7 @@ class EmployeService {
      * @returns {Promise} Une promesse contenant les données des employe.
      */
     getEmploye() {
-        return axios.get(BASE_URL)
+        return axiosInstance.get(BASE_URL)
             .then(response => response.data)
             .catch(error => {
                 console.error("Erreur lors de la récupération des employe :", error);
@@ -22,7 +23,7 @@ class EmployeService {
      * @returns {Promise} Une promesse contenant les données de l'employe spécifique.
      */
     getEmployesById(id) {
-        return axios.get(`${BASE_URL}/${id}`)
+        return axiosInstance.get(`${BASE_URL}/${id}`)
             .then(response => response.data)
             .catch(error => {
                 console.error(`Erreur lors de la récupération de l'employe avec l'ID ${id} :`, error);
@@ -36,7 +37,7 @@ class EmployeService {
      * @returns {Promise} Une promesse contenant les données de l'employe créé.
      */
     createEmploye(employe) {
-        return axios.post(BASE_URL, employe)
+        return axiosInstance.post(BASE_URL, employe)
             .then(response => response.data)
             .catch(error => {
                 console.error("Erreur lors de la création de l'employe :", error);
@@ -51,7 +52,7 @@ class EmployeService {
      * @returns {Promise} Une promesse contenant les données mises à jour.
      */
     updateEmploye(id, employe) {
-        return axios.patch(`${BASE_URL}/${id}`, employe)
+        return axiosInstance.patch(`${BASE_URL}/${id}`, employe)
             .then(response => response.data)
             .catch(error => {
                 console.error(`Erreur lors de la mise à jour de l'employe avec l'ID ${id} :`, error);
@@ -65,7 +66,7 @@ class EmployeService {
      * @returns {Promise} Une promesse confirmant la suppression.
      */
     deleteEmploye(id) {
-        return axios.delete(`${BASE_URL}/${id}`)
+        return axiosInstance.delete(`${BASE_URL}/${id}`)
             .then(response => response.data)
             .catch(error => {
                 console.error(`Erreur lors de la suppression de l'employe avec l'ID ${id} :`, error);
