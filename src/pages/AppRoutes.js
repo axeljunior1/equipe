@@ -20,11 +20,11 @@ const AppRoutes = () => {
     useEffect(() => {
         console.log("AppRoutes loaded");
     }, []);
-    return (
-        <BrowserRouter>
+    return (<>
             <BreadcrumbNav/>
             <div className="container">
-                <Routes className="">
+
+                <Routes className="container">
                     <Route path="/" element={<Home/>}/>
                     <Route path="/produits" element={<ListProduits/>}/>
                     <Route path="/creer-produit" element={<CreateProductPage/>}/>
@@ -42,8 +42,7 @@ const AppRoutes = () => {
                 </Routes>
 
             </div>
-        </BrowserRouter>
-
+        </>
     );
 };
 

@@ -5,13 +5,9 @@ const ThemeContext = createContext();
 export const ThemeProvider = ({children}) => {
     // const [loading, setLoading] = useState(false);
     // const [error, setError] = useState(null);
-    const [theme, setTheme] = useState(()=>{
-        const savedPanier = localStorage.getItem("theme");
-        return savedPanier ? JSON.parse(savedPanier) : 'danger';
-    });
+    const [theme, setTheme] = useState('danger');
     useEffect(() => {
         //     // Sauvegarder le panier dans localStorage à chaque modification
-            localStorage.setItem("theme", JSON.stringify(theme));
     }, [theme]);
 
     console.log("ThemeProvider monté ou mis à jour");

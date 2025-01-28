@@ -2,6 +2,7 @@ import React, {useEffect} from "react";
 import AppRoutes from "./pages/AppRoutes";
 import {Container, Nav, Navbar} from "react-bootstrap";
 import {usePanier} from "./context/PanierContext";
+import {Link} from "react-router-dom";
 
 
 const App = () => {
@@ -16,23 +17,27 @@ const {panier} = usePanier()
             <div className="">
                 <Navbar expand="lg" className="bg-body-tertiary" bg="dark" data-bs-theme="dark">
                     <Container>
-                        <Navbar.Brand href="/">STORE</Navbar.Brand>
+                        <Navbar.Brand as={Link} to="/">STORE</Navbar.Brand>
                         <Navbar.Toggle aria-controls="basic-navbar-nav"/>
                         <Navbar.Collapse id="basic-navbar-nav">
                             <Nav className="me-auto">
-                                <Nav.Link href="/produits">Produits</Nav.Link>
-                                {/*<Nav.Link href="/creer-produit">Creer Produits</Nav.Link>*/}
-                                <Nav.Link href="/achats">Achats</Nav.Link>
-                                <Nav.Link href="/entree-en-stock">Entree en stock</Nav.Link>
-                                <Nav.Link href="/employes">Employe</Nav.Link>
-                                <Nav.Link href="/panier">Panier 🛒 {panier && panier.length > 0 && (
+                                <Nav.Link as={Link} to="/produits">Produits</Nav.Link>
+                                {/*<Nav.Link to="/creer-produit">Creer Produits</Nav.Link>*/}
+                                <Nav.Link as={Link} to="/achats">Achats</Nav.Link>
+                                <Nav.Link as={Link} to="/entree-en-stock">Entree en stock</Nav.Link>
+                                <Nav.Link as={Link} to="/employes">Employe</Nav.Link>
+                                <Nav.Link as={Link} to="/panier">Panier 🛒 {panier && panier.length > 0 && (
                                     <span className={'text-primary'}> {panier.length} </span>)} </Nav.Link>
-                                <Nav.Link href="/qr-code">Code</Nav.Link>
-                                <Nav.Link href="/categories">Categories</Nav.Link>
+                                <Nav.Link as={Link} to="/qr-code">Code</Nav.Link>
+                                <Nav.Link as={Link} to="/categories">Categories</Nav.Link>
                             </Nav>
                         </Navbar.Collapse>
                     </Container>
                 </Navbar>
+
+
+
+
 
                 <AppRoutes/>
             </div>

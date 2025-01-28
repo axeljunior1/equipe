@@ -9,15 +9,12 @@ export const usePanier = () => useContext(PanierContext);
 // Composant Provider qui encapsule l'ensemble de l'application
 export const PanierProvider = ({ children }) => {
 
-    const [panier, setPanier] = useState(() => {
-        // Récupérer les données du panier depuis localStorage si elles existent
-        const savedPanier = localStorage.getItem("panier");
-        return savedPanier ? JSON.parse(savedPanier) : [];
-    });
+    const [panier, setPanier] = useState([]);
 
     useEffect(() => {
+        console.log("Le panier a changé");
+        console.log(panier);
         // Sauvegarder le panier dans localStorage à chaque modification
-        localStorage.setItem("panier", JSON.stringify(panier));
     }, [panier]);
 
     const dejaPresent = (produit) =>{

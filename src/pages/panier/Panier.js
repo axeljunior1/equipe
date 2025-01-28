@@ -41,10 +41,10 @@ const Panier = () => {
                                     <Col xs={"2"}>{item.quantite}</Col>
                                     <Col xs={"10"}>
                                         <Button
-                                            variant="outline-secondary" className='w-100 text-primary fw-bold '
+                                            variant="outline-secondary" className='w-100 fw-bold '
                                             onClick={() => handleAjouterAuPanier(item)}
                                         >
-                                            ➕
+                                            Ajouter 1
                                         </Button>
                                     </Col>
                                 </Row>
