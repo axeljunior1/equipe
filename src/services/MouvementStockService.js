@@ -46,6 +46,29 @@ class MouvementStockService {
 
     }
 
+    async getMouvementStocksByProduitId(id, page = 0 ,size = 5, sortCriteria) {
+        try {
+            // Créer une chaîne de tri basée sur `sortCriteria`, qui est un tableau d'objets
+            const sortString = sortCriteria ? sortCriteria.map(criterion => `${criterion.field},${criterion.direction}`)
+                .join(',') : '';
+
+            let axiosResponse = await axiosInstance.get(`${BASE_URL}/produit/${id}`, {
+                params: {
+                    page: page, // Le numéro de la page (indexé à partir de 0)
+                    size: size, // Nombre d'éléments par page
+                    sort: sortString, // Champ et direction de tri
+
+                }
+            });
+            return axiosResponse.data;
+        }catch(err) {
+            throw err;
+        }
+
+    }
+
+
+
     getMouvementStockByMotCle(motCle) {
 
         return axiosInstance.get(`${BASE_URL}/recherche?motCle=${motCle}`)

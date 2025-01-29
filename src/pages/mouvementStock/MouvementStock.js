@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
-import {Link, useNavigate} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {Button, Pagination} from "react-bootstrap";
 import MouvementStockService from "../../services/MouvementStockService";
 import HeaderBtnElement from "../../components/HeaderBtnElement";
@@ -9,6 +9,7 @@ import SearchMouvementStockCritere from "../../components/SearchMouvementStockCr
 
 
 const MouvementStock = () => {
+    const {id} = useParams(); // Récupère l'ID depuis l'URL
     const [mouvementStocks, setMouvementStocks] = useState([]);
     const [searchInput, SetSearchInput] = useState('');
     const [filters, setFilters] = useState({
@@ -18,7 +19,7 @@ const MouvementStock = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(0); // Page actuelle
-    const [pageSize, setPageSize] = useState(5); // Taille de la page
+    const [pageSize, setPageSize] = useState(99); // Taille de la page
     const [totalPages, setTotalPages] = useState(0); // Nombre total de pages
     const navigate = useNavigate();
     const {  ajouterAuPanier, dejaPresent, nombreDansPanier } = usePanier();
@@ -27,7 +28,12 @@ const MouvementStock = () => {
     const fetchMouvementStocks = async () => {
         setLoading(true);
         try {
-            let data = await MouvementStockService.getMouvementStock(currentPage, pageSize);
+            let data = {}
+            if (!id) {
+                 data = await MouvementStockService.getMouvementStock(currentPage, pageSize);
+            }else{
+                data = await MouvementStockService.getMouvementStocksByProduitId(id, currentPage, pageSize);
+            }
             setMouvementStocks(data.content);
             setTotalPages(data.totalPages); 
         } catch (error) {
@@ -116,7 +122,7 @@ const MouvementStock = () => {
 
     return (
         <div>
-            <h1><strong>MouvementStock</strong></h1>
+            <h1><strong>Mouvement de Stock {id} </strong></h1>
 
 
             <HeaderBtnElement titreFil='' variant='outline-primary' onClick={() => navigate('/creer-mouvementStock')}
@@ -151,7 +157,10 @@ const MouvementStock = () => {
                         <td>
                             <Link to={`/mouvementStocks/${mouvementStock.id}`} className='text-decoration-none'>{mouvementStock.reference}</Link>
                         </td>
-                        <td>{mouvementStock.produitId} - {mouvementStock.produitNom}</td>
+                        <td>
+                            <Link to={`/produits/${mouvementStock.produitId}`} className='text-decoration-none'>{mouvementStock.produitId} - {mouvementStock.produitNom}</Link>
+                        </td>
+
                         <td>{mouvementStock.quantite}</td>
                         <td>{mouvementStock.typeMouvementCode}</td>
                         <td>{mouvementStock.dateMouvement.substring(0,10)}</td>

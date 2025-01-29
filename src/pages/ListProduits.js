@@ -23,7 +23,7 @@ const ListProduit = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(0); // Page actuelle
-    const [pageSize, setPageSize] = useState(5); // Taille de la page
+    const [pageSize, setPageSize] = useState(15); // Taille de la page
     const [totalPages, setTotalPages] = useState(0); // Nombre total de pages
     const navigate = useNavigate();
     const {  ajouterAuPanier, dejaPresent, nombreDansPanier } = usePanier();
@@ -148,8 +148,9 @@ const ListProduit = () => {
                 <tr>
                     <th>Nom</th>
                     <th>Description</th>
-                    <th>Stock initial</th>
                     <th>Prix Unitaire</th>
+                    <th>Stock initial</th>
+                    <th>Stock Courant</th>
                     <th>Add to Cart 🛒</th>
                 </tr>
                 </thead>
@@ -160,8 +161,9 @@ const ListProduit = () => {
                             <Link to={`/produits/${produit.id}`} className='text-decoration-none'>{produit.nom}</Link>
                         </td>
                         <td>{produit.description}</td>
-                        <td>{produit.stockInitial}</td>
                         <td>{produit.prixUnitaire}</td>
+                        <td>{produit.stockInitial}</td>
+                        <td>{produit.stockCourant}</td>
                         <td><Button
                             variant="" className={'w-100 text-primary fw-bold'}
                             onClick={() => handleAjouterAuPanier(produit)} >

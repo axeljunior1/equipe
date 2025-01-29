@@ -8,7 +8,7 @@ class ProduitService {
      * Récupère la liste des produit.
      * @returns {Promise} Une promesse contenant les données des produit.
      */
-    async getProduit(page = 0 ,size = 5, sortCriteria) {
+    async getProduit(page = 0 ,size = 15, sortCriteria) {
         try {
             // Créer une chaîne de tri basée sur `sortCriteria`, qui est un tableau d'objets
             const sortString = sortCriteria ? sortCriteria.map(criterion => `${criterion.field},${criterion.direction}`)

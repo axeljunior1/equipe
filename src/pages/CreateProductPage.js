@@ -1,7 +1,9 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import ProduitService from "../services/ProduitService";
+import * as categories from "react-bootstrap/ElementChildren";
+import CategorieService from "../services/CategorieService";
 
 const CreateProductPage = () => {
     const [formData, setFormData] = useState({
@@ -10,14 +12,15 @@ const CreateProductPage = () => {
         image: '',
         quantity: 0,
         prixUnitaire: 0,
-        categorie: '',
+        categorieId: '',
         qrCode: [''],
         stockInitial: 0
+
     });
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-
+    const [categories, setCategories] = useState([]);
     // Gestion des modifications du formulaire
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -25,6 +28,19 @@ const CreateProductPage = () => {
             ...formData,
             [name]: value
         });
+    };
+
+    const fetchCategories = async () => {
+        setLoading(true);
+        try {
+            let data = await CategorieService.getCategories(0, 50);
+            setCategories(data.content);  // Assuming 'content' is the array of products
+        } catch (error) {
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
+
     };
 
     // Fonction pour soumettre les données à l'API
@@ -41,6 +57,14 @@ const CreateProductPage = () => {
 
 
     };
+
+    function handleChangeSelect(e) {
+        const { name, value } = e.target;
+    }
+
+    useEffect(() => {
+        fetchCategories().then(response => response);
+    },[])
 
     return (
         <div className="container mt-5">
@@ -102,16 +126,17 @@ const CreateProductPage = () => {
                     />
                 </Form.Group>
 
-                <Form.Group className="mb-3">
-                    <Form.Label>Catégorie</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="categorie"
-                        value={formData.categorie}
-                        onChange={handleChange}
-                        placeholder="Entrez la catégorie"
-                    />
-                </Form.Group>
+                <Form.Select aria-label="Default select example"
+                             name="categorieId"
+                             value={formData.categorieId}
+                             onChange={handleChange}
+                             placeholder="Entrez la catégorie">
+                    <option>Catégorie</option>
+                    <>
+                    {categories.map((item) => (
+                        <option key={item.id} value={item.id}>{item.nom}</option>
+                    ))}</>
+                </Form.Select>
 
                 <Form.Group className="mb-3">
                     <Form.Label>QR Code</Form.Label>

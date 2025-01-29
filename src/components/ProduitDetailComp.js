@@ -39,7 +39,7 @@ const ProduitDetailComp = (props) => {
             <div className="card-body">
                 <p><strong>Prix :</strong> {produit.prixUnitaire} €</p>
                 <p><strong>Description :</strong> {produit.description}</p>
-                <p><strong>Catégorie :</strong> {produit.categorie}</p>
+                <p><strong>Catégorie :</strong> {produit.categorieNom}</p>
                 <p><strong>Stock initial :</strong> {produit.stockInitial}</p>
                 {produit.qrCode && (
                     <div>
@@ -53,12 +53,24 @@ const ProduitDetailComp = (props) => {
                 )}
             </div>
             <div className="d-flex justify-content-center">
-                {props.isEditing && <button
-                    className="btn btn-outline-primary me-2 fw-bold"
-                    onClick={() => props.isEditing()}
-                >
-                    Modifier
-                </button>}
+                {/*Il n'est plus necessaire car c'est testé dans le parent*/}
+
+                {props.isEditing &&
+                    <>
+                        <button
+                            className="btn btn-outline-primary me-2 fw-bold"
+                            onClick={() => props.handleStockProduit(produit.id)}
+                        >
+                            Stock du produit
+                        </button>
+                        <button
+                            className="btn btn-outline-primary me-2 fw-bold"
+                            onClick={() => props.isEditing()}
+                        >
+                            Modifier
+                        </button>
+                    </>
+                }
                 <button
                     className="btn btn-outline-primary me-2 fw-bold"
                     onClick={() => handleAjouterAuPanier(produit)}

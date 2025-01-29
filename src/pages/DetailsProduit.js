@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import ProduitService from "../services/ProduitService";
 import produitService from "../services/ProduitService";
 import {usePanier} from "../context/PanierContext";
@@ -8,13 +8,24 @@ import ProduitDetailComp from "../components/ProduitDetailComp";
 const ProduitDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
     const {panier, ajouterAuPanier, dejaPresent, nombreDansPanier} = usePanier();
+    const navigate = useNavigate();
+
+    let initialFormDetailProduit = {
+        nom : "",
+        prixUnitaire : 0,
+        description : "",
+        categorieNom : "",
+        categorieId : 0,
+        stockInitial : 0,
+        qrCode : ""
+    };
 
 
     const [produit, setProduit] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isEditing, setIsEditing] = useState(false); // État pour basculer en mode édition
-    const [formData, setFormData] = useState({}); // État pour stocker les modifications
+    const [formData, setFormData] = useState(initialFormDetailProduit); // État pour stocker les modifications
 
     // Fonction pour récupérer les données d'un produit
     const fetchProduit = useCallback(async () => {
@@ -89,6 +100,9 @@ const ProduitDetail = () => {
     const onNombreDansPanier = () =>{
         return onNombreDansPanier(produit)
     }
+    const handleStockProduit = (id) =>{
+        navigate(`/mouvements-stock/produit/${id}`);
+    }
 
     return (
 
@@ -98,7 +112,7 @@ const ProduitDetail = () => {
 
             {!isEditing ? (
 
-                <ProduitDetailComp id ={id} isEditing={handeIsEditing}  />
+                <ProduitDetailComp id ={id} isEditing={handeIsEditing}  handleStockProduit = {handleStockProduit} />
             ) : (
                 <div className="card p-4 shadow bg-light">
                     <h3 className="text-center mb-4">Modifier le produit</h3>
@@ -143,7 +157,7 @@ const ProduitDetail = () => {
                                 id="categorie"
                                 name="categorie"
                                 className="form-control"
-                                value={formData.categorie}
+                                value={formData.categorieNom}
                                 onChange={handleChange}
                                 placeholder="Entrez la description"
                             />
