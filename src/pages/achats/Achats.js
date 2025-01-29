@@ -22,12 +22,6 @@ function Achats() {
          fetchAchats().then(r => {});
     }, []);
 
-    const handleAddAchat = () => {
-        const newAchat = { nom: 'Achat Test', montant: 200 };
-        AchatService.createAchat(newAchat)
-            .then(data => setAchats([...achats, data]))
-            .catch(err => setError(err));
-    };
 
     const handleUpdateAchat = (id) => {
         const updatedData = { montant: 300 };
@@ -61,8 +55,8 @@ function Achats() {
                     <th></th>
                     <th>Nom</th>
                     <th>Montant</th>
-                    <th>Client</th>
-                    <th>Employe</th>
+                    <th>Date de création/modification</th>
+                    <th>Employé</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -73,9 +67,9 @@ function Achats() {
                             <Link to={`/achats/${achat.id}`} className='text-decoration-none'>{'Achat'}</Link>
                         </td>
                         <td>{achat.montantTotal}</td>
-                        <td>{achat.client}</td>
+                        <td>{achat.dateCreation}</td>
                         <td>
-                            <Link to={`/employe/${achat.employeId}`} className='text-decoration-none'>{achat.employeId}</Link>
+                            <Link to={`/employes/${achat.employeId}`} className='text-decoration-none'>{achat.employeId} - {achat.employeNom}</Link>
                         </td>
                     </tr>
                 ))}

@@ -19,7 +19,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response && (error.response.status === 401 || error.response.status === 403 )) {
+        if (error.response && (error.response.status === 401 )) {
 
             // Récupérer l'URL demandée depuis localStorage
             const requestedUrl = localStorage.getItem("requestedUrl") || "/"; // Valeur par défaut si non trouvée

@@ -1,6 +1,6 @@
 import axiosInstance from "../context/axiosInstance";
 
-const BASE_URL = '/ligneAchat';
+const BASE_URL = '/ligneAchats';
 
 class LigneAchatService {
     /**

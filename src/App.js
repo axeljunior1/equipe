@@ -39,7 +39,9 @@ const App = () => {
                                 {jwt !== "" && (<>
                                     <Nav.Link as={Link} to="/produits">Produits</Nav.Link>
                                     <Nav.Link as={Link} to="/achats">Achats</Nav.Link>
-                                    <Nav.Link as={Link} to="/entree-en-stock">Entree en stock</Nav.Link>
+                                    <Nav.Link as={Link} to="/ventes">Ventes</Nav.Link>
+                                    <Nav.Link as={Link} to="/mouvements-stock">Mouvements stocks</Nav.Link>
+                                    <Nav.Link as={Link} to="/entrees-en-stock">Entree en stock</Nav.Link>
                                     <Nav.Link as={Link} to="/employes">Employe</Nav.Link>
                                     <Nav.Link as={Link} to="/panier">Panier 🛒 {panier && panier.length > 0 && (
                                         <span className={'text-primary'}> {panier.length} </span>)} </Nav.Link>

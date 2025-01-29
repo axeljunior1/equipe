@@ -1,7 +1,7 @@
 import axiosInstance from "../context/axiosInstance";
 
 
-const BASE_URL = '/employe';
+const BASE_URL = '/employes';
 
 class EmployeService {
     /**

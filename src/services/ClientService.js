@@ -1,14 +1,14 @@
 import axiosInstance from "../context/axiosInstance";
 
 
-const BASE_URL = '/produits';
+const BASE_URL = '/clients';
 
-class ProduitService {
+class ClientService {
     /**
-     * Récupère la liste des produit.
-     * @returns {Promise} Une promesse contenant les données des produit.
+     * Récupère la liste des client.
+     * @returns {Promise} Une promesse contenant les données des client.
      */
-    async getProduit(page = 0 ,size = 5, sortCriteria) {
+    async getClient(page = 0 ,size = 5, sortCriteria) {
         try {
             // Créer une chaîne de tri basée sur `sortCriteria`, qui est un tableau d'objets
             const sortString = sortCriteria ? sortCriteria.map(criterion => `${criterion.field},${criterion.direction}`)
@@ -25,18 +25,18 @@ class ProduitService {
             });
             return response.data
         }catch (error) {
-            console.error("Erreur lors de la récupération des produit :", error);
+            console.error("Erreur lors de la récupération des clients :", error);
             throw error;
         }
 
     }
 
     /**
-     * Récupère les détails d'un produit spécifique par son ID.
-     * @param {string} id - L'ID de l'produit.
-     * @returns {Promise} Une promesse contenant les données de l'produit spécifique.
+     * Récupère les détails d'un client spécifique par son ID.
+     * @param {string} id - L'ID de l'client.
+     * @returns {Promise} Une promesse contenant les données de l'client spécifique.
      */
-    async getProduitsById(id) {
+    async getClientsById(id) {
         try {
             let axiosResponse = await axiosInstance.get(`${BASE_URL}/${id}`);
             return axiosResponse.data;
@@ -46,18 +46,18 @@ class ProduitService {
 
     }
 
-    getProduitByMotCle(motCle) {
+    getClientByMotCle(motCle) {
 
         return axiosInstance.get(`${BASE_URL}/recherche?motCle=${motCle}`)
             .then(response => response.data)
             .catch(error => {
-                console.error(`Erreur lors de la récupération de l'produit avec l'ID ${motCle} :`, error);
+                console.error(`Erreur lors de la récupération de l'client avec l'ID ${motCle} :`, error);
                 throw error;
             });
     }
 
 
-    getProduitDyn(params) {
+    getClientDyn(params) {
         let str = '?'
         if(params.nom) str+= 'nom=' + params.nom;
         if(params.description) str+= '&' + 'description=' + params.description;
@@ -66,44 +66,44 @@ class ProduitService {
         return axiosInstance.get(`${BASE_URL}/recherche-dynamique${str}`)
             .then(response => response.data)
             .catch(error => {
-                console.error(`Erreur lors de la récupération de l'produit avec l'ID ${params.description} - ${params.nom} :`, error);
+                console.error(`Erreur lors de la récupération de l'client avec l'ID ${params.description} - ${params.nom} :`, error);
                 throw error;
             });
     }
 
     /**
-     * Crée un nouvel produit.
-     * @param {Object} produit - Les données de l'produit à créer.
-     * @returns {Promise} Une promesse contenant les données de l'produit créé.
+     * Crée un nouvel client.
+     * @param {Object} client - Les données de l'client à créer.
+     * @returns {Promise} Une promesse contenant les données de l'client créé.
      */
-    async createProduit(produit) {
+    async createClient(client) {
         try {
-            let response = await axiosInstance.post(`${BASE_URL}`, produit);
+            let response = await axiosInstance.post(`${BASE_URL}`, client);
             return response.data;
         }catch (error) {
-            console.error("Erreur lors de la création de l'produit :", error);
+            console.error("Erreur lors de la création de l'client :", error);
             throw error;
         }
 
     }
 
     /**
-     * Met à jour un produit existant (partiellement) via son ID.
-     * @param {String} id - L'ID de l'produit à mettre à jour.
-     * @param {Object} produit - Les données à mettre à jour.
+     * Met à jour un client existant (partiellement) via son ID.
+     * @param {String} id - L'ID de l'client à mettre à jour.
+     * @param {Object} client - Les données à mettre à jour.
      * @returns {Promise} Une promesse contenant les données mises à jour.
      */
-    async updateProduit(id, produit) {
+    async updateClient(id, client) {
         try {
             // Appel de la requête PATCH
-            let updateReponse = await axiosInstance.patch(`${BASE_URL}/${id}`, produit);
+            let updateReponse = await axiosInstance.patch(`${BASE_URL}/${id}`, client);
             return updateReponse.data; // Retour des données mises à jour
         } catch (error) {
-            console.error(`Erreur lors de la mise à jour du produit avec l'ID ${id} :`, error);
+            console.error(`Erreur lors de la mise à jour du client avec l'ID ${id} :`, error);
 
             // Différenciation des erreurs pour une meilleure gestion
             if (error.response && error.response.status === 404) {
-                throw new Error(`Produit avec l'ID ${id} introuvable.`);
+                throw new Error(`Client avec l'ID ${id} introuvable.`);
             } else if (error.response && error.response.status === 400) {
                 throw new Error(`Erreur de validation : ${error.response.data.message || 'Données invalides.'}`);
             } else {
@@ -114,19 +114,19 @@ class ProduitService {
 
 
     /**
-     * Supprime un produit via son ID.
-     * @param {number} id - L'ID de l'produit à supprimer.
+     * Supprime un client via son ID.
+     * @param {number} id - L'ID de l'client à supprimer.
      * @returns {Promise} Une promesse confirmant la suppression.
      */
-    async deleteProduit(id) {
+    async deleteClient(id) {
         try {
             let response = await axiosInstance.delete(`${BASE_URL}/${id}`);
             return response.data;
         }catch (error) {
-            console.error(`Erreur lors de la suppression de l'produit avec l'ID ${id} :`, error);
+            console.error(`Erreur lors de la suppression de l'client avec l'ID ${id} :`, error);
             throw error;
         }
     }
 }
 
-export default new ProduitService();
+export default new ClientService();

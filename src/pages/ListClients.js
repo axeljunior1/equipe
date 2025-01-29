@@ -3,9 +3,10 @@ import Table from "react-bootstrap/Table";
 import {Link, useNavigate} from "react-router-dom";
 import ProduitService from "../services/ProduitService";
 import HeaderBtnElement from "../components/HeaderBtnElement";
-import {Button} from "react-bootstrap";
+import {Accordion, Button, Col, Container, Form, Row} from "react-bootstrap";
 import {usePanier} from "../context/PanierContext";
 import Pagination from "../components/Pagination";
+import * as PropTypes from "prop-types";
 import SearchProduitCritere from "../components/SearchProduitCritere";
 
 
@@ -32,7 +33,7 @@ const ListProduit = () => {
     const fetchProduits = async () => {
         setLoading(true);
         try {
-            let data = await ProduitService.getProduit(currentPage, pageSize); // on peut ajouter des critères de filtre (nom : desc, description : asc)
+            let data = await ProduitService.getProduit(currentPage, pageSize);
             setProduits(data.content);  // Assuming 'content' is the array of products
             setTotalPages(data.totalPages); // Assuming 'totalPages' is the total page count
         } catch (error) {

@@ -1,17 +1,17 @@
 import React, {useEffect, useState} from "react";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import AchatService from "../../services/AchatService";
-import achatService from "../../services/AchatService";
+import VenteService from "../../services/VenteService";
+import venteService from "../../services/VenteService";
 import Table from "react-bootstrap/Table";
-import LigneAchatService from "../../services/LigneAchatService";
+import LigneVenteService from "../../services/LigneVenteService";
 import {Button, Col, Form, Modal, Row} from "react-bootstrap";
 import InputGroup from "react-bootstrap/InputGroup";
 import SearchProduitPopup from "../test/SearchProduitPopup";
 
-const AchatDetail = () => {
+const VenteDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
-    const [achat, setAchat] = useState(null);
-    const [lignesAchats, setLignesAchats] = useState([]);
+    const [vente, setVente] = useState(null);
+    const [lignesVentes, setLignesVentes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isEditing, setIsEditing] = useState(false); // État pour le mode édition
@@ -20,9 +20,9 @@ const AchatDetail = () => {
     const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
 
     let initFormAddLigne = {
-        "prixAchatUnitaire": 0,
+        "prixVenteUnitaire": 0,
         "quantite": 0,
-        "achatId": id,
+        "venteId": id,
         "produitId": 0,
         "produitNom": ""
     }
@@ -30,13 +30,13 @@ const AchatDetail = () => {
 
 
     // Fonction pour récupérer les données de l'employé
-    const fetchAchat = async () => {
+    const fetchVente = async () => {
         setLoading(true);
         try {
-            let data = await AchatService.getAchatById(id)
-            setAchat(data)
-            await fetchLigneAchat(data)
-            // setFormData(data) // Pré-remplit le formulaire
+            let data = await VenteService.getVenteById(id)
+            setVente(data)
+            await fetchLigneVente(data)
+            setFormData(data) // Pré-remplit le formulaire
         } catch (err) {
             setError(err);
         } finally {
@@ -45,9 +45,9 @@ const AchatDetail = () => {
     };
 
     // Fonction pour mettre à jour les données de l'employé
-    const updateAchat = async () => {
-        AchatService.updateAchat(id, formData).then(data => {
-            setAchat(data)
+    const updateVente = async () => {
+        VenteService.updateVente(id, formData).then(data => {
+            setVente(data)
             setFormData(data);
             setIsEditing(false);
         }).catch(err => setError('Une erreur est survenue lors de la mise à jour de l\'employé' + err));
@@ -55,13 +55,13 @@ const AchatDetail = () => {
     };
 
 
-    const fetchLigneAchat = async () => {
+    const fetchLigneVente = async () => {
 
         setLoading(true);
         try {
-            let data = await achatService.getAchatLines(id);
+            let data = await venteService.getVenteLines(id);
             console.log('ligneData :', data);
-            setLignesAchats(data.content); // Mise à jour de l'état après que toutes les données sont récupérées
+            setLignesVentes(data.content); // Mise à jour de l'état après que toutes les données sont récupérées
         } catch (err) {
             setError(err);
         } finally {
@@ -70,15 +70,15 @@ const AchatDetail = () => {
     };
 
 
-    const handleDeleteAchat = async () => {
-        await AchatService.deleteAchat(id);
-        navigate('/achats')
+    const handleDeleteVente = async () => {
+        await VenteService.deleteVente(id);
+        navigate('/ventes')
 
     }
 
 
     useEffect(() => {
-        fetchAchat();
+        fetchVente();
     }, [id]);
 
 
@@ -104,8 +104,8 @@ const AchatDetail = () => {
         return <h1 className="text-danger">{error}</h1>;
     }
 
-    if (!achat) {
-        return <h1 className="text-warning">Achat introuvable</h1>;
+    if (!vente) {
+        return <h1 className="text-warning">Vente introuvable</h1>;
     }
 
     const handleInputChange = (e) => {
@@ -113,12 +113,11 @@ const AchatDetail = () => {
         setFormAddLigne({...formAddLigne, [name]: value});
     };
 
-    async function createAchatLine() {
+    async function createVenteLine() {
         setLoading(true)
         try {
-            await LigneAchatService.createLigneAchat(formAddLigne);
+            await LigneVenteService.createLigneVente(formAddLigne);
             setFormAddLigne({...formAddLigne, 'produitId': 0, "produitNom": "" });
-            fetchAchat();
         } catch (error) {
             setError(error);
         } finally {
@@ -130,36 +129,36 @@ const AchatDetail = () => {
 
     const handleSubmitFormAAddLine = async (e) => {
         e.preventDefault();
-        await createAchatLine();
+        await createVenteLine();
     }
 
     const handleDeleteLigne = async (e, id) => {
         e.preventDefault();
-        await LigneAchatService.deleteLigneAchat(id)
+        await LigneVenteService.deleteLigneVente(id)
 
-        await fetchAchat();
+        await fetchVente();
     }
 
     // Fonction pour gérer la sélection d'un employé
     const handleEmployeeSelect = (id, nom, prixUnitaire) => {
-        setFormAddLigne({...formAddLigne, 'produitId': id, "produitNom": nom, prixAchatUnitaire: prixUnitaire});
+        setFormAddLigne({...formAddLigne, 'produitId': id, "produitNom": nom, prixVenteUnitaire: prixUnitaire});
         setShowModal(false); // Ferme le modal
     };
 
     return (
         <div className="">
 
-            <h1><strong>Details de l'achat</strong></h1>
+            <h1><strong>Details de l'vente</strong></h1>
             {!isEditing ? (
                 <div className="card p-4 shadow">
-                    <h3 className="card-title text-center">{achat.nom}</h3>
+                    <h3 className="card-title text-center">{vente.nom}</h3>
                     <div className="card-body">
                         <p><strong>Employé :</strong>
-                            <Link to={`/employes/${achat.employe.id}`}
-                                  className='text-decoration-none'> {achat.employe.nom} - {achat.employe.prenom}</Link>
+                            <Link to={`/employes/${vente.employe.id}`}
+                                  className='text-decoration-none'> {vente.employe.nom} - {vente.employe.prenom}</Link>
                         </p>
-                        <p><strong>Montant :</strong> {achat.montantTotal}</p>
-                        <p><strong>Date de Création :</strong> {achat.dateCreation}</p>
+                        <p><strong>Montant :</strong> {vente.montantTotal}</p>
+                        <p><strong>Date de Création :</strong> {vente.dateCreation}</p>
                     </div>
                     <div className="d-flex justify-content-center">
                         <button
@@ -170,8 +169,8 @@ const AchatDetail = () => {
                         </button>
                     </div>
                     <br/>
-                    <h3> Lignes de l'achat</h3>
-                    <Table striped bordered hover>
+                    <h3> Lignes de l'vente</h3>
+                    <Table striped bordered hover className={"mt-2"}>
                         <thead>
                         <tr>
                             <th>Numéro</th>
@@ -182,7 +181,7 @@ const AchatDetail = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        {lignesAchats.map((ligne, index) => (
+                        {lignesVentes.map((ligne, index) => (
                             <tr key={ligne.id}>
                                 <td>{index + 1}</td>
                                 <td><Link to={`/produits/${ligne.produitId}`}
@@ -238,10 +237,10 @@ const AchatDetail = () => {
                                 <Form.Label className={'fw-bold'}>Prix Unitaire</Form.Label>
                                 <Form.Control
                                     type="number"
-                                    value={formAddLigne.prixAchatUnitaire}
+                                    value={formAddLigne.prixVenteUnitaire}
                                     onChange={handleInputChange}
-                                    placeholder="Prix unitaire d'achat"
-                                    name='prixAchatUnitaire'
+                                    placeholder="Prix unitaire d'vente"
+                                    name='prixVenteUnitaire'
                                     className="my-1"
                                 />
                             </Col>
@@ -256,18 +255,18 @@ const AchatDetail = () => {
                     <hr/>
                     <Row className={'justify-content-end mt-3 '}>
                         <Col xs={"3"}>
-                            <Button variant={"danger"} className='w-100' onClick={handleDeleteAchat}>Supprimmer
-                                l'achat</Button>
+                            <Button variant={"danger"} className='w-100' onClick={handleDeleteVente}>Supprimmer
+                                l'vente</Button>
                         </Col>
                     </Row>
                 </div>
             ) : (
                 <div className="card p-4 shadow bg-light">
-                    <h3 className="text-center mb-4">Modifier l'Achat</h3>
+                    <h3 className="text-center mb-4">Modifier l'Vente</h3>
                     <form
                         onSubmit={(e) => {
                             e.preventDefault(); // Empêche le rechargement de la page
-                            updateAchat(); // Appelle la fonction de mise à jour
+                            updateVente(); // Appelle la fonction de mise à jour
                         }}
                     >
                         {/* Nom */}
@@ -342,4 +341,4 @@ const AchatDetail = () => {
     );
 };
 
-export default AchatDetail;
+export default VenteDetail;

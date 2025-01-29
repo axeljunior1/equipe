@@ -149,7 +149,7 @@ const SearchProduitPopup = ({ onSelect }) => {
                         <td>{produit.nom}</td>
                         <td>{produit.description}</td>
                         <td>
-                            <Button variant="primary" onClick={() => onSelect(produit.id)}>
+                            <Button variant="primary" onClick={() => onSelect(produit.id, produit.nom, produit.prixUnitaire, )}>
                                 Sélectionner
                             </Button>
                         </td>

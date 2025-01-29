@@ -17,6 +17,9 @@ import ListCategories from "./ListCategories";
 import CategorieDetail from "./DetailsCategorie";
 import LoginForm from "./LoginForm";
 import Redirect from "../components/Redirect";
+import Ventes from "./ventes/Ventes";
+import VenteDetail from "./ventes/VenteDetail";
+import MouvementStock from "./mouvementStock/MouvementStock";
 
 const AppRoutes = () => {
     useEffect(() => {
@@ -31,16 +34,19 @@ const AppRoutes = () => {
                     <Route path="/home" element={<Home/>}/>
                     <Route path="/produits" element={<ListProduits/>}/>
                     <Route path="/creer-produit" element={<CreateProductPage/>}/>
-                    <Route path="/entree-en-stock" element={<CreateAchatPage/>}/>
+                    <Route path="/entrees-en-stock" element={<CreateAchatPage/>}/>
                     <Route path="/produits/:id" element={<ProduitDetail/>}/>
                     <Route path="/achats" element={<Achats/>}/>
                     <Route path="/achats/:id" element={<AchatDetail/>}/>
+                    <Route path="/ventes" element={<Ventes/>}/>
+                    <Route path="/ventes/:id" element={<VenteDetail/>}/>
                     <Route path="/employes" element={<Employe/>}/>
                     <Route path="/panier" element={<Panier/>}/>
                     <Route path="/qr-code" element={<QRCodeScanner/>}/>
                     <Route path="/categories" element={<ListCategories/>}/>
                     <Route path="/employes/:id" element={<EmployeDetail/>}/>
                     <Route path="/categories/:id" element={<CategorieDetail/>}/>
+                    <Route path="/mouvements-stock" element={<MouvementStock/>}/>
                     <Route path="/login" element={<LoginForm/>}/>
                     <Route path="*" element={<NotFound/>}/>
                 </Routes>

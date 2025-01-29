@@ -61,7 +61,7 @@ function Achats() {
                     <tr key={employe.id}>
                         <td>{index + 1}</td>
                         <td>
-                            <Link to={`/employe/${employe.id}`} className='text-decoration-none'>{employe.id}</Link>
+                            <Link to={`/employes/${employe.id}`} className='text-decoration-none'>{employe.id}</Link>
                         </td>
                         <td>{employe.nom}</td>
                         <td>{employe.prenom}</td>

@@ -1,24 +1,19 @@
 import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
 import {Link, useNavigate} from "react-router-dom";
-import ProduitService from "../services/ProduitService";
-import HeaderBtnElement from "../components/HeaderBtnElement";
-import {Button} from "react-bootstrap";
-import {usePanier} from "../context/PanierContext";
-import Pagination from "../components/Pagination";
-import SearchProduitCritere from "../components/SearchProduitCritere";
+import {Button, Pagination} from "react-bootstrap";
+import MouvementStockService from "../../services/MouvementStockService";
+import HeaderBtnElement from "../../components/HeaderBtnElement";
+import {usePanier} from "../../context/PanierContext";
+import SearchMouvementStockCritere from "../../components/SearchMouvementStockCritere";
 
 
-const ListProduit = () => {
-    const [produits, setProduits] = useState([]);
+const MouvementStock = () => {
+    const [mouvementStocks, setMouvementStocks] = useState([]);
     const [searchInput, SetSearchInput] = useState('');
     const [filters, setFilters] = useState({
         nom: "",
-        description: "",
-        stockInitialMin: "",
-        stockInitialMax: "",
-        prixUnitaireMin: "",
-        prixUnitaireMax: "",
+        description: ""
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -28,13 +23,13 @@ const ListProduit = () => {
     const navigate = useNavigate();
     const {  ajouterAuPanier, dejaPresent, nombreDansPanier } = usePanier();
 
-    // Fonction pour récupérer les produits avec pagination
-    const fetchProduits = async () => {
+    // Fonction pour récupérer les mouvementStocks avec pagination
+    const fetchMouvementStocks = async () => {
         setLoading(true);
         try {
-            let data = await ProduitService.getProduit(currentPage, pageSize); // on peut ajouter des critères de filtre (nom : desc, description : asc)
-            setProduits(data.content);  // Assuming 'content' is the array of products
-            setTotalPages(data.totalPages); // Assuming 'totalPages' is the total page count
+            let data = await MouvementStockService.getMouvementStock(currentPage, pageSize);
+            setMouvementStocks(data.content);
+            setTotalPages(data.totalPages); 
         } catch (error) {
             setError(error);
         } finally {
@@ -42,12 +37,12 @@ const ListProduit = () => {
         }
 
     };
-    // Fonction pour récupérer les produits depuis l'API
-    const fetchProduitByMotCle = async () => {
+    // Fonction pour récupérer les mouvementStocks depuis l'API
+    const fetchMouvementStockByMotCle = async () => {
         setLoading(true);
         try {
-            let data = await ProduitService.getProduitByMotCle(searchInput);
-            setProduits(data);
+            let data = await MouvementStockService.getMouvementStockByMotCle(searchInput);
+            setMouvementStocks(data);
         } catch (error) {
             setError(error);
         } finally {
@@ -57,12 +52,12 @@ const ListProduit = () => {
 
 
     // useEffect(() => {
-    //     fetchProduitByMotCle(searchInput).then(r => console.log(r));
+    //     fetchMouvementStockByMotCle(searchInput).then(r => console.log(r));
     // }, [searchInput]);
 
 
     useEffect(() => {
-        fetchProduits().then(r => null );
+        fetchMouvementStocks().then(r => r );
     }, [currentPage, pageSize]);
 
     if (loading) {
@@ -86,13 +81,9 @@ const ListProduit = () => {
         const params = {};
         if (filters.nom) params.nom = filters.nom;
         if (filters.description) params.description = filters.description;
-        if (filters.stockInitialMin) params.stockInitialMin = filters.stockInitialMin;
-        if (filters.stockInitialMax) params.stockInitialMax = filters.stockInitialMax;
-        if (filters.prixUnitaireMin) params.prixUnitaireMin = filters.prixUnitaireMin;
-        if (filters.prixUnitaireMax) params.prixUnitaireMax = filters.prixUnitaireMax;
 
-        ProduitService.getProduitDyn(params).then(data => {
-            setProduits(data);
+        MouvementStockService.getMouvementStockDyn(params).then(data => {
+            setMouvementStocks(data);
         }).catch(error => {
             setError(error);
         }).finally(
@@ -103,11 +94,11 @@ const ListProduit = () => {
 
     function handleSubmitSearch(e) {
         e.preventDefault();
-        fetchProduitByMotCle(searchInput).then(r => console.log(r));
+        fetchMouvementStockByMotCle(searchInput).then(r => console.log(r));
     }
 
-    const handleAjouterAuPanier = (produit) => {
-        ajouterAuPanier({ ...produit, quantite: 1 });
+    const handleAjouterAuPanier = (mouvementStock) => {
+        ajouterAuPanier({ ...mouvementStock, quantite: 1 });
     };
 
     const handlePageChange = (pageNumber) => {
@@ -125,15 +116,15 @@ const ListProduit = () => {
 
     return (
         <div>
-            <h1><strong>Produit</strong></h1>
+            <h1><strong>MouvementStock</strong></h1>
 
 
-            <HeaderBtnElement titreFil='' variant='outline-primary' onClick={() => navigate('/creer-produit')}
-                              valueBtn='Créer produit' />
+            <HeaderBtnElement titreFil='' variant='outline-primary' onClick={() => navigate('/creer-mouvementStock')}
+                              valueBtn='Créer mouvementStock' />
 
 
 
-            <SearchProduitCritere
+            <SearchMouvementStockCritere
                 handleSubmitSearch={handleSubmitSearch}
                 searchInput={searchInput}
                 handleSearchInput={handleSearchInput}
@@ -146,27 +137,25 @@ const ListProduit = () => {
             <Table striped bordered hover>
                 <thead>
                 <tr>
-                    <th>Nom</th>
-                    <th>Description</th>
-                    <th>Stock initial</th>
-                    <th>Prix Unitaire</th>
-                    <th>Add to Cart 🛒</th>
+                    <th>Réference</th>
+                    <th>Produit</th>
+                    <th>Quantité</th>
+                    <th>Type de Mouvement</th>
+                    <th>Date du Mouvement</th>
+                    <th>Commentaire</th>
                 </tr>
                 </thead>
                 <tbody>
-                {produits.map((produit, index) => (
-                    <tr key={produit.id}>
+                {mouvementStocks.map((mouvementStock) => (
+                    <tr key={mouvementStock.id}>
                         <td>
-                            <Link to={`/produits/${produit.id}`} className='text-decoration-none'>{produit.nom}</Link>
+                            <Link to={`/mouvementStocks/${mouvementStock.id}`} className='text-decoration-none'>{mouvementStock.reference}</Link>
                         </td>
-                        <td>{produit.description}</td>
-                        <td>{produit.stockInitial}</td>
-                        <td>{produit.prixUnitaire}</td>
-                        <td><Button
-                            variant="" className={'w-100 text-primary fw-bold'}
-                            onClick={() => handleAjouterAuPanier(produit)} >
-                            {dejaPresent(produit) ? ( <span> Ajouter (1) au panier 🧺 <span className={'text-danger'}> { nombreDansPanier(produit)} </span> </span> ):( <span>Ajouter au panier 🧺 </span>)}
-                        </Button> </td>
+                        <td>{mouvementStock.produitId} - {mouvementStock.produitNom}</td>
+                        <td>{mouvementStock.quantite}</td>
+                        <td>{mouvementStock.typeMouvementCode}</td>
+                        <td>{mouvementStock.dateMouvement.substring(0,10)}</td>
+                        <td>{mouvementStock.commentaire}</td>
                     </tr>
                 ))}
                 </tbody>
@@ -186,4 +175,4 @@ const ListProduit = () => {
     );
 };
 
-export default ListProduit;
+export default MouvementStock;
