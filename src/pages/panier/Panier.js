@@ -6,6 +6,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import QRCodeScanner from "../../components/QRCodeScanner";
 import SearchClientPopup from "../test/SearchClientPopup";
 import ProductCartCounter from "./ProductCartCounter";
+import axiosInstance from "../../context/axiosInstance";
 
 const Panier = () => {
     const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
@@ -64,12 +65,54 @@ const Panier = () => {
         ajouterAuPanier(itemPanier)
     }
 
-    function validerLaVente() {
+    const postCaisse = async (caisse) => {
+        try {
+            let response = await  axiosInstance.post("/ventes/createVenteNLignes", caisse)
+
+            console.log(response.data)
+
+        }catch (error) {
+            console.log(error);
+        }
+    }
+
+
+    const validerLaVente = ()=> {
         // on a un panier dans le quel on a des items
         // on a un formulaire avec les info client
         // creer une vente
         // creer des ligne
         //creer ou pas le client
+        console.log("validerLaVente");
+        console.log(panier)
+        let caisse = {
+            clientNom : formClient.nom,
+            clientPrenom : formClient.prenom,
+            clientEmail : formClient.email,
+            clientTelephone : formClient.telephone,
+            venteMontantTotal : 0,
+            venteClientId : formClient.id,
+            venteEmployeId : 1,
+            lignesCaisses : []
+        }
+
+        panier.map(item => {
+            caisse.lignesCaisses.push({
+                lVentePrixVenteUnitaire : item.prixUnitaire,
+                lVenteQuantite : item.quantite,
+                lVenteProduitId : item.id
+            });
+        })
+
+        try {
+            console.log(caisse)
+
+            postCaisse(caisse
+            );
+        }catch (error) {
+            console.log(error);
+        }
+
     }
 
     return (
