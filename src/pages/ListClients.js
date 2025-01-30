@@ -3,10 +3,9 @@ import Table from "react-bootstrap/Table";
 import {Link, useNavigate} from "react-router-dom";
 import ProduitService from "../services/ProduitService";
 import HeaderBtnElement from "../components/HeaderBtnElement";
-import {Accordion, Button, Col, Container, Form, Row} from "react-bootstrap";
+import {Button} from "react-bootstrap";
 import {usePanier} from "../context/PanierContext";
 import Pagination from "../components/Pagination";
-import * as PropTypes from "prop-types";
 import SearchProduitCritere from "../components/SearchProduitCritere";
 
 

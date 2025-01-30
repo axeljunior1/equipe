@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
-import ProduitService from "../services/ProduitService";
-import * as categories from "react-bootstrap/ElementChildren";
+import produitService from "../services/ProduitService";
 import CategorieService from "../services/CategorieService";
 
 const CreateProductPage = () => {
@@ -47,13 +46,15 @@ const CreateProductPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        ProduitService.createProduit(formData).then(response => {
-            navigate('/produits');
+        try {
+            let response = await produitService.createProduit(formData);
+            navigate(`/produits/${response.data.id}?showAlertCreation=true`);
 
-            console.log(response);
-        }).catch(error => {
+        }catch (error) {
             setError(error);
-        }).finally(() => setLoading(false));
+        }finally {
+            setLoading(false);
+        }
 
 
     };

@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import AchatService from "../../services/AchatService";
-import Table from "react-bootstrap/Table";
-import {Link, useNavigate, useParams} from "react-router-dom";
-import {Button} from "react-bootstrap";
-import VenteService from "../../services/VenteService";
-import HeaderBtnElement from "../../components/HeaderBtnElement";
 import achatService from "../../services/AchatService";
+import Table from "react-bootstrap/Table";
+import {Link, useNavigate} from "react-router-dom";
+import {Button} from "react-bootstrap";
+import HeaderBtnElement from "../../components/HeaderBtnElement";
 import {useJwt} from "../../context/JwtContext";
-import employeService from "../../services/EmployeService";
-import AlertComp from "../../components/AlertComp";
 
 function Achats() {
     const [achats, setAchats] = useState([]);
