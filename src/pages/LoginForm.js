@@ -14,7 +14,7 @@ const LoginForm = () => {
     const [formLoging, setFormLoging] = useState(initialFormLogin);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState([]);
-    const { setJwt } = useJwt();
+    const { setJwt, setLoggedEmployee } = useJwt();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -26,9 +26,10 @@ const LoginForm = () => {
             const res = await axiosInstance.post("/login", formLoging); // Utilisation de l'instance Axios
             const token = res.data.token;
 
-            console.log("Réponse réussie -> Token :", token);
+            // console.log("Réponse réussie -> Token :", token);
             setJwt(token);
-            localStorage.setItem("jwt", token); // Sauvegarder le token pour persistance
+
+            setLoggedEmployee(res.data.employeGetDto);
 
             // Vérifiez si une URL mémorisée existe
             const requestedUrl = localStorage.getItem("requestedUrl");

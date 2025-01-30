@@ -31,6 +31,16 @@ class EmployeService {
             });
     }
 
+    getEmployesByUsername = async (username) => {
+        try {
+            let response =  await axiosInstance.get(`${BASE_URL}/user/${username}`)
+            return response.data
+        }catch(err){
+            console.error(`Erreur lors de la récupération de l'employe avec l'ID ${username} :`, err);
+            throw err;
+        }
+    }
+
     /**
      * Crée un nouvel employe.
      * @param {Object} employe - Les données de l'employe à créer.

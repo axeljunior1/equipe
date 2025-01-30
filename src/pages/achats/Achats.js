@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import AchatService from "../../services/AchatService";
 import Table from "react-bootstrap/Table";
-import {Link} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {Button} from "react-bootstrap";
 import VenteService from "../../services/VenteService";
+import HeaderBtnElement from "../../components/HeaderBtnElement";
+import achatService from "../../services/AchatService";
+import {useJwt} from "../../context/JwtContext";
+import employeService from "../../services/EmployeService";
 
 function Achats() {
     const [achats, setAchats] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+    const {loggedEmployee} = useJwt();
 
     async function fetchAchats() {
         setLoading(true);
@@ -55,10 +61,34 @@ function Achats() {
         return <p>Erreur : {error.message}</p>;
     }
 
+    const handleCreateAchat = async (e) =>{
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+        try{
+            // let resIdEmploye = await employeService.getEmployesByUsername(username);
+            let achat = {
+                montantTotal : 0,
+                employeId: loggedEmployee.id
+            };
+            let restCreateAchat = await achatService.createAchat(achat)
+            navigate(`/achats/${restCreateAchat.id}`);
+
+        }catch(err){
+            setError(err);
+        }finally {
+            setLoading(false);
+        }
+
+    }
+
     return (
         <div>
-            <h1>Achats </h1>
+            <h1><strong>Achats</strong></h1>
 
+
+            <HeaderBtnElement titreFil='' variant='outline-primary' onClick={handleCreateAchat}
+                              valueBtn='Créer Achat' />
 
             <Table striped bordered hover>
                 <thead>

@@ -33,18 +33,18 @@ const AppRoutes = () => {
                     <Route path="/" element={<Redirect/>}/>
                     <Route path="/home" element={<Home/>}/>
                     <Route path="/produits" element={<ListProduits/>}/>
-                    <Route path="/creer-produit" element={<CreateProductPage/>}/>
-                    <Route path="/entrees-en-stock" element={<CreateAchatPage/>}/>
                     <Route path="/produits/:id" element={<ProduitDetail/>}/>
+                    <Route path="/creer-produit" element={<CreateProductPage/>}/>
+                    <Route path="/creer-achat" element={<CreateAchatPage/>}/>
                     <Route path="/achats" element={<Achats/>}/>
                     <Route path="/achats/:id" element={<AchatDetail/>}/>
                     <Route path="/ventes" element={<Ventes/>}/>
                     <Route path="/ventes/:id" element={<VenteDetail/>}/>
                     <Route path="/employes" element={<Employe/>}/>
+                    <Route path="/employes/:id" element={<EmployeDetail/>}/>
                     <Route path="/panier" element={<Panier/>}/>
                     <Route path="/qr-code" element={<QRCodeScanner/>}/>
                     <Route path="/categories" element={<ListCategories/>}/>
-                    <Route path="/employes/:id" element={<EmployeDetail/>}/>
                     <Route path="/categories/:id" element={<CategorieDetail/>}/>
                     <Route path="/mouvements-stock" element={<MouvementStock/>}/>
                     <Route path="/mouvements-stock/produit/:id" element={<MouvementStock/>}/>

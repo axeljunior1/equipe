@@ -1,6 +1,6 @@
 import React from 'react';
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import {Container, Row, Col, Card, Button} from 'react-bootstrap';
+import {Link} from 'react-router-dom';
 
 const HomePage = () => {
     return (
@@ -14,17 +14,38 @@ const HomePage = () => {
             </Row>
 
             <Row className="d-flex align-items-stretch">
+
+
+                {/* Section Caisse */}
+                <Col md={4} className="mb-4">
+                    <Card className="h-100">
+                        <Card.Body className="d-flex flex-column">
+                            <Card.Title>Passer à la caisse</Card.Title>
+                            <Card.Text>
+                                Sélectionnez et vendez les produits actuellement en stock.
+                            </Card.Text>
+                            <div className="mt-auto">
+                                <Link to="/panier">
+                                    <Button className="w-100" variant="primary">Vendre les produits</Button>
+                                </Link>
+                            </div>
+                        </Card.Body>
+                    </Card>
+                </Col>
+
                 {/* Section Produits */}
                 <Col md={4} className="mb-4">
                     <Card className="h-100">
-                        <Card.Body>
+                        <Card.Body className="d-flex flex-column">
                             <Card.Title>Produits en Stock</Card.Title>
                             <Card.Text>
                                 Gérez et consultez les produits actuellement en stock.
                             </Card.Text>
-                            <Link to="/produits">
-                                <Button variant="primary">Voir les produits</Button>
-                            </Link>
+                            <div className="mt-auto">
+                                <Link to="/produits">
+                                    <Button className="w-100" variant="primary">Voir les produits</Button>
+                                </Link>
+                            </div>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -32,14 +53,16 @@ const HomePage = () => {
                 {/* Section Ajouter un produit */}
                 <Col md={4} className="mb-4">
                     <Card className="h-100">
-                        <Card.Body>
+                        <Card.Body className="d-flex flex-column">
                             <Card.Title>Ajouter un produit</Card.Title>
                             <Card.Text>
                                 Ajoutez de nouveaux produits dans le stock.
                             </Card.Text>
-                            <Link to="/ajouter-produit">
-                                <Button variant="success">Ajouter un produit</Button>
-                            </Link>
+                            <div className="mt-auto">
+                                <Link to="/ajouter-produit">
+                                    <Button className="w-100" variant="success">Ajouter un produit</Button>
+                                </Link>
+                            </div>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -47,31 +70,50 @@ const HomePage = () => {
                 {/* Section Entrées en Stock */}
                 <Col md={4} className="mb-4">
                     <Card className="h-100">
-                        <Card.Body>
-                            <Card.Title>Entrées en stock</Card.Title>
+                        <Card.Body className="d-flex flex-column">
+                            <Card.Title>Mouvements de stock</Card.Title>
                             <Card.Text>
-                                Gérez les entrées de produits dans le stock.
+                                Consultez les movements de produits dans le stock.
                             </Card.Text>
-                            <Link to="/entrees-en-stock">
-                                <Button variant="warning">Gérer les entrées</Button>
-                            </Link>
+                            <div className="mt-auto">
+                                <Link to="/mouvements-stock">
+                                    <Button className="w-100" variant="warning">Gérer les mouvement de Stocks</Button>
+                                </Link>
+                            </div>
                         </Card.Body>
                     </Card>
                 </Col>
-            </Row>
 
-            <Row className="d-flex align-items-stretch">
                 {/* Section Ventes */}
                 <Col md={4} className="mb-4">
                     <Card className="h-100">
-                        <Card.Body>
+                        <Card.Body className="d-flex flex-column">
                             <Card.Title>Ventes</Card.Title>
                             <Card.Text>
                                 Gérez les ventes de produits et suivez les transactions.
                             </Card.Text>
-                            <Link to="/ventes">
-                                <Button variant="danger">Voir les ventes</Button>
-                            </Link>
+                            <div className="mt-auto">
+                                <Link to="/ventes">
+                                    <Button className="w-100" variant="danger">Voir les ventes</Button>
+                                </Link>
+                            </div>
+                        </Card.Body>
+                    </Card>
+                </Col>
+
+                {/* Section Ventes */}
+                <Col md={4} className="mb-4">
+                    <Card className="h-100">
+                        <Card.Body className="d-flex flex-column">
+                            <Card.Title>Achats</Card.Title>
+                            <Card.Text>
+                                Gérez les achats de produits et suivez les transactions.
+                            </Card.Text>
+                            <div className="mt-auto">
+                                <Link to="/achats">
+                                    <Button className="w-100" variant="danger">Voir les Achats</Button>
+                                </Link>
+                            </div>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -79,14 +121,16 @@ const HomePage = () => {
                 {/* Section Utilisateurs */}
                 <Col md={4} className="mb-4">
                     <Card className="h-100">
-                        <Card.Body>
+                        <Card.Body className="d-flex flex-column">
                             <Card.Title>Employés</Card.Title>
                             <Card.Text>
                                 Gérez les employés et leur accès à l'application.
                             </Card.Text>
-                            <Link to="/employes">
-                                <Button variant="info">Voir les employés</Button>
-                            </Link>
+                            <div className="mt-auto">
+                                <Link to="/employes">
+                                    <Button className="w-100" variant="info">Voir les employés</Button>
+                                </Link>
+                            </div>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -94,14 +138,16 @@ const HomePage = () => {
                 {/* Section Catégories */}
                 <Col md={4} className="mb-4">
                     <Card className="h-100">
-                        <Card.Body>
+                        <Card.Body className="d-flex flex-column">
                             <Card.Title>Catégories</Card.Title>
                             <Card.Text>
                                 Organisez les produits par catégories.
                             </Card.Text>
-                            <Link to="/categories">
-                                <Button variant="secondary">Voir les catégories</Button>
-                            </Link>
+                            <div className="mt-auto">
+                                <Link to="/categories">
+                                    <Button className="w-100" variant="secondary">Voir les catégories</Button>
+                                </Link>
+                            </div>
                         </Card.Body>
                     </Card>
                 </Col>
