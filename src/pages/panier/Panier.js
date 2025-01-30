@@ -7,10 +7,15 @@ import QRCodeScanner from "../../components/QRCodeScanner";
 import SearchClientPopup from "../test/SearchClientPopup";
 import axiosInstance from "../../context/axiosInstance";
 import {useNavigate} from "react-router-dom";
+import ModalDetailProduit from "../../modales/modalDetailProduit";
+import AlertComp from "../../components/AlertComp";
 
 const Panier = () => {
-    const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
+    const [showModalClient, setshowModalClient] = useState(false); // Contrôle d'affichage du modal
+    const [showModalDetailProduit, setShowModalDetailProduit] = useState(false); // Contrôle d'affichage du modal
     const {panier, ajouterAuPanier ,  retirerDuPanier, calculerTotal} = usePanier();
+    const [produitIdModal, setProduitIdModal] = useState("");
+    const [showAlert, setShowAlert] = useState(false);
     const navigate = useNavigate();
 
     let initFormClient = {
@@ -53,8 +58,13 @@ const Panier = () => {
             telephone: param.telephone,
 
         });
-        setShowModal(false); // Ferme le modal
+        setshowModalClient(false); // Ferme le modal
     };
+
+    const handleShowModalDetailProduit = async (produitId)=>{
+        setProduitIdModal(produitId);
+        setShowModalDetailProduit(true);
+    }
 
     const handleIncrease = (itemPanier) =>{
         itemPanier.quantite++;
@@ -119,6 +129,16 @@ const Panier = () => {
     return (
         <div>
             <h2>Panier</h2>
+
+            {showAlert && (
+                <AlertComp
+                    message="Opération réussie le produit a été ajouté au panier !"
+                    type="success"
+                    timeout={9500} // L'alerte disparaît après 5 secondes
+                    onClose={() => setShowAlert(false)}
+                />
+            )}
+
             {panier.length === 0 ? (
                 <p>Votre panier est vide.</p>
 
@@ -136,7 +156,9 @@ const Panier = () => {
                     <tbody>
                     {panier.map((item) => (
                         <tr key={item.id || `${item.nom}-${item.prixUnitaire}`}>
-                            <td>{item.nom}</td>
+                            <td>
+                                <Button variant={"outline-primary"} className={"w-100"} onClick={()=>handleShowModalDetailProduit(item.id)}>{item.nom}</Button>
+                                </td>
                             <td>{item.prixUnitaire}€</td>
                             <td>
                                 <Row>
@@ -189,7 +211,7 @@ const Panier = () => {
                                     className="my-1"
                                 />
                                 <Button variant={"outline-info"} onClick={() => {
-                                    setShowModal(true);
+                                    setshowModalClient(true);
                                 }
                                 }>
                                     🔍Search
@@ -257,11 +279,11 @@ const Panier = () => {
             <h3>Total: {calculerTotal()}€</h3>
 
             <div className={'mt-3'}>
-                <QRCodeScanner scanAndAdd={true}/>
+                <QRCodeScanner scanAndAdd={true} setAlert={setShowAlert}/>
             </div>
 
             {/* Modal de recherche d'employé */}
-            <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
+            <Modal show={showModalClient} onHide={() => setshowModalClient(false)} size="lg" centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Rechercher un Client</Modal.Title>
                 </Modal.Header>
@@ -269,6 +291,9 @@ const Panier = () => {
                     <SearchClientPopup onSelect={handleProductSelect}/>
                 </Modal.Body>
             </Modal>
+
+            <ModalDetailProduit  produitId={produitIdModal} showModal={showModalDetailProduit}
+                                setShowModal={setShowModalDetailProduit} />
         </div>
     );
 };

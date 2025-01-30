@@ -20,7 +20,7 @@ const ProduitDetailComp = (props) => {
             const data = await produitService.getProduitsById(id)
             console.log(data)
             setProduit(data);
-            if (props.scanAndAdd){
+            if (props.scanAndAdd) {
                 handleAjouterAuPanier(data);
             }
 
@@ -28,10 +28,28 @@ const ProduitDetailComp = (props) => {
             setError(error);
         }
     };
+    // Fonction pour récupérer les données d'un produit
+    const fetchProduitByCodeBarre = async (codeBarre) => {
+        try {
+            const data = await produitService.getProduitsByCodeBarre(codeBarre)
+            console.log(data)
+            setProduit(data);
+            handleAjouterAuPanier(data);
+            props.setTexte('')
+
+        } catch (error) {
+            setError(error);
+        }
+    };
 
     useEffect(() => {
-        fetchProduit(props.id);
-    }, [props.id]);
+        if (props.scanAndAdd) {
+            fetchProduitByCodeBarre(props.codeBarre).then(r => r);
+
+        } else {
+            fetchProduit(props.id).then(r => r);
+        }
+    }, [props.id, props.codeBarre]);
 
     return (
         <div className="card p-4 shadow">
@@ -75,7 +93,9 @@ const ProduitDetailComp = (props) => {
                     className="btn btn-outline-primary me-2 fw-bold"
                     onClick={() => handleAjouterAuPanier(produit)}
                 >
-                    {dejaPresent(produit) ? ( <span> Ajouter (1) au panier 🧺 <span className={'text-danger'}> { nombreDansPanier(produit)} </span> </span> ):( <span>Ajouter au panier 🧺 </span>)}
+                    {dejaPresent(produit) ? (<span> Ajouter (1) au panier 🧺 <span
+                        className={'text-danger'}> {nombreDansPanier(produit)} </span> </span>) : (
+                        <span>Ajouter au panier 🧺 </span>)}
 
                 </button>
 

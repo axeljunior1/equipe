@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {Button, Pagination} from "react-bootstrap";
+import { Pagination} from "react-bootstrap";
 import MouvementStockService from "../../services/MouvementStockService";
 import HeaderBtnElement from "../../components/HeaderBtnElement";
 import {usePanier} from "../../context/PanierContext";
@@ -22,7 +22,7 @@ const MouvementStock = () => {
     const [pageSize, setPageSize] = useState(99); // Taille de la page
     const [totalPages, setTotalPages] = useState(0); // Nombre total de pages
     const navigate = useNavigate();
-    const {  ajouterAuPanier, dejaPresent, nombreDansPanier } = usePanier();
+    const {  ajouterAuPanier } = usePanier();
 
     // Fonction pour récupérer les mouvementStocks avec pagination
     const fetchMouvementStocks = async () => {
@@ -107,11 +107,11 @@ const MouvementStock = () => {
         ajouterAuPanier({ ...mouvementStock, quantite: 1 });
     };
 
-    const handlePageChange = (pageNumber) => {
+    const onHandlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
 
-    const handlePageSizeChange = (e) => {
+    const onHandlePageSizeChange = (e) => {
         setPageSize(Number(e.target.value));
         setCurrentPage(0); // Reset to first page whenever page size changes
     };
@@ -182,10 +182,10 @@ const MouvementStock = () => {
 
             <Pagination
                 currentPage = {currentPage}
-                handlePageChange = {handlePageChange}
+                handlePageChange = {onHandlePageChange}
                 totalPages = {totalPages}
                 pageSize = {pageSize}
-                handlePageSizeChange = {handlePageSizeChange}
+                handlePageSizeChange = {onHandlePageSizeChange}
 
             />
         </div>

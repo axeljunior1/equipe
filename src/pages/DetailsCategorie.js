@@ -91,7 +91,7 @@ const CategorieDetail = () => {
 
         <div className="">
 
-            <h1><strong>Details du Categorie</strong></h1>
+            <h1><strong>Détails du Categorie</strong></h1>
 
             {!isEditing ? (
 

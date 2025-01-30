@@ -1,14 +1,19 @@
 import React, {useCallback, useEffect, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import ProduitService from "../services/ProduitService";
 import produitService from "../services/ProduitService";
 import {usePanier} from "../context/PanierContext";
 import ProduitDetailComp from "../components/ProduitDetailComp";
+import AlertComp from "../components/AlertComp";
 
-const ProduitDetail = () => {
-    const {id} = useParams(); // Récupère l'ID depuis l'URL
+const ProduitDetail = (props) => {
+    const {id:rlt} = useParams(); // Récupère l'ID depuis l'URL*
+    const id = rlt??props.id // id de l'url ou id dans props, ils'agit ici de l'id du produit
     const {panier, ajouterAuPanier, dejaPresent, nombreDansPanier} = usePanier();
     const navigate = useNavigate();
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const pShowAlertCreation = queryParams.get("showAlertCreation");
 
     let initialFormDetailProduit = {
         nom : "",
@@ -26,6 +31,7 @@ const ProduitDetail = () => {
     const [error, setError] = useState(null);
     const [isEditing, setIsEditing] = useState(false); // État pour basculer en mode édition
     const [formData, setFormData] = useState(initialFormDetailProduit); // État pour stocker les modifications
+    const [showAlertCreation, setShowAlertCreation] = useState(!!pShowAlertCreation);
 
     // Fonction pour récupérer les données d'un produit
     const fetchProduit = useCallback(async () => {
@@ -107,8 +113,16 @@ const ProduitDetail = () => {
     return (
 
         <div className="">
+            {showAlertCreation && (
+                <AlertComp
+                    message="Opération réussie le produit a été crée !"
+                    type="success"
+                    timeout={9500} // L'alerte disparaît après 5 secondes
+                    onClose={() => setShowAlertCreation(false)}
+                />
+            )}
 
-            <h1><strong>Details du Produit</strong></h1>
+            <h1><strong>Détail du Produit</strong></h1>
 
             {!isEditing ? (
 

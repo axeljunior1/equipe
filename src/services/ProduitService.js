@@ -46,14 +46,25 @@ class ProduitService {
 
     }
 
-    getProduitByMotCle(motCle) {
+    async getProduitsByCodeBarre(code) {
+        try {
+            let axiosResponse = await axiosInstance.get(`${BASE_URL}/code-barre/${code}`);
+            return axiosResponse.data;
+        }catch(err) {
+            throw err;
+        }
 
-        return axiosInstance.get(`${BASE_URL}/recherche?motCle=${motCle}`)
-            .then(response => response.data)
-            .catch(error => {
-                console.error(`Erreur lors de la récupération de l'produit avec l'ID ${motCle} :`, error);
-                throw error;
-            });
+    }
+
+    getProduitByMotCle = async (motCle) => {
+        try {
+            let response = await axiosInstance.get(`${BASE_URL}/recherche?motCle=${motCle}`);
+            return response.data;
+        }catch (error) {
+            console.error(`Erreur lors de la récupération de l'produit avec l'ID ${motCle} :`, error);
+            throw error;
+        }
+
     }
 
 

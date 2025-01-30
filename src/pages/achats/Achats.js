@@ -8,13 +8,14 @@ import HeaderBtnElement from "../../components/HeaderBtnElement";
 import achatService from "../../services/AchatService";
 import {useJwt} from "../../context/JwtContext";
 import employeService from "../../services/EmployeService";
+import AlertComp from "../../components/AlertComp";
 
 function Achats() {
     const [achats, setAchats] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-    const {loggedEmployee} = useJwt();
+    const {loggedEmployee, jwt} = useJwt();
 
     async function fetchAchats() {
         setLoading(true);
@@ -31,6 +32,11 @@ function Achats() {
     }
 
     useEffect( () => {
+        console.log('loggedEmployee');
+        console.log(loggedEmployee);
+        console.log('--------------------------- **************************** --------------------------');
+        console.log('jwt')
+        console.log(jwt)
          fetchAchats().then(r => {});
     }, []);
 
@@ -72,7 +78,7 @@ function Achats() {
                 employeId: loggedEmployee.id
             };
             let restCreateAchat = await achatService.createAchat(achat)
-            navigate(`/achats/${restCreateAchat.id}`);
+            navigate(`/achats/${restCreateAchat.id}?showAlert=true`);
 
         }catch(err){
             setError(err);

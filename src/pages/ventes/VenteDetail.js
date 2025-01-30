@@ -148,7 +148,7 @@ const VenteDetail = () => {
     return (
         <div className="">
 
-            <h1><strong>Detail de la vente</strong></h1>
+            <h1><strong>Détail de la vente</strong></h1>
             {!isEditing ? (
                 <div className="card p-4 shadow">
                     <h3 className="card-title text-center">{vente.nom}</h3>

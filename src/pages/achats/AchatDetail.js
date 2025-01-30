@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Link, useNavigate, useParams} from "react-router-dom";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import AchatService from "../../services/AchatService";
 import achatService from "../../services/AchatService";
 import Table from "react-bootstrap/Table";
@@ -7,9 +7,15 @@ import LigneAchatService from "../../services/LigneAchatService";
 import {Button, Col, Form, Modal, Row} from "react-bootstrap";
 import InputGroup from "react-bootstrap/InputGroup";
 import SearchProduitPopup from "../test/SearchProduitPopup";
+import AlertComp from "../../components/AlertComp";
 
 const AchatDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search); // Utilise URLSearchParams pour obtenir les paramètres de requête
+
+    const pShowAlert = queryParams.get("showAlert"); // Récupère la valeur de param1
+
     const [achat, setAchat] = useState(null);
     const [lignesAchats, setLignesAchats] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -18,6 +24,8 @@ const AchatDetail = () => {
     const [formData, setFormData] = useState({}); // État pour stocker les données du formulaire
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
+    const [showAlert, setShowAlert] = useState(pShowAlert?pShowAlert:false);
+
 
     let initFormAddLigne = {
         "prixAchatUnitaire": 0,
@@ -148,8 +156,16 @@ const AchatDetail = () => {
 
     return (
         <div className="">
+            {showAlert && (
+                <AlertComp
+                    message="Opération réussie l'achat a été crée !"
+                    type="success"
+                    timeout={9500} // L'alerte disparaît après 5 secondes
+                    onClose={() => setShowAlert(false)}
+                />
+            )}
 
-            <h1><strong>Detail de l'achat</strong></h1>
+            <h1><strong>Détail de l'achat</strong></h1>
             {!isEditing ? (
                 <div className="card p-4 shadow">
                     <h3 className="card-title text-center">{achat.nom}</h3>
