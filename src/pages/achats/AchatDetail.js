@@ -149,7 +149,7 @@ const AchatDetail = () => {
     return (
         <div className="">
 
-            <h1><strong>Details de l'achat</strong></h1>
+            <h1><strong>Detail de l'achat</strong></h1>
             {!isEditing ? (
                 <div className="card p-4 shadow">
                     <h3 className="card-title text-center">{achat.nom}</h3>

@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import AchatService from "../../services/AchatService";
 import Table from "react-bootstrap/Table";
 import {Link} from "react-router-dom";
+import {Button} from "react-bootstrap";
+import VenteService from "../../services/VenteService";
 
 function Achats() {
     const [achats, setAchats] = useState([]);
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     async function fetchAchats() {
+        setLoading(true);
         setError(null);
 
         try {
@@ -15,6 +19,8 @@ function Achats() {
             setAchats(data.content)
         } catch (e) {
             setError(e.response.data);
+        }finally {
+            setLoading(false);
         }
     }
 
@@ -32,12 +38,17 @@ function Achats() {
             .catch(err => setError(err));
     };
 
-    const handleDeleteAchat = (id) => {
-        AchatService.deleteAchat(id)
-            .then(() => {
-                setAchats(achats.filter(achat => achat.id !== id));
-            })
-            .catch(err => setError(err));
+    const handleDeleteAchat =async (id) => {
+        setLoading(true);
+        setError(null);
+        try{
+            await AchatService.deleteAchat(id);
+            fetchAchats().then(r => {});
+        }catch(err){
+            setError(err);
+        }finally {
+            setLoading(false);
+        }
     };
 
     if (error) {
@@ -57,6 +68,7 @@ function Achats() {
                     <th>Montant</th>
                     <th>Date de création/modification</th>
                     <th>Employé</th>
+                    <th>Supprimer ? 🚮</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -70,6 +82,9 @@ function Achats() {
                         <td>{achat.dateCreation}</td>
                         <td>
                             <Link to={`/employes/${achat.employeId}`} className='text-decoration-none'>{achat.employeId} - {achat.employeNom}</Link>
+                        </td>
+                        <td>
+                            <Button variant={"outline-danger"} className={"w-100"} onClick={()=>handleDeleteAchat(achat.id)}> Supprimer la ligne </Button>
                         </td>
                     </tr>
                 ))}

@@ -5,12 +5,13 @@ import {usePanier} from "../../context/PanierContext";
 import InputGroup from "react-bootstrap/InputGroup";
 import QRCodeScanner from "../../components/QRCodeScanner";
 import SearchClientPopup from "../test/SearchClientPopup";
-import ProductCartCounter from "./ProductCartCounter";
 import axiosInstance from "../../context/axiosInstance";
+import {useNavigate} from "react-router-dom";
 
 const Panier = () => {
     const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
     const {panier, ajouterAuPanier ,  retirerDuPanier, calculerTotal} = usePanier();
+    const navigate = useNavigate();
 
     let initFormClient = {
         "id": 0,
@@ -71,6 +72,7 @@ const Panier = () => {
 
             console.log(response.data)
 
+            navigate(`/ventes/${response.data.id}`);
         }catch (error) {
             console.log(error);
         }
@@ -92,7 +94,7 @@ const Panier = () => {
             clientTelephone : formClient.telephone,
             venteMontantTotal : 0,
             venteClientId : formClient.id,
-            venteEmployeId : 1,
+            venteEmployeId : 2,
             lignesCaisses : []
         }
 
@@ -107,8 +109,7 @@ const Panier = () => {
         try {
             console.log(caisse)
 
-            postCaisse(caisse
-            );
+            postCaisse(caisse);
         }catch (error) {
             console.log(error);
         }

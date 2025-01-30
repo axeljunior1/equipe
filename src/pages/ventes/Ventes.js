@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import VenteService from "../../services/VenteService";
 import Table from "react-bootstrap/Table";
 import {Link} from "react-router-dom";
+import {Button} from "react-bootstrap";
 
 function Ventes() {
     const [ventes, setVentes] = useState([]);
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     async function fetchVentes() {
+        setLoading(true);
         setError(null);
 
         try {
@@ -15,6 +18,8 @@ function Ventes() {
             setVentes(data.content)
         } catch (e) {
             setError(e.response.data);
+        }finally {
+            setLoading(false);
         }
     }
 
@@ -33,12 +38,17 @@ function Ventes() {
             .catch(err => setError(err));
     };
 
-    const handleDeleteVente = (id) => {
-        VenteService.deleteVente(id)
-            .then(() => {
-                setVentes(ventes.filter(vente => vente.id !== id));
-            })
-            .catch(err => setError(err));
+    const handleDeleteVente = async (id) => {
+        setLoading(true);
+        setError(null);
+        try{
+             await VenteService.deleteVente(id);
+            fetchVentes().then(r => {});
+        }catch(err){
+            setError(err);
+        }finally {
+            setLoading(false);
+        }
     };
 
     if (error) {
@@ -57,7 +67,8 @@ function Ventes() {
                     <th>Nom</th>
                     <th>Montant</th>
                     <th>Client</th>
-                    <th>Employe</th>
+                    <th>Employé</th>
+                    <th>Supprimer ? 🚮</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -73,6 +84,9 @@ function Ventes() {
                         </td>
                         <td>
                             <Link to={`/employes/${vente.employeId}`} className='text-decoration-none'>{vente.employeId} - {vente.employeNom}</Link>
+                        </td>
+                        <td>
+                            <Button variant={"outline-danger"} className={"w-100"} onClick={()=>handleDeleteVente(vente.id)}> Supprimer la ligne </Button>
                         </td>
                     </tr>
                 ))}

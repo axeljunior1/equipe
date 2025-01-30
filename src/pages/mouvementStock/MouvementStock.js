@@ -120,6 +120,10 @@ const MouvementStock = () => {
         SetSearchInput(e.target.value);
     }
 
+    const chooseTypeEveOrigine = (typeMouvementCode) =>{
+        if(typeMouvementCode==="ACHAT_MARCHANDISE") return "achats"
+        if(typeMouvementCode==="VENTE_PRODUIT") return "ventes"
+    };
     return (
         <div>
             <h1><strong>Mouvement de Stock {id} </strong></h1>
@@ -144,6 +148,7 @@ const MouvementStock = () => {
                 <thead>
                 <tr>
                     <th>Réference</th>
+                    <th>Événement d'origine</th>
                     <th>Produit</th>
                     <th>Quantité</th>
                     <th>Type de Mouvement</th>
@@ -158,10 +163,13 @@ const MouvementStock = () => {
                             <Link to={`/mouvementStocks/${mouvementStock.id}`} className='text-decoration-none'>{mouvementStock.reference}</Link>
                         </td>
                         <td>
+                            <Link to={`/${chooseTypeEveOrigine(mouvementStock.typeMouvementCode)}/${mouvementStock.idEvenementOrigine}`} className='text-decoration-none'>{chooseTypeEveOrigine(mouvementStock.typeMouvementCode)} - {mouvementStock.idEvenementOrigine}</Link>
+                        </td>
+                        <td>
                             <Link to={`/produits/${mouvementStock.produitId}`} className='text-decoration-none'>{mouvementStock.produitId} - {mouvementStock.produitNom}</Link>
                         </td>
 
-                        <td>{mouvementStock.quantite}</td>
+                        <td className={mouvementStock.typeMouvementCode === 'VENTE_PRODUIT' ? 'text-danger':''}>{mouvementStock.quantite}</td>
                         <td>{mouvementStock.typeMouvementCode}</td>
                         <td>{mouvementStock.dateMouvement.substring(0,10)}</td>
                         <td>{mouvementStock.commentaire}</td>
