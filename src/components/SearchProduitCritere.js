@@ -14,6 +14,7 @@ const SearchProduitCritere = ({
 
             <form className='my-3' onSubmit={handleSubmitSearch}>
                 <Row>
+
                     <Col xs="auto">
                         <input
                             type="text"
@@ -40,6 +41,18 @@ const SearchProduitCritere = ({
 
                             <Container>
                                 <Row className="">
+                                    <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
+                                        <Form.Select className="mb-3"
+                                                     name="actif"
+                                                     value={filters.actif}
+                                                     onChange={handleInputChange}
+                                                     placeholder="Actif">
+                                            <option>Produits actifs uniquement ?</option>
+                                            <option value={"true"}>Oui</option>
+                                            <option value={"false"}>Non</option>
+
+                                        </Form.Select>
+                                    </Col>
                                     <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
                                         <Form.Control
                                             type="text"

@@ -14,12 +14,11 @@ const App = () => {
 
     const handleLogout = () => {
         localStorage.removeItem("jwt"); // Supprimer le JWT
-        setJwt(""); // Réinitialiser le contexte JWT
         localStorage.removeItem("loggedEmployee"); // Supprimer le JWT
-        setLoggedEmployee(""); // Réinitialiser le contexte JWT
         navigate("/login"); // Rediriger vers la page de connexion
     };
     useEffect(() => {
+
 
         // Mettre à jour localStorage avec l'URL courante
         if (location.pathname !== "/login") {
@@ -33,7 +32,7 @@ const App = () => {
                     <Container>
 
                         {jwt !== "" && (
-                            <Navbar.Brand as={Link} to="/home">STORE</Navbar.Brand>
+                            <Navbar.Brand as={Link} to="/home">Boutique</Navbar.Brand>
                         )}
                         <Navbar.Toggle aria-controls="basic-navbar-nav"/>
                         <Navbar.Collapse id="basic-navbar-nav">
@@ -46,7 +45,6 @@ const App = () => {
                                     <Nav.Link as={Link} to="/employes">Employe</Nav.Link>
                                     <Nav.Link as={Link} to="/panier">Panier 🛒 {panier && panier.length > 0 && (
                                         <span className={'text-primary'}> {panier.length} </span>)} </Nav.Link>
-                                    <Nav.Link as={Link} to="/qr-code">Code</Nav.Link>
                                     <Nav.Link as={Link} to="/categories">Categories</Nav.Link>
                                 </>)}
                             </Nav>

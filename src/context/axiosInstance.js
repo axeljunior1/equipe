@@ -24,7 +24,6 @@ axiosInstance.interceptors.response.use(
 
             // Récupérer l'URL demandée depuis localStorage
             const requestedUrl = localStorage.getItem("requestedUrl") || "/"; // Valeur par défaut si non trouvée
-            console.log("URL demandée :", requestedUrl);
 
             localStorage.removeItem("jwt"); // Supprimer le JWT
             window.location.href = "/login"; // Rediriger vers la connexion

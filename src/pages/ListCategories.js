@@ -31,7 +31,6 @@ const ListCategories = () => {
     // Fonction pour récupérer les categories avec pagination
     const fetchCategories = async () => {
         setLoading(true);
-        console.log("test")
         try {
             let data = await CategorieService.getCategories(currentPage, pageSize);
             setCategories(data.content);  // Assuming 'content' is the array of products

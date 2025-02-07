@@ -10,7 +10,6 @@ export const ThemeProvider = ({children}) => {
         //     // Sauvegarder le panier dans localStorage à chaque modification
     }, [theme]);
 
-    console.log("ThemeProvider monté ou mis à jour");
 
 
     const toggleTheme = (preTheme) => {

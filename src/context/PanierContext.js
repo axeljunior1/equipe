@@ -11,11 +11,7 @@ export const PanierProvider = ({ children }) => {
 
     const [panier, setPanier] = useState([]);
 
-    useEffect(() => {
-        console.log("Le panier a changé");
-        console.log(panier);
-        // Sauvegarder le panier dans localStorage à chaque modification
-    }, [panier]);
+
 
     const dejaPresent = (produit) =>{
         const index = panier.findIndex(item => item.id === produit.id);
@@ -30,7 +26,6 @@ export const PanierProvider = ({ children }) => {
 
     // Fonction pour ajouter un produit au panier
     const ajouterAuPanier = (produit) => {
-        console.log(produit)
         setPanier((prevPanier) => {
             const index = prevPanier.findIndex(item => item.id === produit.id);
             if (index === -1) {

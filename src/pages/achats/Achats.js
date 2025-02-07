@@ -6,13 +6,16 @@ import {Link, useNavigate} from "react-router-dom";
 import {Button} from "react-bootstrap";
 import HeaderBtnElement from "../../components/HeaderBtnElement";
 import {useJwt} from "../../context/JwtContext";
+import {formatDate} from "../../utils/dateUtils";
+import ErrorAlert from "../../exceptions/ErrorAlert";
 
 function Achats() {
     const [achats, setAchats] = useState([]);
     const [error, setError] = useState(null);
+    const [createError, setCreateError] = useState("");
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-    const {loggedEmployee, jwt} = useJwt();
+    const {loggedEmployee} = useJwt();
 
     async function fetchAchats() {
         setLoading(true);
@@ -29,23 +32,11 @@ function Achats() {
     }
 
     useEffect( () => {
-        console.log('loggedEmployee');
-        console.log(loggedEmployee);
-        console.log('--------------------------- **************************** --------------------------');
-        console.log('jwt')
-        console.log(jwt)
          fetchAchats().then(r => {});
     }, []);
 
 
-    const handleUpdateAchat = (id) => {
-        const updatedData = { montant: 300 };
-        AchatService.updateAchat(id, updatedData)
-            .then(updatedAchat => {
-                setAchats(achats.map(achat => achat.id === id ? updatedAchat : achat));
-            })
-            .catch(err => setError(err));
-    };
+
 
     const handleDeleteAchat =async (id) => {
         setLoading(true);
@@ -61,7 +52,7 @@ function Achats() {
     };
 
     if (error) {
-        return <p>Erreur : {error.message}</p>;
+        return <ErrorAlert error={error} />;
     }
 
     const handleCreateAchat = async (e) =>{
@@ -69,16 +60,18 @@ function Achats() {
         setLoading(true);
         setError(null);
         try{
+
             // let resIdEmploye = await employeService.getEmployesByUsername(username);
             let achat = {
                 montantTotal : 0,
-                employeId: loggedEmployee.id
+                employeId: JSON.parse(loggedEmployee).id
             };
             let restCreateAchat = await achatService.createAchat(achat)
             navigate(`/achats/${restCreateAchat.id}?showAlert=true`);
 
         }catch(err){
-            setError(err);
+            if (err.response?.data?.message)
+                setCreateError(err.response.data.message);
         }finally {
             setLoading(false);
         }
@@ -89,6 +82,10 @@ function Achats() {
         <div>
             <h1><strong>Achats</strong></h1>
 
+            {createError &&
+
+                <p className={"mt-3 text-danger"}> Erreur :  {createError} </p>
+            }
 
             <HeaderBtnElement titreFil='' variant='outline-primary' onClick={handleCreateAchat}
                               valueBtn='Créer Achat' />
@@ -112,7 +109,7 @@ function Achats() {
                             <Link to={`/achats/${achat.id}`} className='text-decoration-none'>{'Achat'}</Link>
                         </td>
                         <td>{achat.montantTotal}</td>
-                        <td>{achat.dateCreation}</td>
+                        <td>{formatDate(achat.dateCreation)}</td>
                         <td>
                             <Link to={`/employes/${achat.employeId}`} className='text-decoration-none'>{achat.employeId} - {achat.employeNom}</Link>
                         </td>

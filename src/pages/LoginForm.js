@@ -29,7 +29,7 @@ const LoginForm = () => {
             // console.log("Réponse réussie -> Token :", token);
             setJwt(token);
 
-            setLoggedEmployee(res.data.employeGetDto);
+            setLoggedEmployee(JSON.stringify(res.data.employeGetDto));
 
             // Vérifiez si une URL mémorisée existe
             const requestedUrl = localStorage.getItem("requestedUrl");

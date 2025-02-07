@@ -1,9 +1,11 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import AchatService from "../services/AchatService";
+import {useJwt} from "../context/JwtContext";
 
 const CreateAchatPage = () => {
+    const {loggedEmployee} = useJwt();
 
     let formInitialState = {
         montantTotal: 0,
@@ -38,6 +40,9 @@ const CreateAchatPage = () => {
 
     };
 
+    useEffect(() => {
+        console.log(loggedEmployee)
+    },[])
     return (
         <div className="container mt-5">
             <h3>Entrée en stock</h3>

@@ -14,6 +14,7 @@ const VenteDetail = () => {
     const [lignesVentes, setLignesVentes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [formAddLinesError, setFormAddLinesError] = useState("");
     const [isEditing, setIsEditing] = useState(false); // État pour le mode édition
     const [formData, setFormData] = useState({}); // État pour stocker les données du formulaire
     const navigate = useNavigate();
@@ -36,7 +37,7 @@ const VenteDetail = () => {
             let data = await VenteService.getVenteById(id)
             setVente(data)
             await fetchLigneVente(data)
-            setFormData(data) // Pré-remplit le formulaire
+            // setFormData(data) // Pré-remplit le formulaire
         } catch (err) {
             setError(err);
         } finally {
@@ -60,7 +61,6 @@ const VenteDetail = () => {
         setLoading(true);
         try {
             let data = await venteService.getVenteLines(id);
-            console.log('ligneData :', data);
             setLignesVentes(data.content); // Mise à jour de l'état après que toutes les données sont récupérées
         } catch (err) {
             setError(err);
@@ -118,8 +118,12 @@ const VenteDetail = () => {
         try {
             await LigneVenteService.createLigneVente(formAddLigne);
             setFormAddLigne({...formAddLigne, 'produitId': 0, "produitNom": "" });
+            fetchVente().then();
         } catch (error) {
-            setError(error);
+            console.log(error)
+            if (error.response?.data?.message) {
+                setFormAddLinesError(error.response.data.message);
+            }
         } finally {
             setIsEditing(false);
             setLoading(false)
@@ -200,6 +204,11 @@ const VenteDetail = () => {
                         </tbody>
                     </Table>
                     <Form onSubmit={handleSubmitFormAAddLine} className={"mt-5"}>
+                        {formAddLinesError && <Row>
+                            <Col xs={12} className="text-danger my-1" >
+                                {formAddLinesError}
+                            </Col>
+                        </Row>}
                         <Row className="">
                             <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
                                 <Form.Group className="mb-3">

@@ -13,7 +13,6 @@ const AchatDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search); // Utilise URLSearchParams pour obtenir les paramètres de requête
-
     const pShowAlert = queryParams.get("showAlert"); // Récupère la valeur de param1
 
     const [achat, setAchat] = useState(null);
@@ -41,7 +40,7 @@ const AchatDetail = () => {
     const fetchAchat = async () => {
         setLoading(true);
         try {
-            let data = await AchatService.getAchatById(id)
+            let data = await AchatService.getAchatById(Number(id))
             setAchat(data)
             await fetchLigneAchat(data)
             // setFormData(data) // Pré-remplit le formulaire
@@ -68,7 +67,6 @@ const AchatDetail = () => {
         setLoading(true);
         try {
             let data = await achatService.getAchatLines(id);
-            console.log('ligneData :', data);
             setLignesAchats(data.content); // Mise à jour de l'état après que toutes les données sont récupérées
         } catch (err) {
             setError(err);
@@ -87,7 +85,10 @@ const AchatDetail = () => {
 
     useEffect(() => {
         fetchAchat();
-    }, [id]);
+        setError('testPathPatternToRegExp')
+    },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [id]);
 
 
     // Gestion des modifications du formulaire
@@ -108,9 +109,7 @@ const AchatDetail = () => {
         );
     }
 
-    if (error) {
-        return <h1 className="text-danger">{error}</h1>;
-    }
+
 
     if (!achat) {
         return <h1 className="text-warning">Achat introuvable</h1>;
@@ -216,7 +215,14 @@ const AchatDetail = () => {
                         ))}
                         </tbody>
                     </Table>
+
                     <Form onSubmit={handleSubmitFormAAddLine} className={"mt-5"}>
+                        {error &&
+                            <Row>
+                                <Col xs={12} className="text-danger my-1">
+                                  Erreur :   {error.response?.data?.message}
+                                </Col>
+                            </Row>}
                         <Row className="">
                             <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
                                 <Form.Group className="mb-3">

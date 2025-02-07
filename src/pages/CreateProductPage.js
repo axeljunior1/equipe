@@ -3,6 +3,8 @@ import {useNavigate} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import produitService from "../services/ProduitService";
 import CategorieService from "../services/CategorieService";
+import apiCrudService from "../services/ApiCrudService";
+import ErrorAlert from "../exceptions/ErrorAlert";
 
 const CreateProductPage = () => {
     const [formData, setFormData] = useState({
@@ -47,8 +49,9 @@ const CreateProductPage = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            let response = await produitService.createProduit(formData);
-            navigate(`/produits/${response.data.id}?showAlertCreation=true`);
+            let response = await apiCrudService.post('produits',formData);
+            debugger;
+            navigate(`/produits/${response.id}?showAlertCreation=true`);
 
         }catch (error) {
             setError(error);
@@ -59,18 +62,15 @@ const CreateProductPage = () => {
 
     };
 
-    function handleChangeSelect(e) {
-        const { name, value } = e.target;
-    }
-
     useEffect(() => {
         fetchCategories().then(response => response);
     },[])
 
+    // if (error) return <ErrorAlert error={error} />;
     return (
         <div className="container mt-5">
             <h3>Créer un nouveau produit</h3>
-            {error && <div className="alert alert-danger">{error}</div>}
+            {error && <div className="alert alert-danger">{error.message}</div>}
             <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
                     <Form.Label>Nom</Form.Label>
@@ -95,28 +95,6 @@ const CreateProductPage = () => {
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>Image</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="image"
-                        value={formData.image}
-                        onChange={handleChange}
-                        placeholder="URL de l'image"
-                    />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                    <Form.Label>Quantité</Form.Label>
-                    <Form.Control
-                        type="number"
-                        name="quantity"
-                        value={formData.quantity}
-                        onChange={handleChange}
-                        placeholder="Entrez la quantité"
-                    />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
                     <Form.Label>Prix Unitaire</Form.Label>
                     <Form.Control
                         type="number"
@@ -127,7 +105,7 @@ const CreateProductPage = () => {
                     />
                 </Form.Group>
 
-                <Form.Select aria-label="Default select example"
+                <Form.Select className="mb-3"
                              name="categorieId"
                              value={formData.categorieId}
                              onChange={handleChange}
@@ -138,17 +116,6 @@ const CreateProductPage = () => {
                         <option key={item.id} value={item.id}>{item.nom}</option>
                     ))}</>
                 </Form.Select>
-
-                <Form.Group className="mb-3">
-                    <Form.Label>QR Code</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="qrCode"
-                        value={formData.qrCode[0]}
-                        onChange={(e) => setFormData({ ...formData, qrCode: [e.target.value] })}
-                        placeholder="QR Code"
-                    />
-                </Form.Group>
 
                 <Form.Group className="mb-3">
                     <Form.Label>Stock Initial</Form.Label>

@@ -1,38 +1,36 @@
 import {createContext, useContext, useEffect, useState} from "react";
 
 const JwtContext = createContext();
-
-export const JwtProvider = ({children}) => {
+export const JwtProvider = ({ children }) => {
     const [jwt, setJwt] = useState(() => localStorage.getItem("jwt") || "");
-    const [loggedEmployee, setLoggedEmployee] = useState(() => localStorage.getItem("username") || "");
+    const [loggedEmployee, setLoggedEmployee] = useState(() => {
+        const storedUser = localStorage.getItem("username");
+        return storedUser ? JSON.parse(storedUser) : null; // Convertir en objet ou null si absent
+    });
 
-    console.log("Token Provider monté ou mis à jour");
 
     useEffect(() => {
-        // Sauvegarder le token dans localStorage chaque fois qu'il change
         if (jwt) {
             localStorage.setItem("jwt", jwt);
         } else {
-            localStorage.removeItem("jwt"); // Supprimer si déconnexion
+            localStorage.removeItem("jwt");
         }
     }, [jwt]);
 
     useEffect(() => {
-        // Sauvegarder le username dans localStorage chaque fois qu'il change
         if (loggedEmployee) {
-            localStorage.setItem("username", loggedEmployee);
+            localStorage.setItem("username", JSON.stringify(loggedEmployee)); // Stocker en JSON
         } else {
-            localStorage.removeItem("username"); // Supprimer si déconnexion
+            localStorage.removeItem("username");
         }
     }, [loggedEmployee]);
 
     return (
-        <JwtContext.Provider value={{jwt, setJwt, loggedEmployee, setLoggedEmployee}}>
+        <JwtContext.Provider value={{ jwt, setJwt, loggedEmployee, setLoggedEmployee }}>
             {children}
         </JwtContext.Provider>
-    )
-
-}
+    );
+};
 
 
 

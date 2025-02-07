@@ -1,10 +1,11 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import ProduitService from "../services/ProduitService";
-import produitService from "../services/ProduitService";
 import {usePanier} from "../context/PanierContext";
 import ProduitDetailComp from "../components/ProduitDetailComp";
 import AlertComp from "../components/AlertComp";
+import ErrorAlert from "../exceptions/ErrorAlert";
+import apiCrudService from "../services/ApiCrudService";
 
 const ProduitDetail = (props) => {
     const {id:rlt} = useParams(); // Récupère l'ID depuis l'URL*
@@ -34,11 +35,11 @@ const ProduitDetail = (props) => {
     const [showAlertCreation, setShowAlertCreation] = useState(!!pShowAlertCreation);
 
     // Fonction pour récupérer les données d'un produit
-    const fetchProduit = useCallback(async () => {
+    const fetchProduit = async () => {
         console.log(panier)
         setLoading(true);
         try {
-            const data = await produitService.getProduitsById(id)
+            const data = await apiCrudService.getById('produits', id)
             // console.log(data)
             setProduit(data);
             setFormData(data);
@@ -47,7 +48,7 @@ const ProduitDetail = (props) => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    };
 
     // Fonction pour mettre à jour un produit (PATCH)
     const updateProduit = async () => {
@@ -69,17 +70,13 @@ const ProduitDetail = (props) => {
 
 
     useEffect(() => {
-        fetchProduit()// Appel de la fonction asynchrone
+        fetchProduit().then(r => r)// Appel de la fonction asynchrone
     }, []);
 
     if (loading) {
         return <h1>Chargement en cours...</h1>;
     }
 
-    if (error) {
-        console.log('error545');
-        return <h1> Une erruer {error}</h1>;
-    }
 
     if (!produit) {
         return <h1>Produit introuvable</h1>;
@@ -91,23 +88,16 @@ const ProduitDetail = (props) => {
         setFormData({...formData, [name]: value});
     };
 
-    const handleAjouterAuPanier = () => {
-        // console.log(produit)
-        ajouterAuPanier({...produit, quantite: 1});
-    };
+
 
     function handeIsEditing() {
-        console.log('isEditing')
-        setIsEditing(true);
     }
-    const onDejaPresent = () =>{
-        return dejaPresent(produit)
-    }
-    const onNombreDansPanier = () =>{
-        return onNombreDansPanier(produit)
-    }
+
     const handleStockProduit = (id) =>{
         navigate(`/mouvements-stock/produit/${id}`);
+    }
+    if(error){
+       return <ErrorAlert error={error} />
     }
 
     return (

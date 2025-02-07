@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Col, Row} from "react-bootstrap";
+import {Button, Col, Form, Row} from "react-bootstrap";
 
 const Pagination = ({currentPage,pageSize, handlePageChange, handlePageSizeChange, totalPages}) => {
 
@@ -30,7 +30,7 @@ const Pagination = ({currentPage,pageSize, handlePageChange, handlePageSizeChang
                 <Row>
                     <Col xs="auto">
                         <label htmlFor="pageSize">Produits par page:</label>
-                        <select
+                        <Form.Select
                             id="pageSize"
                             value={pageSize}
                             onChange={handlePageSizeChange}
@@ -38,7 +38,10 @@ const Pagination = ({currentPage,pageSize, handlePageChange, handlePageSizeChang
                             <option value="5">5</option>
                             <option value="10">10</option>
                             <option value="15">15</option>
-                        </select>
+                            <option value="15">50</option>
+                            <option value="15">100</option>
+                            <option value="15">200</option>
+                        </Form.Select>
                     </Col>
                 </Row>
             </div>

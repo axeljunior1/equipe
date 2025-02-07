@@ -1,8 +1,20 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Container, Row, Col, Card, Button} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
+import apiCrudService from "../services/ApiCrudService";
 
 const HomePage = () => {
+    const fetchInit = async () =>{
+        try {
+            await apiCrudService.get("produits",0,1, "");
+        }catch(err) {
+        }
+    }
+
+    useEffect(() => {
+        fetchInit().then();
+    }, [])
+
     return (
         <Container className="mt-5">
             {/* Section d'introduction sans Jumbotron */}
@@ -17,7 +29,7 @@ const HomePage = () => {
 
 
                 {/* Section Caisse */}
-                <Col md={4} className="mb-4">
+                <Col xl={4} md={6} sm={12} className="mb-4">
                     <Card className="h-100">
                         <Card.Body className="d-flex flex-column">
                             <Card.Title>Passer à la caisse</Card.Title>
@@ -34,7 +46,7 @@ const HomePage = () => {
                 </Col>
 
                 {/* Section Produits */}
-                <Col md={4} className="mb-4">
+                <Col xl={4} md={6} sm={12} className="mb-4">
                     <Card className="h-100">
                         <Card.Body className="d-flex flex-column">
                             <Card.Title>Produits en Stock</Card.Title>
@@ -51,7 +63,7 @@ const HomePage = () => {
                 </Col>
 
                 {/* Section Ajouter un produit */}
-                <Col md={4} className="mb-4">
+                <Col xl={4} md={6} sm={12} className="mb-4">
                     <Card className="h-100">
                         <Card.Body className="d-flex flex-column">
                             <Card.Title>Ajouter un produit</Card.Title>
@@ -59,7 +71,7 @@ const HomePage = () => {
                                 Ajoutez de nouveaux produits dans le stock.
                             </Card.Text>
                             <div className="mt-auto">
-                                <Link to="/ajouter-produit">
+                                <Link to="/creer-produit">
                                     <Button className="w-100" variant="success">Ajouter un produit</Button>
                                 </Link>
                             </div>
@@ -68,7 +80,7 @@ const HomePage = () => {
                 </Col>
 
                 {/* Section Entrées en Stock */}
-                <Col md={4} className="mb-4">
+                <Col xl={4} md={6} sm={12} className="mb-4">
                     <Card className="h-100">
                         <Card.Body className="d-flex flex-column">
                             <Card.Title>Mouvements de stock</Card.Title>
@@ -85,7 +97,7 @@ const HomePage = () => {
                 </Col>
 
                 {/* Section Ventes */}
-                <Col md={4} className="mb-4">
+                <Col xl={4} md={6} sm={12} className="mb-4">
                     <Card className="h-100">
                         <Card.Body className="d-flex flex-column">
                             <Card.Title>Ventes</Card.Title>
@@ -102,7 +114,7 @@ const HomePage = () => {
                 </Col>
 
                 {/* Section Ventes */}
-                <Col md={4} className="mb-4">
+                <Col xl={4} md={6} sm={12} className="mb-4">
                     <Card className="h-100">
                         <Card.Body className="d-flex flex-column">
                             <Card.Title>Achats</Card.Title>
@@ -119,7 +131,7 @@ const HomePage = () => {
                 </Col>
 
                 {/* Section Utilisateurs */}
-                <Col md={4} className="mb-4">
+                <Col xl={4} md={6} sm={12} className="mb-4">
                     <Card className="h-100">
                         <Card.Body className="d-flex flex-column">
                             <Card.Title>Employés</Card.Title>
@@ -136,7 +148,7 @@ const HomePage = () => {
                 </Col>
 
                 {/* Section Catégories */}
-                <Col md={4} className="mb-4">
+                <Col xl={4} md={6} sm={12} className="mb-4">
                     <Card className="h-100">
                         <Card.Body className="d-flex flex-column">
                             <Card.Title>Catégories</Card.Title>
