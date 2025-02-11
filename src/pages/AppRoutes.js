@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import Home from "./Home";
 import ListProduits from "./ListProduits";
 import CreateProductPage from "./CreateProductPage";
@@ -20,6 +20,8 @@ import Redirect from "../components/Redirect";
 import Ventes from "./ventes/Ventes";
 import VenteDetail from "./ventes/VenteDetail";
 import MouvementStock from "./mouvementStock/MouvementStock";
+import Roles from "./roles/Roles";
+import RoleDetail from "./roles/RoleDetails";
 
 const AppRoutes = () => {
     useEffect(() => {
@@ -48,6 +50,8 @@ const AppRoutes = () => {
                     <Route path="/categories/:id" element={<CategorieDetail/>}/>
                     <Route path="/mouvements-stock" element={<MouvementStock/>}/>
                     <Route path="/mouvements-stock/produit/:id" element={<MouvementStock/>}/>
+                    <Route path="/roles" element={<Roles/>}/>
+                    <Route path="/roles/:id" element={<RoleDetail/>}/>
                     <Route path="/login" element={<LoginForm/>}/>
                     <Route path="*" element={<NotFound/>}/>
                 </Routes>

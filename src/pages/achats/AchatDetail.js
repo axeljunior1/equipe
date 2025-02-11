@@ -170,8 +170,8 @@ const AchatDetail = () => {
                     <h3 className="card-title text-center">{achat.nom}</h3>
                     <div className="card-body">
                         <p><strong>Employé :</strong>
-                            <Link to={`/employes/${achat.employe.id}`}
-                                  className='text-decoration-none'> {achat.employe.nom} - {achat.employe.prenom}</Link>
+                            <Link to={`/employes/${achat.employeId}`}
+                                  className='text-decoration-none'> {achat.employeNom} - {achat.employeNom}</Link>
                         </p>
                         <p><strong>Montant :</strong> {achat.montantTotal}</p>
                         <p><strong>Date de Création :</strong> {achat.dateCreation}</p>

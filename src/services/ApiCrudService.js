@@ -54,6 +54,17 @@ const apiService = {
         }
     },
 
+
+    patch: async (endpoint, id, data) => {
+        try {
+            const response = await axiosInstance.patch(`/${endpoint}/${id}`, data);
+            return response.data;
+        } catch (error) {
+            console.error("Erreur lors de la mise à jour :", error);
+            throw error;
+        }
+    },
+
     // Méthode DELETE : Supprimer une ressource par ID
     delete: async (endpoint, id) => {
         try {

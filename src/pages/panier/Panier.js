@@ -9,6 +9,7 @@ import {useNavigate} from "react-router-dom";
 import ModalDetailProduit from "../../modales/modalDetailProduit";
 import AlertComp from "../../components/AlertComp";
 import {Search} from "lucide-react";
+import {useJwt} from "../../context/JwtContext";
 
 const Panier = () => {
     const [showModalClient, setshowModalClient] = useState(false); // Contrôle d'affichage du modal
@@ -16,6 +17,8 @@ const Panier = () => {
     const {panier, ajouterAuPanier, retirerDuPanier, calculerTotal} = usePanier();
     const [produitIdModal, setProduitIdModal] = useState("");
     const [showAlert, setShowAlert] = useState(false);
+    const { loggedEmployee} = useJwt();
+
     const navigate = useNavigate();
 
     let initFormClient = {
@@ -103,7 +106,7 @@ const Panier = () => {
             clientTelephone: formClient.telephone,
             venteMontantTotal: 0,
             venteClientId: formClient.id,
-            venteEmployeId: 2,
+            venteEmployeId: JSON.parse(loggedEmployee)?.id,
             lignesCaisses: []
         }
 
@@ -113,6 +116,7 @@ const Panier = () => {
                 lVenteQuantite: item.quantite,
                 lVenteProduitId: item.id
             });
+            caisse.venteMontantTotal = calculerTotal();
         })
 
         try {
@@ -203,7 +207,7 @@ const Panier = () => {
             <h3> Informations client </h3>
             <Form onSubmit={handleSubmitFormAAddLine} className={""}>
                 <Row className="">
-                    <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="position-relative d-inline">
+                    <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="position-relative d-inline mt-2">
                         <Form.Label className={'fw-bold'}>Id du client</Form.Label>
 
                         <Form.Control
@@ -223,28 +227,7 @@ const Panier = () => {
                             <Search className={isHovered ? "text-success" : "text-info"} size={30}/>
                         </button>
                     </Col>
-                    {/*<Col xs={12} sm={12} md={6} lg={4} xxl={3}>*/}
-                    {/*    <Form.Group className="mb-3">*/}
-                    {/*        <Form.Label className={'fw-bold'}>Id du client</Form.Label>*/}
-
-                    {/*        <InputGroup className="mb-3">*/}
-                    {/*            <Form.Control*/}
-                    {/*                type="number"*/}
-                    {/*                value={formClient.id}*/}
-                    {/*                onChange={handleInputChange}*/}
-                    {/*                name='produitId'*/}
-                    {/*                className="my-1"*/}
-                    {/*            />*/}
-                    {/*            <Button variant={"outline-info"} onClick={() => {*/}
-                    {/*                setshowModalClient(true);*/}
-                    {/*            }*/}
-                    {/*            }>*/}
-                    {/*                🔍Search*/}
-                    {/*            </Button>*/}
-                    {/*        </InputGroup>*/}
-                    {/*    </Form.Group>*/}
-                    {/*</Col>*/}
-                    <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
+                    <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
                         <Form.Label className={'fw-bold'}>Nom</Form.Label>
                         <Form.Control
                             type="text"
@@ -255,7 +238,7 @@ const Panier = () => {
                             className="my-1"
                         />
                     </Col>
-                    <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
+                    <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
                         <Form.Label className={'fw-bold'}>prenom</Form.Label>
                         <Form.Control
                             type="text"
@@ -266,7 +249,7 @@ const Panier = () => {
                             className="my-1"
                         />
                     </Col>
-                    <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
+                    <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
                         <Form.Label className={'fw-bold'}>Email</Form.Label>
                         <Form.Control
                             type="text"
@@ -277,7 +260,7 @@ const Panier = () => {
                             className="my-1"
                         />
                     </Col>
-                    <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
+                    <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
                         <Form.Label className={'fw-bold'}>Email</Form.Label>
                         <Form.Control
                             type="tel"
@@ -290,10 +273,10 @@ const Panier = () => {
                     </Col>
                 </Row>
 
-                <Row className={'justify-content-end mt-3 '}>
+                <Row className={'justify-content-end mt-3 '} >
                     <Col xs={"3"}>
-                        <Button variant={"success"} onClick={validerLaVente} className='w-100'>Valider le panier
-                            (Valider la vente)
+                        <Button variant={"success"} onClick={validerLaVente} className='w-100'>
+                            Valider la vente
                         </Button>
                     </Col>
                 </Row>
