@@ -72,18 +72,18 @@ function Ventes() {
                 </tr>
                 </thead>
                 <tbody>
-                {ventes.map((vente, index) => (
+                {ventes && ventes.map((vente, index) => (
                     <tr key={vente.id}>
                         <td>{index + 1}</td>
                         <td>
                             <Link to={`/ventes/${vente.id}`} className='text-decoration-none'>{'Vente'} - {vente.id}</Link>
                         </td>
                         <td>{vente.montantTotal}</td>
-                        <td>{vente.client}
-                            <Link to={`/clients/${vente.clientId}`} className='text-decoration-none'>{vente.clientId} - {vente.clientNom}</Link>
+                        <td>
+                            <Link to={`/clients/${vente.client.id}`} className='text-decoration-none'>{vente.client.id} - {vente.client.nom}</Link>
                         </td>
                         <td>
-                            <Link to={`/employes/${vente.employeId}`} className='text-decoration-none'>{vente.employeId} - {vente.employeNom}</Link>
+                            <Link to={`/employes/${vente.employe.id}`} className='text-decoration-none'>{vente.employe.id} - {vente.employe.nom}</Link>
                         </td>
                         <td>
                             <Button variant={"outline-danger"} className={"w-100"} onClick={()=>handleDeleteVente(vente.id)}> Supprimer la ligne </Button>

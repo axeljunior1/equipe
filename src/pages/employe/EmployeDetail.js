@@ -64,9 +64,13 @@ const EmployeDetail = () => {
     };
 
     const setSelectedOptions = (selectedItems) => {
-        console.log(selectedItems);
-        console.log(formData);
-        setFormData({...formData, rolesNoms: selectedItems});
+        let newFormData = {...formData,
+            rolesNoms: selectedItems.map(item => item.nom),
+            rolesIds: selectedItems.map(item => item.id)
+            };
+        console.log(newFormData.rolesNoms);
+
+        setFormData(newFormData);
 
     }
     const OnSubmitPutEmploye = (e) => {

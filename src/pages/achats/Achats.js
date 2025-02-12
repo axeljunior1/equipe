@@ -106,12 +106,12 @@ function Achats() {
                     <tr key={achat.id}>
                         <td>{index + 1}</td>
                         <td>
-                            <Link to={`/achats/${achat.id}`} className='text-decoration-none'>{'Achat'}</Link>
+                            <Link to={`/achats/${achat.id}`} className='text-decoration-none'> Achat - {achat.id}</Link>
                         </td>
                         <td>{achat.montantTotal}</td>
                         <td>{formatDate(achat.dateCreation)}</td>
                         <td>
-                            <Link to={`/employes/${achat.employeId}`} className='text-decoration-none'>{achat.employeId} - {achat.employeNom}</Link>
+                            <Link to={`/employes/${achat.employeId}`} className='text-decoration-none'>{achat.employe.id} - {achat.employe.nom}</Link>
                         </td>
                         <td>
                             <Button variant={"outline-danger"} className={"w-100"} onClick={()=>handleDeleteAchat(achat.id)}> Supprimer la ligne </Button>

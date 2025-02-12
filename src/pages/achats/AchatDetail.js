@@ -170,8 +170,8 @@ const AchatDetail = () => {
                     <h3 className="card-title text-center">{achat.nom}</h3>
                     <div className="card-body">
                         <p><strong>Employé :</strong>
-                            <Link to={`/employes/${achat.employeId}`}
-                                  className='text-decoration-none'> {achat.employeNom} - {achat.employeNom}</Link>
+                            <Link to={`/employes/${achat.employe.id}`}
+                                  className='text-decoration-none'> {achat.employe.id} - {achat.employe.nom}</Link>
                         </p>
                         <p><strong>Montant :</strong> {achat.montantTotal}</p>
                         <p><strong>Date de Création :</strong> {achat.dateCreation}</p>
@@ -201,9 +201,9 @@ const AchatDetail = () => {
                             <tr key={ligne.id}>
                                 <td>{index + 1}</td>
                                 <td><Link to={`/produits/${ligne.produitId}`}
-                                          className='text-decoration-none'>{ligne.produitId} - {ligne.produitNom}</Link>
+                                          className='text-decoration-none'>{ligne.produit?.id} - {ligne.produit?.nom}</Link>
                                 </td>
-                                <td>{ligne.prixUnitaire}</td>
+                                <td>{ligne.produit?.prixUnitaire}</td>
                                 <td>{ligne.quantite}</td>
                                 <td className={'justify-content-center align-items-center'}>
                                     <Button variant={"outline-danger"} className={'w-100'} onClick={(e) => {

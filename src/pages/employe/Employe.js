@@ -2,16 +2,27 @@ import React, { useState, useEffect } from 'react';
 import Table from "react-bootstrap/Table";
 import {Link} from "react-router-dom";
 import EmployeService from "../../services/EmployeService";
+import axios from "axios";
+import apiService from "../../services/ApiCrudService";
+import {formatDate} from "../../utils/dateUtils";
 
 function Achats() {
     const [employes, setEmployes] = useState([]);
     const [error, setError] = useState(null);
 
+    const fetchEmployes = async () => {
+        try{
+            let data = await apiService.get("employes");
+            setEmployes(data.content);
+        }catch(e){
+            setError(e);
+
+        }finally{
+        }
+    }
+
     useEffect(() => {
-        // Charger les achats au chargement du composant
-        EmployeService.getEmploye()
-            .then(data => setEmployes(data))
-            .catch(err => setError(err));
+        fetchEmployes().then();
     }, []);
 
     const handleAddEmploye = () => {
@@ -50,22 +61,26 @@ function Achats() {
                 <thead>
                 <tr>
                     <th></th>
-                    <th>id</th>
                     <th>Nom</th>
                     <th>Prenom</th>
+                    <th>Roles</th>
                     <th>Date de creation</th>
                 </tr>
                 </thead>
                 <tbody>
-                {employes.map((employe, index) => (
+                {employes?.map((employe, index) => (
                     <tr key={employe.id}>
-                        <td>{index + 1}</td>
+                        <td>{index+1}</td>
                         <td>
-                            <Link to={`/employes/${employe.id}`} className='text-decoration-none'>{employe.id}</Link>
+                            <Link to={`/employes/${employe.id}`} className='text-decoration-none'>{employe.id} - {employe.nom}  </Link>
                         </td>
-                        <td>{employe.nom}</td>
                         <td>{employe.prenom}</td>
-                        <td>{employe.dateCreation}
+                        <td className="fw-bold">
+                            {employe.roles.length > 3
+                                ? employe.roles.slice(0, 3).map(r => r.nom).join(', ') + '...'
+                                : employe.roles.map(r => r.nom).join(', ')}
+                        </td>
+                        <td>{formatDate(employe.dateCreation)}
                         </td>
                     </tr>
                 ))}

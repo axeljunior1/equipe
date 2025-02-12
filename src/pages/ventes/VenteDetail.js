@@ -7,6 +7,7 @@ import LigneVenteService from "../../services/LigneVenteService";
 import {Button, Col, Form, Modal, Row} from "react-bootstrap";
 import InputGroup from "react-bootstrap/InputGroup";
 import SearchProduitPopup from "../test/SearchProduitPopup";
+import {formatDate} from "../../utils/dateUtils";
 
 const VenteDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
@@ -36,11 +37,13 @@ const VenteDetail = () => {
         try {
             let data = await VenteService.getVenteById(id)
             setVente(data)
-            await fetchLigneVente(data)
+            // await fetchLigneVente(data)
             // setFormData(data) // Pré-remplit le formulaire
         } catch (err) {
             setError(err);
         } finally {
+            setLoading(false);
+
             setIsEditing(false);
         }
     };
@@ -159,10 +162,10 @@ const VenteDetail = () => {
                     <div className="card-body">
                         <p><strong>Employé :</strong>
                             <Link to={`/employes/${vente.employe.id}`}
-                                  className='text-decoration-none'> {vente.employe.nom} - {vente.employe.prenom}</Link>
+                                  className='text-decoration-none'> {vente.employe.id} - {vente.employe.prenom}</Link>
                         </p>
                         <p><strong>Montant :</strong> {vente.montantTotal}</p>
-                        <p><strong>Date de Création :</strong> {vente.dateCreation}</p>
+                        <p><strong>Date de Création :</strong> { formatDate(vente.dateDerniereMiseAJour)}</p>
                     </div>
                     <div className="d-flex justify-content-center">
                         <button
@@ -185,13 +188,13 @@ const VenteDetail = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        {lignesVentes.map((ligne, index) => (
+                        {vente.ligneVentes?.map((ligne, index) => (
                             <tr key={ligne.id}>
                                 <td>{index + 1}</td>
-                                <td><Link to={`/produits/${ligne.produitId}`}
-                                          className='text-decoration-none'>{ligne.produitId} - {ligne.produitNom}</Link>
+                                <td><Link to={`/produits/${ligne.produit.id}`}
+                                          className='text-decoration-none'>{ligne.produit.id} - {ligne.produit.nom}</Link>
                                 </td>
-                                <td>{ligne.prixUnitaire}</td>
+                                <td>{ligne.prixVenteUnitaire}</td>
                                 <td>{ligne.quantite}</td>
                                 <td className={'justify-content-center align-items-center'}>
                                     <Button variant={"outline-danger"} className={'w-100'} onClick={(e) => {
