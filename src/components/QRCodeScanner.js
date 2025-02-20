@@ -1,13 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Scanner} from '@yudiel/react-qr-scanner';
-import {Card, Col, Row} from "react-bootstrap";
-import ProduitDetailComp from "./ProduitDetailComp";
+import {Col, Row} from "react-bootstrap";
 import {usePanier} from "../context/PanierContext";
 import produitService from "../services/ProduitService";
 
 const QRCodeScanner = (props) => {
     const [texte, setTexte] = useState('');
-    const {ajouterAuPanier, dejaPresent, nombreDansPanier} = usePanier();
+    const {ajouterAuPanier, nombreProduitDansPanier} = usePanier();
     const [error, setError] = useState(null);
 
 
@@ -20,20 +19,19 @@ const QRCodeScanner = (props) => {
             console.log('QR Code Data:', textValue);
         }
     };
-    const handleAjouterAuPanier = (produit) => {
-        // console.log(produit)
-        ajouterAuPanier({...produit, quantite: 1});
-    };
-    // useEffect(() => {
-    //
-    // }, [lastScanned]);
+
 
     const fetchProduitByCodeBarre = async (codeBarre) => {
         try {
             const data = await produitService.getProduitsByCodeBarre(codeBarre)
             // console.log(data)
-            // setProduit(data);
-            handleAjouterAuPanier(data);
+            debugger
+            console.log('nombreProduitDansPanier(data.id)' ,nombreProduitDansPanier(data.id));
+            ajouterAuPanier({
+                "prixVente": data.prixVente,
+                "produitId": data.id,
+                "quantite":  (Number(nombreProduitDansPanier(data.id)) + 1)
+            });
             // props.setTexte('')
             props.setAlert(true);
 
@@ -46,7 +44,7 @@ const QRCodeScanner = (props) => {
         <div>
             <Row>
                 <Col xs={4}>
-                    <div style={{width: '15rem'}}>
+                    <div style={{width: '20rem'}}>
                         <Scanner onScan={handleScan} allowMultiple={true} scanDelay={1500}
                                  style={{width: '100%', height: '100%'}} // Adapter le scanner à la taille du conteneur
                         />

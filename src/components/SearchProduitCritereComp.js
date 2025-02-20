@@ -1,7 +1,7 @@
 import React from 'react';
 import {Accordion, Button, Col, Container, Form, Row} from "react-bootstrap";
 
-const SearchProduitCritere = ({
+const SearchProduitCritereComp = ({
                                   searchInput,
                                   handleSearchInput,
                                   handleSubmitSearch,
@@ -133,4 +133,4 @@ const SearchProduitCritere = ({
     );
 };
 
-export default SearchProduitCritere;
+export default SearchProduitCritereComp;

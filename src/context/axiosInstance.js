@@ -1,8 +1,10 @@
 import axios from "axios";
-import {useLocation} from "react-router-dom";
+
+const apiUrl = "http://192.168.1.82:8080/";
+
 
 const axiosInstance = axios.create({
-    baseURL: "http://localhost:8089", // URL de votre backend
+    baseURL: apiUrl, // URL de votre backend
 });
 
 axiosInstance.interceptors.request.use(

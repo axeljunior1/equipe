@@ -3,6 +3,7 @@ import VenteService from "../../services/VenteService";
 import Table from "react-bootstrap/Table";
 import {Link} from "react-router-dom";
 import {Button} from "react-bootstrap";
+import {formatDate} from "../../utils/dateUtils";
 
 function Ventes() {
     const [ventes, setVentes] = useState([]);
@@ -68,6 +69,8 @@ function Ventes() {
                     <th>Montant</th>
                     <th>Client</th>
                     <th>Employé</th>
+                    <th>Date de création</th>
+                    <th>Date de mise à jour</th>
                     <th>Supprimer ? 🚮</th>
                 </tr>
                 </thead>
@@ -85,6 +88,8 @@ function Ventes() {
                         <td>
                             <Link to={`/employes/${vente.employe.id}`} className='text-decoration-none'>{vente.employe.id} - {vente.employe.nom}</Link>
                         </td>
+                        <td> {formatDate(vente.createdAt)}</td>
+                        <td> {formatDate(vente.updatedAt)}</td>
                         <td>
                             <Button variant={"outline-danger"} className={"w-100"} onClick={()=>handleDeleteVente(vente.id)}> Supprimer la ligne </Button>
                         </td>

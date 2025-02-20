@@ -4,7 +4,6 @@ import SearchProduitPopup from "../pages/test/SearchProduitPopup";
 import DetailsProduit from "../pages/DetailsProduit";
 
 const ModalDetailProduit = (props) => {
-    console.log(props);
     return (
         <div>
             <Modal show={props.showModal} onHide={() => props.setShowModal(false)} size="lg" centered>

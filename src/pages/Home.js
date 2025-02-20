@@ -1,19 +1,8 @@
-import React, {useEffect} from 'react';
-import {Container, Row, Col, Card, Button} from 'react-bootstrap';
+import React from 'react';
+import {Button, Card, Col, Container, Row} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
-import apiCrudService from "../services/ApiCrudService";
 
 const HomePage = () => {
-    const fetchInit = async () =>{
-        try {
-            await apiCrudService.get("produits",0,1, "");
-        }catch(err) {
-        }
-    }
-
-    useEffect(() => {
-        fetchInit().then();
-    }, [])
 
     return (
         <Container className="mt-5">

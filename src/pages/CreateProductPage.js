@@ -1,10 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
-import produitService from "../services/ProduitService";
 import CategorieService from "../services/CategorieService";
 import apiCrudService from "../services/ApiCrudService";
-import ErrorAlert from "../exceptions/ErrorAlert";
 
 const CreateProductPage = () => {
     const [formData, setFormData] = useState({

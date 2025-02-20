@@ -6,24 +6,37 @@ import ProduitDetailComp from "../components/ProduitDetailComp";
 import AlertComp from "../components/AlertComp";
 import ErrorAlert from "../exceptions/ErrorAlert";
 import apiCrudService from "../services/ApiCrudService";
+import {updateObject} from "../utils/objectMapping";
+import {Form} from "react-bootstrap";
+import {useJwt} from "../context/JwtContext";
 
 const ProduitDetail = (props) => {
-    const {id:rlt} = useParams(); // Récupère l'ID depuis l'URL*
-    const id = rlt??props.id // id de l'url ou id dans props, ils'agit ici de l'id du produit
-    const {panier, ajouterAuPanier, dejaPresent, nombreDansPanier} = usePanier();
+    const {id: rlt} = useParams(); // Récupère l'ID depuis l'URL*
+    const id = rlt ?? props.id // id de l'url ou id dans props, ils'agit ici de l'id du produit
+    const {
+        panier,
+        ajouterAuPanier,
+        retirerDuPanier,
+        calculerTotal,
+        refreshPanier,
+        nombreProduitDansPanier,
+        presentDansPanier,
+        updatePanier} = usePanier();
+
+
     const navigate = useNavigate();
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const pShowAlertCreation = queryParams.get("showAlertCreation");
+    // const [nbrePanier, setNbrePanier] = useState(0);
+    const {panierId} = useJwt()
 
     let initialFormDetailProduit = {
-        nom : "",
-        prixUnitaire : 0,
-        description : "",
-        categorieNom : "",
-        categorieId : 0,
-        stockInitial : 0,
-        qrCode : ""
+        nom: "",
+        description: "",
+        prixUnitaire: 0,
+        categorieId: 0,
+        stockInitial: 0,
     };
 
 
@@ -33,22 +46,30 @@ const ProduitDetail = (props) => {
     const [isEditing, setIsEditing] = useState(false); // État pour basculer en mode édition
     const [formData, setFormData] = useState(initialFormDetailProduit); // État pour stocker les modifications
     const [showAlertCreation, setShowAlertCreation] = useState(!!pShowAlertCreation);
+    const [categories, setCategories] = useState([]);
 
     // Fonction pour récupérer les données d'un produit
     const fetchProduit = async () => {
-        console.log(panier)
         setLoading(true);
         try {
             const data = await apiCrudService.getById('produits', id)
             // console.log(data)
             setProduit(data);
-            setFormData(data);
+            // Important pour ne retourner que les champs utiles pour la mise a jour
+            setFormData((prev) => {
+                let copie = {...prev};
+                updateObject(copie, data);
+                return copie;
+            });
         } catch (error) {
             setError(error);
         } finally {
             setLoading(false);
         }
     };
+
+
+
 
     // Fonction pour mettre à jour un produit (PATCH)
     const updateProduit = async () => {
@@ -57,9 +78,13 @@ const ProduitDetail = (props) => {
         try {
             let data = await ProduitService.updateProduit(id, formData)
             setProduit(data);
-            setFormData(data);
+            // Important pour ne retourner que les champs utiles pour la mise a jour
+            setFormData((prev) => {
+                let copie = {...prev};
+                updateObject(copie, data);
+                return copie;
+            });
             setIsEditing(false);
-            console.log(data)
         } catch (error) {
             setLoading(false);
             setError(error);
@@ -68,6 +93,30 @@ const ProduitDetail = (props) => {
         }
     };
 
+    const fetchCategories = async () => {
+        setLoading(true);
+        try {
+            let data = await apiCrudService.get("categories", 0, 50);
+            setCategories(data.content);  // Assuming 'content' is the array of products
+        } catch (error) {
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
+
+    };
+
+    // Fonction pour gérer les modifications dans le formulaire
+    const handleChange = (e) => {
+        const {name, value} = e.target;
+        setFormData({...formData, [name]: value});
+    };
+
+
+    useEffect(() => {
+        fetchCategories().then(response => response);
+
+    }, [])
 
     useEffect(() => {
         fetchProduit().then(r => r)// Appel de la fonction asynchrone
@@ -82,11 +131,6 @@ const ProduitDetail = (props) => {
         return <h1>Produit introuvable</h1>;
     }
 
-    // Fonction pour gérer les modifications dans le formulaire
-    const handleChange = (e) => {
-        const {name, value} = e.target;
-        setFormData({...formData, [name]: value});
-    };
 
 
 
@@ -94,11 +138,11 @@ const ProduitDetail = (props) => {
         setIsEditing(true);
     }
 
-    const handleStockProduit = (id) =>{
+    const handleStockProduit = (id) => {
         navigate(`/mouvements-stock/produit/${id}`);
     }
-    if(error){
-       return <ErrorAlert error={error} />
+    if (error) {
+        return <ErrorAlert error={error}/>
     }
 
     return (
@@ -117,14 +161,16 @@ const ProduitDetail = (props) => {
 
             {!isEditing ? (
 
-                <ProduitDetailComp id ={id} isEditing={handeIsEditing}  handleStockProduit = {handleStockProduit} />
+                <ProduitDetailComp id={id} isEditing={handeIsEditing} handleStockProduit={handleStockProduit}
+                                   nbrePanier={nombreProduitDansPanier}  panier={panier}/>
+
             ) : (
                 <div className="card p-4 shadow bg-light">
                     <h3 className="text-center mb-4">Modifier le produit</h3>
                     <form
                         onSubmit={(e) => {
                             e.preventDefault(); // Empêche le rechargement de la page
-                            updateProduit(); // Appelle la fonction de mise à jour
+                            updateProduit().then(); // Appelle la fonction de mise à jour
                         }}
                     >
                         {/* Nom */}
@@ -166,19 +212,44 @@ const ProduitDetail = (props) => {
                                 onChange={handleChange}
                                 placeholder="Entrez la description"
                             />
+                            <Form.Select className="mb-3"
+                                         name="categorieId"
+                                         value={formData.categorieId}
+                                         onChange={handleChange}
+                                         placeholder="Entrez la catégorie">
+                                <option>Catégorie</option>
+                                <>
+                                    {categories.map((item) => (
+                                        <option key={item.id} value={item.id}>{item.nom}</option>
+                                    ))}</>
+                            </Form.Select>
                         </div>
 
                         {/* Date de Création */}
                         <div className="mb-3">
                             <label htmlFor="stockInitial" className="form-label">Stock Initial :</label>
                             <input
-                                type="text"
+                                type="number"
                                 id="stockInitial"
                                 name="stockInitial"
                                 className="form-control"
                                 value={formData.stockInitial}
                                 onChange={handleChange}
-                                placeholder="Entrez la date de création"
+                                placeholder="Entrez le stock initial"
+                            />
+                        </div>
+
+                        {/* Date de Création */}
+                        <div className="mb-3">
+                            <label htmlFor="prixUnitaire" className="form-label">Prix Unitaire :</label>
+                            <input
+                                type="number"
+                                id="prixUnitaire"
+                                name="prixUnitaire"
+                                className="form-control"
+                                value={formData.prixUnitaire}
+                                onChange={handleChange}
+                                placeholder="Entrez le prix unitaire"
                             />
                         </div>
 

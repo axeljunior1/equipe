@@ -1,16 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
 import {Link, useNavigate} from "react-router-dom";
-import ProduitService from "../services/ProduitService";
-import HeaderBtnElement from "../components/HeaderBtnElement";
+import ClientService from "../services/ClientService";
+import HeaderBtnElementComp from "../components/HeaderBtnElementComp";
 import {Button} from "react-bootstrap";
 import {usePanier} from "../context/PanierContext";
-import Pagination from "../components/Pagination";
-import SearchProduitCritere from "../components/SearchProduitCritere";
+import PaginationComp from "../components/PaginationComp";
+import SearchClientCritereComp from "../components/SearchClientCritereComp";
 
 
-const ListProduit = () => {
-    const [produits, setProduits] = useState([]);
+const ListClient = () => {
+    const [clients, setClients] = useState([]);
     const [searchInput, SetSearchInput] = useState('');
     const [filters, setFilters] = useState({
         nom: "",
@@ -28,12 +28,12 @@ const ListProduit = () => {
     const navigate = useNavigate();
     const {  ajouterAuPanier, dejaPresent, nombreDansPanier } = usePanier();
 
-    // Fonction pour récupérer les produits avec pagination
-    const fetchProduits = async () => {
+    // Fonction pour récupérer les clients avec pagination
+    const fetchClients = async () => {
         setLoading(true);
         try {
-            let data = await ProduitService.getProduit(currentPage, pageSize);
-            setProduits(data.content);  // Assuming 'content' is the array of products
+            let data = await ClientService.getClient(currentPage, pageSize);
+            setClients(data.content);  // Assuming 'content' is the array of products
             setTotalPages(data.totalPages); // Assuming 'totalPages' is the total page count
         } catch (error) {
             setError(error);
@@ -42,12 +42,12 @@ const ListProduit = () => {
         }
 
     };
-    // Fonction pour récupérer les produits depuis l'API
-    const fetchProduitByMotCle = async () => {
+    // Fonction pour récupérer les clients depuis l'API
+    const fetchClientByMotCle = async () => {
         setLoading(true);
         try {
-            let data = await ProduitService.getProduitByMotCle(searchInput);
-            setProduits(data);
+            let data = await ClientService.getClientByMotCle(searchInput);
+            setClients(data);
         } catch (error) {
             setError(error);
         } finally {
@@ -57,12 +57,12 @@ const ListProduit = () => {
 
 
     // useEffect(() => {
-    //     fetchProduitByMotCle(searchInput).then(r => console.log(r));
+    //     fetchClientByMotCle(searchInput).then(r => console.log(r));
     // }, [searchInput]);
 
 
     useEffect(() => {
-        fetchProduits().then(r => null );
+        fetchClients().then(r => null );
     }, [currentPage, pageSize]);
 
     if (loading) {
@@ -91,8 +91,8 @@ const ListProduit = () => {
         if (filters.prixUnitaireMin) params.prixUnitaireMin = filters.prixUnitaireMin;
         if (filters.prixUnitaireMax) params.prixUnitaireMax = filters.prixUnitaireMax;
 
-        ProduitService.getProduitDyn(params).then(data => {
-            setProduits(data);
+        ClientService.getClientDyn(params).then(data => {
+            setClients(data);
         }).catch(error => {
             setError(error);
         }).finally(
@@ -103,11 +103,11 @@ const ListProduit = () => {
 
     function handleSubmitSearch(e) {
         e.preventDefault();
-        fetchProduitByMotCle(searchInput).then(r => console.log(r));
+        fetchClientByMotCle(searchInput).then(r => console.log(r));
     }
 
-    const handleAjouterAuPanier = (produit) => {
-        ajouterAuPanier({ ...produit, quantite: 1 });
+    const handleAjouterAuPanier = (client) => {
+        ajouterAuPanier({ ...client, quantite: 1 });
     };
 
     const handlePageChange = (pageNumber) => {
@@ -125,15 +125,15 @@ const ListProduit = () => {
 
     return (
         <div>
-            <h1><strong>Produit</strong></h1>
+            <h1><strong>Client</strong></h1>
 
 
-            <HeaderBtnElement titreFil='' variant='outline-primary' onClick={() => navigate('/creer-produit')}
-                              valueBtn='Créer produit' />
+            <HeaderBtnElementComp titreFil='' variant='outline-primary' onClick={() => navigate('/creer-client')}
+                                  valueBtn='Créer client' />
 
 
 
-            <SearchProduitCritere
+            <SearchClientCritereComp
                 handleSubmitSearch={handleSubmitSearch}
                 searchInput={searchInput}
                 handleSearchInput={handleSearchInput}
@@ -154,18 +154,18 @@ const ListProduit = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {produits.map((produit, index) => (
-                    <tr key={produit.id}>
+                {clients.map((client, index) => (
+                    <tr key={client.id}>
                         <td>
-                            <Link to={`/produits/${produit.id}`} className='text-decoration-none'>{produit.nom}</Link>
+                            <Link to={`/clients/${client.id}`} className='text-decoration-none'>{client.nom}</Link>
                         </td>
-                        <td>{produit.description}</td>
-                        <td>{produit.stockInitial}</td>
-                        <td>{produit.prixUnitaire}</td>
+                        <td>{client.description}</td>
+                        <td>{client.stockInitial}</td>
+                        <td>{client.prixUnitaire}</td>
                         <td><Button
                             variant="" className={'w-100 text-primary fw-bold'}
-                            onClick={() => handleAjouterAuPanier(produit)} >
-                            {dejaPresent(produit) ? ( <span> Ajouter (1) au panier 🧺 <span className={'text-danger'}> { nombreDansPanier(produit)} </span> </span> ):( <span>Ajouter au panier 🧺 </span>)}
+                            onClick={() => handleAjouterAuPanier(client)} >
+                            {dejaPresent(client) ? ( <span> Ajouter (1) au panier 🧺 <span className={'text-danger'}> { nombreDansPanier(client)} </span> </span> ):( <span>Ajouter au panier 🧺 </span>)}
                         </Button> </td>
                     </tr>
                 ))}
@@ -174,7 +174,7 @@ const ListProduit = () => {
 
             {/* Pagination controls */}
 
-            <Pagination
+            <PaginationComp
                 currentPage = {currentPage}
                 handlePageChange = {handlePageChange}
                 totalPages = {totalPages}
@@ -186,4 +186,4 @@ const ListProduit = () => {
     );
 };
 
-export default ListProduit;
+export default ListClient;

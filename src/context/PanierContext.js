@@ -1,4 +1,9 @@
 import React, {createContext, useContext, useEffect, useState} from 'react';
+import axiosInstance from "./axiosInstance";
+import {useJwt} from "./JwtContext";
+import apiCrudService from "../services/ApiCrudService";
+import SockJS from "sockjs-client";
+import {Client} from "@stomp/stompjs";
 
 // Création du contexte
 const PanierContext = createContext();
@@ -7,49 +12,154 @@ const PanierContext = createContext();
 export const usePanier = () => useContext(PanierContext);
 
 // Composant Provider qui encapsule l'ensemble de l'application
-export const PanierProvider = ({ children }) => {
+export const PanierProvider = ({children}) => {
+    const {panierId} = useJwt();
+
+
+    const [client, setClient] = useState(null);
+    const [input, setInput] = useState("");
 
     const [panier, setPanier] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+
+
+            fetchCart();
+        },
+        []);
 
 
 
-    const dejaPresent = (produit) =>{
-        const index = panier.findIndex(item => item.id === produit.id);
-        return index > -1;
-
-    }
-    const nombreDansPanier = (produit) =>{
-        const index = panier.findIndex(item => item.id === produit.id);
-        return panier[index].quantite;
-
-    }
-
-    // Fonction pour ajouter un produit au panier
-    const ajouterAuPanier = (produit) => {
-        setPanier((prevPanier) => {
-            const index = prevPanier.findIndex(item => item.id === produit.id);
-            if (index === -1) {
-                return [...prevPanier, produit];
-            } else {
-                const newPanier = [...prevPanier];
-                newPanier[index].quantite += produit.quantite;
-                return newPanier;
-            }
+    useEffect(() => {
+        const socket = new SockJS("http://192.168.1.82:8080/ws");
+        const stompClient = new Client({
+            webSocketFactory: () => socket,
+            reconnectDelay: 5000,
+            onConnect: () => {
+                console.log("Connecté");
+                stompClient.subscribe("/topic/messages", (message) => {
+                    fetchCart().then()
+                });
+            },
         });
+
+        stompClient.activate();
+        setClient(stompClient);
+
+        return () => {
+            stompClient.deactivate();
+        };
+    }, []);
+
+    const sendMessage = (message) => {
+        if (client ) {
+            client.publish({ destination: "/app/send", body: message });
+            console.log('client.publish')
+            setInput("");
+        }
     };
 
-    // Fonction pour retirer un produit du panier
-    const retirerDuPanier = (id) => {
-        setPanier(panier.filter(item => item.id !== id));
+
+    const fetchCart = async () => {
+        setLoading(true);
+        try {
+            const response = await axiosInstance.get(`panier-produit/panier/${panierId}`);
+            setPanier(response.data);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
+
+    const ajouterAuPanier = async (lignePanier) => {
+        try {
+            const postData = {
+                prixVente: lignePanier.prixVente,
+                panierId: panierId,
+                produitId: lignePanier.produitId,
+                quantite: lignePanier.quantite
+            };
+            console.log( 'postData', postData );
+            await axiosInstance.post("panier-produit", postData);
+            sendMessage('ajout')
+        } catch (err) {
+            console.error("Error adding product:", err);
+        }
+    };
+
+
+
+    // Rafraîchir le panier
+    const refreshPanier = async () => {
+        sendMessage('refresh')
+    };
+
+
+
+    // Mettre à jour un produit dans le panier
+    const updatePanier = async (param) => {
+
+        const updateData = {"prixVente" : param.prixVente,
+            "quantite" : param.quantite};
+        console.log(updateData)
+        try {
+            await apiCrudService.patch(`panier-produit`, param.id , updateData);
+            sendMessage('update')
+        } catch (error) {
+            console.error("Erreur lors de la mise à jour du panier:", error);
+        }
+    };
+
+    // Supprimer un produit du panier
+    const retirerDuPanier = async (id) => {
+        try {
+            await apiCrudService.delete('panier-produit', id);
+            sendMessage('remove')
+        } catch (error) {
+            console.error("Erreur lors de la suppression du produit:", error);
+        }
+    };
+
+
+
+
+    const presentDansPanier = (productId) => {
+        return panier.some((item) => item.produit.id === productId);
+    };
+
+    const nombreLigneDansPanier = panier.length;
+
+    const nombreProduitDansPanier = (produitId) => {
+        if (presentDansPanier(produitId)) {
+            for (const panierElement of panier) {
+                if (panierElement.produit.id === produitId) {
+                    return panierElement.quantite;
+                }
+            }
+        }
+        return 0;
+    }
 
     // Fonction pour calculer le total du panier
     const calculerTotal = () => {
-        return panier.reduce((total, item) => Number(total) + Number(item.prixUnitaire) * Number(item.quantite), 0).toFixed(2);
+
+        return panier.reduce((total, item) => Number(total) + Number(item.prixVente) * Number(item.quantite), 0).toFixed(2);
     };
 
     return (
-        <PanierContext.Provider value={{ panier, ajouterAuPanier, retirerDuPanier, calculerTotal, dejaPresent, nombreDansPanier }}>
+        <PanierContext.Provider value={{
+            panier,
+            ajouterAuPanier,
+            retirerDuPanier,
+            calculerTotal,
+            refreshPanier,
+            nombreProduitDansPanier,
+            presentDansPanier, loading, error,
+            updatePanier
+        }}>
             {children}
         </PanierContext.Provider>
     );

@@ -10,7 +10,6 @@ const CategorieDetailComp = (props) => {
 
     // Fonction pour récupérer les données d'un categorie
     const fetchCategorie = async (id) => {
-        console.log(props.id)
         try {
             const data = await categorieService.getCategoriesById(id)
             console.log(data)

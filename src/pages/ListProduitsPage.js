@@ -1,18 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import Table from "react-bootstrap/Table";
+// import Table from "react-bootstrap/Table";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import ProduitService from "../services/ProduitService";
-import HeaderBtnElement from "../components/HeaderBtnElement";
-import {Button} from "react-bootstrap";
+import HeaderBtnElementComp from "../components/HeaderBtnElementComp";
+import {Button, Col, Form} from "react-bootstrap";
 import {usePanier} from "../context/PanierContext";
-import Pagination from "../components/Pagination";
-import SearchProduitCritere from "../components/SearchProduitCritere";
+import PaginationComp from "../components/PaginationComp";
+// import SearchProduitCritereComp from "../components/SearchProduitCritereComp";
 import apiCrudService from "../services/ApiCrudService";
 import ErrorAlert from "../exceptions/ErrorAlert";
 import AlertComp from "../components/AlertComp";
+import DataTableComp from "../components/DataTableComp";
+import SearchCritereComp from "../components/SearchCritereComp";
 
 
-const ListProduit = () => {
+const ListProduitPage = () => {
     const [produits, setProduits] = useState([]);
 
     const location = useLocation();
@@ -38,7 +40,7 @@ const ListProduit = () => {
     const [totalPages, setTotalPages] = useState(0); // Nombre total de pages
     const [nombreTotalDeLigne, setNombreTotalDeLigne] = useState(0); // Nombre total de pages
     const navigate = useNavigate();
-    const {ajouterAuPanier, dejaPresent, nombreDansPanier} = usePanier();
+    const {ajouterAuPanier, nombreProduitDansPanier} = usePanier();
 
     // Fonction pour récupérer les produits avec pagination
     const fetchProduits = async () => {
@@ -112,10 +114,73 @@ const ListProduit = () => {
         )
     };
 
+    const columns = [
+        {
+            header: "Nom", accessor: "nom", render: (value, produit) => (
+                <Link to={`/produits/${produit.id}`} className="text-decoration-none">{value}</Link>
+            )
+        },
+        {header: "Description", accessor: "description"},
+        {header: "Prix Unitaire", accessor: "prixVente"},
+        {header: "Stock Initial", accessor: "stockInitial"},
+        {
+            header: "Stock Courant", accessor: "stockCourant", render: (value) => (
+                <span className="fw-bold text-success">{value}</span>
+            )
+        },
+        {
+            header: "Panier 🛒", accessor: "", render: (_, produit) => (
+                <Col sm={12}>
+                    <Button
+                        variant="outline-primary" className='fw-bold me-3'
+                        onClick={() => ajouterAuPanier({
 
-    function handleSubmitSearch(e) {
+                            prixVente: produit.prixVente,
+                            produitId: produit.id,
+                            quantite: nombreProduitDansPanier(produit.id) + 1
+                        })}
+                    >
+                        +
+                    </Button>
+                    <span className="fw-bold">
+                    {nombreProduitDansPanier(produit.id)}
+                    </span>
+                    <Button
+                        variant="outline-info" className=' fw-bold ms-3'
+                        onClick={() => ajouterAuPanier({
+                            prixVente: produit.prixVente,
+                            produitId: produit.id,
+                            quantite: nombreProduitDansPanier(produit.id) - 1
+                        })}
+                    >
+                        -
+                    </Button>
+                </Col>
+            )
+        }
+    ];
+
+    let cols = [
+        {
+            render: () => (<Col xs={12} sm={12} md={6} lg={4} xxl={3}>
+                <Form.Select className="mb-3"
+                             name="actif"
+                             value={filters.actif}
+                             onChange={handleInputChange}
+                             placeholder="Actif">
+                    <option>Produits actifs uniquement ?</option>
+                    <option value={"true"}>Oui</option>
+                    <option value={"false"}>Non</option>
+
+                </Form.Select>
+            </Col>)
+        }
+    ]
+
+
+    const handleSubmitSearch = async (e) => {
         e.preventDefault();
-        fetchProduitByMotCle(searchInput).then(r => console.log(r));
+        fetchProduitByMotCle(searchInput).then();
     }
 
     const handleAjouterAuPanier = (produit) => {
@@ -139,6 +204,10 @@ const ListProduit = () => {
         return <ErrorAlert error={error}/>;
     }
 
+    const entetes = [
+        {title: "Nombre de ligne", value: nombreTotalDeLigne},
+        {title: "Nombre de ligne", value: nombreTotalDeLigne},
+    ];
     return (
         <div>
             {showAlertSupprProduit && (
@@ -153,74 +222,39 @@ const ListProduit = () => {
             <h1><strong>Produit</strong></h1>
 
 
-            <HeaderBtnElement titreFil='' variant='outline-primary' onClick={() => navigate('/creer-produit')}
-                              valueBtn='Créer produit'/>
+            <HeaderBtnElementComp titreFil='creer-produit' variant='outline-primary'
+                                  valueBtn='Créer produit'/>
 
 
-            <SearchProduitCritere
-                handleSubmitSearch={handleSubmitSearch}
-                searchInput={searchInput}
-                handleSearchInput={handleSearchInput}
-                handleSubmitFilter={handleSubmitFilter}
-                filters={filters}
-                handleInputChange={handleInputChange}
+            {/*<SearchProduitCritereComp*/}
+            {/*    handleSubmitSearch={handleSubmitSearch}*/}
+            {/*    searchInput={searchInput}*/}
+            {/*    handleSearchInput={handleSearchInput}*/}
+            {/*    handleSubmitFilter={handleSubmitFilter}*/}
+            {/*    filters={filters}*/}
+            {/*    handleInputChange={handleInputChange}*/}
 
-            />
+            {/*/>*/}
 
-            <h5> Nombre total de ligne : <strong className={"text-danger"}>{nombreTotalDeLigne}</strong> </h5>
-            <Table striped bordered hover>
-                <thead>
-                <tr className="text-center align-middle">
-                    <th className="text-center align-middle">Nom</th>
-                    <th className="text-center align-middle">Description</th>
-                    <th className="text-center align-middle">Prix Unitaire</th>
-                    <th className="text-center align-middle">Stock initial</th>
-                    <th className="text-center align-middle">Stock Courant</th>
-                    <th className="text-center align-middle">Panier 🛒</th>
-                </tr>
-                </thead>
-                <tbody>
-                {produits.map((produit) => (
-                    <tr key={produit.id} className="text-center align-middle">
-                        <td className="text-center align-middle">
-                            <Link to={`/produits/${produit.id}`} className="text-decoration-none">
-                                {produit.nom}
-                            </Link>
-                        </td>
-                        <td className="text-center align-middle ">{produit.description}</td>
-                        <td className="text-center align-middle fw-bold">{produit.prixUnitaire}</td>
-                        <td className="text-center align-middle fw-bold">{produit.stockInitial}</td>
-                        <td className="text-center align-middle fw-bold text-success">{produit.stockCourant}</td>
-                        <td className="text-center align-middle">
-                            <Button
-                                variant=""
-                                className="w-100 text-primary fw-bold"
-                                onClick={() => handleAjouterAuPanier(produit)}
-                            >
-                                {dejaPresent(produit) ? (
-                                    <span>
-                                Ajouter (1) au panier 🧺
-                                <span className="text-danger"> {nombreDansPanier(produit)} </span>
-                            </span>
-                                ) : (
-                                    <span>Ajouter au panier 🧺 </span>
-                                )}
-                            </Button>
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </Table>
+            <SearchCritereComp cols={cols}
+                               handleSubmitSearch={handleSubmitSearch}
+                               searchInput={searchInput}
+                               handleSearchInput={handleSearchInput}
+                               handleSubmitFilter={handleSubmitFilter}
+                               filters={filters}
+                               handleInputChange={handleInputChange}/>
 
+            <DataTableComp data={produits} columns={columns} title="test title" totalCount={nombreTotalDeLigne}
+                           entetes={entetes}/>
 
             {/* Pagination controls */}
 
-            <Pagination className={"mb-5"}
-                        currentPage={currentPage}
-                        handlePageChange={handlePageChange}
-                        totalPages={totalPages}
-                        pageSize={pageSize}
-                        handlePageSizeChange={handlePageSizeChange}
+            <PaginationComp className={"mb-5"}
+                            currentPage={currentPage}
+                            handlePageChange={handlePageChange}
+                            totalPages={totalPages}
+                            pageSize={pageSize}
+                            handlePageSizeChange={handlePageSizeChange}
 
             />
 
@@ -231,4 +265,4 @@ const ListProduit = () => {
     );
 };
 
-export default ListProduit;
+export default ListProduitPage;

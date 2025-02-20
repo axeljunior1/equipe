@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button, Col, Form, Row} from "react-bootstrap";
 
-const Pagination = ({currentPage,pageSize, handlePageChange, handlePageSizeChange, totalPages}) => {
+const PaginationComp = ({currentPage,pageSize, handlePageChange, handlePageSizeChange, totalPages}) => {
 
 
     return (
@@ -49,4 +49,4 @@ const Pagination = ({currentPage,pageSize, handlePageChange, handlePageSizeChang
     );
 };
 
-export default Pagination;
+export default PaginationComp;

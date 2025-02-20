@@ -2,10 +2,10 @@ import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
 import {Link, useNavigate} from "react-router-dom";
 import CategorieService from "../services/CategorieService";
-import HeaderBtnElement from "../components/HeaderBtnElement";
+import HeaderBtnElementComp from "../components/HeaderBtnElementComp";
 import {Accordion, Button, Col, Container, Form, Row} from "react-bootstrap";
 import {usePanier} from "../context/PanierContext";
-import Pagination from "../components/Pagination";
+import PaginationComp from "../components/PaginationComp";
 import SearchCategorieCritere from "../components/SearchCategorieCritere";
 
 
@@ -128,8 +128,8 @@ const ListCategories = () => {
             <h1><strong>Categorie</strong></h1>
 
 
-            <HeaderBtnElement titreFil='' variant='outline-primary' onClick={() => navigate('/creer-categorie')}
-                              valueBtn='Créer categorie' />
+            <HeaderBtnElementComp titreFil='' variant='outline-primary' onClick={() => navigate('/creer-categorie')}
+                                  valueBtn='Créer categorie' />
 
 
 
@@ -164,7 +164,7 @@ const ListCategories = () => {
 
             {/* Pagination controls */}
 
-            <Pagination
+            <PaginationComp
                 currentPage = {currentPage}
                 handlePageChange = {handlePageChange}
                 totalPages = {totalPages}

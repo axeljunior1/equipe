@@ -3,8 +3,9 @@ import {Table, Button, Form, Accordion, Container, Row, Col} from "react-bootstr
 import ClientService from "../../services/ClientService";
 import {Link, useNavigate} from "react-router-dom";
 import {usePanier} from "../../context/PanierContext";
-import Pagination from "../../components/Pagination";
+import PaginationComp from "../../components/PaginationComp";
 import SearchClientCritere from "../../components/SearchClientCritere";
+import ErrorAlert from "../../exceptions/ErrorAlert";
 
 const SearchClientPopup = ({ onSelect }) => {
     const [clients, setClients] = useState([]); // Liste des employés
@@ -14,7 +15,7 @@ const SearchClientPopup = ({ onSelect }) => {
     const [currentPage, setCurrentPage] = useState(0); // Page actuelle
     const [pageSize, setPageSize] = useState(15); // Taille de la page
     const [totalPages, setTotalPages] = useState(0); // Nombre total de pages
-    const {  ajouterAuPanier, dejaPresent, nombreDansPanier } = usePanier();
+    const {  ajouterAuPanier } = usePanier();
     const [searchInput, SetSearchInput] = useState('');
     const [filters, setFilters] = useState({
         nom: "",
@@ -112,8 +113,13 @@ const SearchClientPopup = ({ onSelect }) => {
         fetchClients();
     }, [currentPage, pageSize]);
 
+    if (error) {
+        return <ErrorAlert error={error}/>;
+    }
+
     return (
         <div>
+
 
             {/* Permetre la recherche par le numero de telphone Ici */}
             <SearchClientCritere
@@ -168,12 +174,12 @@ const SearchClientPopup = ({ onSelect }) => {
             {/* Pagination controls */}
 
 
-            <Pagination className="mt-2"
-                currentPage = {currentPage}
-                handlePageChange = {handlePageChange}
-                totalPages = {totalPages}
-                pageSize = {pageSize}
-                handlePageSizeChange = {handlePageSizeChange}
+            <PaginationComp className="mt-2"
+                            currentPage = {currentPage}
+                            handlePageChange = {handlePageChange}
+                            totalPages = {totalPages}
+                            pageSize = {pageSize}
+                            handlePageSizeChange = {handlePageSizeChange}
 
             />
         </div>

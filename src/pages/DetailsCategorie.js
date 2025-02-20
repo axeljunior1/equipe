@@ -21,7 +21,6 @@ const CategorieDetail = () => {
 
     // Fonction pour récupérer les données d'un categorie
     const fetchCategorie = useCallback(async () => {
-        console.log(panier)
         setLoading(true);
         try {
             const data = await categorieService.getCategoriesById(id)

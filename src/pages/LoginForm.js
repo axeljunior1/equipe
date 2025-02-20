@@ -14,7 +14,7 @@ const LoginForm = () => {
     const [formLoging, setFormLoging] = useState(initialFormLogin);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState([]);
-    const { setJwt, setLoggedEmployee } = useJwt();
+    const { setJwt, setLoggedEmployee, setPanierId } = useJwt();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -30,6 +30,17 @@ const LoginForm = () => {
             setJwt(token);
 
             setLoggedEmployee(JSON.stringify(res.data.employeGetDto));
+
+            let panierId = null;
+            res.data.panier?.forEach(panier => {
+                if (panier.etat?.nom === 'cree') {
+                    panierId = panier.id;
+                }
+
+            })
+
+            console.log('panierId log form' , panierId);
+            setPanierId(panierId);
 
             // Vérifiez si une URL mémorisée existe
             const requestedUrl = localStorage.getItem("requestedUrl");
@@ -72,9 +83,12 @@ const LoginForm = () => {
 
     return (
         <Container className="d-flex justify-content-center align-items-center" style={{ height: "70vh" }}>
-            <ErrorDisplay errors={errors} />
             <Row>
-                <Col>
+                {errors && <Col xl={12} xs={12}>
+                    <ErrorDisplay errors={errors}/>
+                </Col  >}
+
+                <Col xl={12} xs={12}>
                     <Card style={{ width: "22rem", padding: "20px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
                         <Card.Body>
                             <Card.Title className="text-center mb-4">Connexion</Card.Title>

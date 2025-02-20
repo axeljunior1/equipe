@@ -27,7 +27,7 @@ const AchatDetail = () => {
 
 
     let initFormAddLigne = {
-        "prixAchatUnitaire": 0,
+        "prixAchat": 0,
         "quantite": 0,
         "achatId": id,
         "produitId": 0,
@@ -149,7 +149,7 @@ const AchatDetail = () => {
 
     // Fonction pour gérer la sélection d'un employé
     const handleEmployeeSelect = (id, nom, prixUnitaire) => {
-        setFormAddLigne({...formAddLigne, 'produitId': id, "produitNom": nom, prixAchatUnitaire: prixUnitaire});
+        setFormAddLigne({...formAddLigne, 'produitId': id, "produitNom": nom, prixAchat: prixUnitaire});
         setShowModal(false); // Ferme le modal
     };
 
@@ -260,10 +260,10 @@ const AchatDetail = () => {
                                 <Form.Label className={'fw-bold'}>Prix Unitaire</Form.Label>
                                 <Form.Control
                                     type="number"
-                                    value={formAddLigne.prixAchatUnitaire}
+                                    value={formAddLigne.prixAchat}
                                     onChange={handleInputChange}
                                     placeholder="Prix unitaire d'achat"
-                                    name='prixAchatUnitaire'
+                                    name='prixAchat'
                                     className="my-1"
                                 />
                             </Col>

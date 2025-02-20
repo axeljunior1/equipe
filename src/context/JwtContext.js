@@ -4,9 +4,10 @@ const JwtContext = createContext();
 export const JwtProvider = ({ children }) => {
     const [jwt, setJwt] = useState(() => localStorage.getItem("jwt") || "");
     const [loggedEmployee, setLoggedEmployee] = useState(() => {
-        const storedUser = localStorage.getItem("username");
+        const storedUser = localStorage.getItem("loggedEmployee");
         return storedUser ? JSON.parse(storedUser) : null; // Convertir en objet ou null si absent
     });
+    const [panierId, setPanierId] = useState(() => localStorage.getItem("panierId")  || null);
 
 
     useEffect(() => {
@@ -19,14 +20,22 @@ export const JwtProvider = ({ children }) => {
 
     useEffect(() => {
         if (loggedEmployee) {
-            localStorage.setItem("username", JSON.stringify(loggedEmployee)); // Stocker en JSON
+            localStorage.setItem("loggedEmployee", JSON.stringify(loggedEmployee)); // Stocker en JSON
         } else {
-            localStorage.removeItem("username");
+            localStorage.removeItem("loggedEmployee");
         }
     }, [loggedEmployee]);
 
+    useEffect(() => {
+        if (panierId) {
+            localStorage.setItem("panierId", panierId);
+        } else {
+            localStorage.removeItem("panierId");
+        }
+    }, [panierId]);
+
     return (
-        <JwtContext.Provider value={{ jwt, setJwt, loggedEmployee, setLoggedEmployee }}>
+        <JwtContext.Provider value={{ jwt, setJwt, loggedEmployee, setLoggedEmployee, panierId, setPanierId }}>
             {children}
         </JwtContext.Provider>
     );

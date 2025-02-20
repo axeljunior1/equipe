@@ -4,7 +4,7 @@ import achatService from "../../services/AchatService";
 import Table from "react-bootstrap/Table";
 import {Link, useNavigate} from "react-router-dom";
 import {Button} from "react-bootstrap";
-import HeaderBtnElement from "../../components/HeaderBtnElement";
+import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
 import {useJwt} from "../../context/JwtContext";
 import {formatDate} from "../../utils/dateUtils";
 import ErrorAlert from "../../exceptions/ErrorAlert";
@@ -87,8 +87,8 @@ function Achats() {
                 <p className={"mt-3 text-danger"}> Erreur :  {createError} </p>
             }
 
-            <HeaderBtnElement titreFil='' variant='outline-primary' onClick={handleCreateAchat}
-                              valueBtn='Créer Achat' />
+            <HeaderBtnElementComp titreFil='' variant='outline-primary' onClick={handleCreateAchat}
+                                  valueBtn='Créer Achat' />
 
             <Table striped bordered hover>
                 <thead>

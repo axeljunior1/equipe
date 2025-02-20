@@ -8,6 +8,7 @@ import {Button, Col, Form, Modal, Row} from "react-bootstrap";
 import InputGroup from "react-bootstrap/InputGroup";
 import SearchProduitPopup from "../test/SearchProduitPopup";
 import {formatDate} from "../../utils/dateUtils";
+import apiCrudService from "../../services/ApiCrudService";
 
 const VenteDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
@@ -22,7 +23,7 @@ const VenteDetail = () => {
     const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
 
     let initFormAddLigne = {
-        "prixVenteUnitaire": 0,
+        "prixVente": 0,
         "quantite": 0,
         "venteId": id,
         "produitId": 0,
@@ -37,7 +38,7 @@ const VenteDetail = () => {
         try {
             let data = await VenteService.getVenteById(id)
             setVente(data)
-            // await fetchLigneVente(data)
+            await fetchLigneVente(data)
             // setFormData(data) // Pré-remplit le formulaire
         } catch (err) {
             setError(err);
@@ -63,7 +64,7 @@ const VenteDetail = () => {
 
         setLoading(true);
         try {
-            let data = await venteService.getVenteLines(id);
+            let data = await apiCrudService.get(`ventes/${id}/lignes`);
             setLignesVentes(data.content); // Mise à jour de l'état après que toutes les données sont récupérées
         } catch (err) {
             setError(err);
@@ -147,8 +148,9 @@ const VenteDetail = () => {
     }
 
     // Fonction pour gérer la sélection d'un employé
-    const handleEmployeeSelect = (id, nom, prixUnitaire) => {
-        setFormAddLigne({...formAddLigne, 'produitId': id, "produitNom": nom, prixVenteUnitaire: prixUnitaire});
+    const handleEmployeeSelect = (id, nom, prixVente) => {
+        console.log('prix Vente', id, nom, prixVente);
+        setFormAddLigne({...formAddLigne, 'produitId': id, "produitNom": nom, prixVente: prixVente});
         setShowModal(false); // Ferme le modal
     };
 
@@ -158,14 +160,15 @@ const VenteDetail = () => {
             <h1><strong>Détail de la vente</strong></h1>
             {!isEditing ? (
                 <div className="card p-4 shadow">
-                    <h3 className="card-title text-center">{vente.nom}</h3>
+                    <h3 className="card-title text-center">Vente : {vente.id}</h3>
                     <div className="card-body">
                         <p><strong>Employé :</strong>
                             <Link to={`/employes/${vente.employe.id}`}
                                   className='text-decoration-none'> {vente.employe.id} - {vente.employe.prenom}</Link>
                         </p>
                         <p><strong>Montant :</strong> {vente.montantTotal}</p>
-                        <p><strong>Date de Création :</strong> { formatDate(vente.dateDerniereMiseAJour)}</p>
+                        <p><strong>Date de Création :</strong> { formatDate(vente.createdAt)}</p>
+                        <p><strong>Date de mise à jour :</strong> { formatDate(vente.updatedAt)}</p>
                     </div>
                     <div className="d-flex justify-content-center">
                         <button
@@ -188,13 +191,13 @@ const VenteDetail = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        {vente.ligneVentes?.map((ligne, index) => (
+                        {lignesVentes?.map((ligne, index) => (
                             <tr key={ligne.id}>
                                 <td>{index + 1}</td>
-                                <td><Link to={`/produits/${ligne.produit.id}`}
+                                <td><Link to={`/produits/${ligne.id}`}
                                           className='text-decoration-none'>{ligne.produit.id} - {ligne.produit.nom}</Link>
                                 </td>
-                                <td>{ligne.prixVenteUnitaire}</td>
+                                <td>{ligne.prixVente}</td>
                                 <td>{ligne.quantite}</td>
                                 <td className={'justify-content-center align-items-center'}>
                                     <Button variant={"outline-danger"} className={'w-100'} onClick={(e) => {
@@ -249,10 +252,10 @@ const VenteDetail = () => {
                                 <Form.Label className={'fw-bold'}>Prix Unitaire</Form.Label>
                                 <Form.Control
                                     type="number"
-                                    value={formAddLigne.prixVenteUnitaire}
+                                    value={formAddLigne.prixVente}
                                     onChange={handleInputChange}
                                     placeholder="Prix unitaire d'vente"
-                                    name='prixVenteUnitaire'
+                                    name='prixVente'
                                     className="my-1"
                                 />
                             </Col>
@@ -354,3 +357,94 @@ const VenteDetail = () => {
 };
 
 export default VenteDetail;
+
+
+/*
+
+{
+    "id": 42,
+    "montantTotal": 259.99,
+    "createdAt": "2025-02-12T18:55:49.738605",
+    "updatedAt": "2025-02-12T08:38:16.367019",
+    "clientId": null,
+    "clientNom": null,
+    "client": {
+        "id": 1,
+        "nom": "cli 1 ",
+        "prenom": "pre cli 1",
+        "email": "string@cli1.com",
+        "telephone": "0749482336",
+        "dateCreation": null
+    },
+    "actif": true,
+    "employeId": 12,
+    "employeNom": null,
+    "employe": {
+        "id": 12,
+        "nom": "junior",
+        "prenom": "junior",
+        "actif": true,
+        "rolesIds": [
+            1,
+            2,
+            3,
+            4
+        ],
+        "rolesNoms": [
+            "GESTIONNAIRE_STOCK",
+            "COMPTABLE",
+            "ADMIN",
+            "VENDEUR"
+        ],
+        "roles": [
+            {
+                "id": 1,
+                "nom": "ADMIN",
+                "description": "Administrateur ayant tous les droits",
+                "authorities": [
+                    {
+                        "id": 2,
+                        "nom": "SUPPRIMER_PRODUIT"
+                    },
+                    {
+                        "id": 4,
+                        "nom": "GERER_STOCK"
+                    }
+                ]
+            },
+            {
+                "id": 4,
+                "nom": "COMPTABLE",
+                "description": "Responsable des finances",
+                "authorities": []
+            },
+            {
+                "id": 3,
+                "nom": "VENDEUR",
+                "description": "Employé chargé des ventes",
+                "authorities": []
+            },
+            {
+                "id": 2,
+                "nom": "GESTIONNAIRE_STOCK",
+                "description": "Responsable de la gestion des stocks",
+                "authorities": []
+            }
+        ],
+        "dateCreation": "2025-02-10T22:39:42.907528"
+    },
+    "lignesVenteId": null,
+    "ligneVentes": [
+        {
+            "id": 57,
+            "prixUnitaire": null,
+            "quantite": 1,
+            "venteId": 42,
+            "actif": true,
+            "produitId": 51,
+            "produitNom": null
+        }
+    ]
+}
+
+*/

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {Button, Col, Form, Modal, Row, Table} from 'react-bootstrap';
 import {usePanier} from "../../context/PanierContext";
@@ -10,14 +10,20 @@ import ModalDetailProduit from "../../modales/modalDetailProduit";
 import AlertComp from "../../components/AlertComp";
 import {Search} from "lucide-react";
 import {useJwt} from "../../context/JwtContext";
+import useMobile from "../../context/useMobile";
 
 const Panier = () => {
     const [showModalClient, setshowModalClient] = useState(false); // Contrôle d'affichage du modal
     const [showModalDetailProduit, setShowModalDetailProduit] = useState(false); // Contrôle d'affichage du modal
-    const {panier, ajouterAuPanier, retirerDuPanier, calculerTotal} = usePanier();
+    const {
+        panier,
+        retirerDuPanier,
+        calculerTotal,
+        updatePanier} = usePanier();
+    const isMobile = useMobile(); // Utilisation du hook
     const [produitIdModal, setProduitIdModal] = useState("");
     const [showAlert, setShowAlert] = useState(false);
-    const { loggedEmployee} = useJwt();
+    const { loggedEmployee, panierId} = useJwt();
 
     const navigate = useNavigate();
 
@@ -29,11 +35,29 @@ const Panier = () => {
         "telephone": ""
     }
     const [formClient, setFormClient] = useState(initFormClient);
-    //Todo => lors de la modification d'un article, il faut peut-etre mettre a jour les produit dans le panier
+    //Todo => lors de la modification d'un article, il faut peut-etre mettre a jour les produits dans le panier
 
-    const handleAjouterAuPanier = (produit) => {
-        ajouterAuPanier({...produit, quantite: 1});
+    const handleUpdatePanier = item => {
+        let data =
+            {
+                "prixVente": item.prixVente,
+                "id": item.id,
+                "quantite": item.quantite
+            }
+        updatePanier(data);
     };
+
+
+    const handleIncrease = (itemPanier) => {
+        console.log('itemPanier', itemPanier)
+        itemPanier.quantite++;
+        handleUpdatePanier(itemPanier)
+    }
+
+    const handleDecrease = (itemPanier) => {
+        itemPanier.quantite--;
+        handleUpdatePanier(itemPanier)
+    }
 
     const handleInputChange = (e) => {
         const {name, value} = e.target;
@@ -68,16 +92,6 @@ const Panier = () => {
     const handleShowModalDetailProduit = async (produitId) => {
         setProduitIdModal(produitId);
         setShowModalDetailProduit(true);
-    }
-
-    const handleIncrease = (itemPanier) => {
-        itemPanier.quantite++;
-        ajouterAuPanier(itemPanier)
-    }
-
-    const handleDecrease = (itemPanier) => {
-        itemPanier.quantite--;
-        ajouterAuPanier(itemPanier)
     }
 
     const postCaisse = async (caisse) => {
@@ -130,13 +144,20 @@ const Panier = () => {
     }
     const [isHovered, setIsHovered] = useState(false);
 
-    function handleSearchClick() {
-        alert('test')
+    const test = ()=>{
+        return 10
     }
+
 
     return (
         <div>
             <h2>Panier</h2>
+
+            {isMobile && <div className={'my-3'}>
+                <QRCodeScanner scanAndAdd={true} setAlert={setShowAlert}/>
+            </div>}
+
+            <h3 className="my-4 text-danger">Total: {calculerTotal()}€</h3>
 
             {showAlert && (
                 <AlertComp
@@ -163,28 +184,34 @@ const Panier = () => {
                     </thead>
                     <tbody>
                     {panier.map((item) => (
-                        <tr key={item.id || `${item.nom}-${item.prixUnitaire}`}>
+                        <tr key={item.id || `${item.nom}-${item.prixVente}`}>
                             <td>
                                 <Button variant={"outline-primary"} className={"w-100"}
-                                        onClick={() => handleShowModalDetailProduit(item.id)}>{item.nom}</Button>
+                                        onClick={() => handleShowModalDetailProduit(item.produit.id)}>{item.produit.nom}</Button>
                             </td>
-                            <td>{item.prixUnitaire}€</td>
+                            <td>{item.produit.prixVente}€</td>
                             <td>
                                 <Row>
-                                    <Col xs={"2"}>{item.quantite}</Col>
                                     <Col xs={"10"}>
                                         {/*<ProductCartCounter quantity={item.quantite} handleIncrease={()=>handleIncrease(item)} handleDecrease={()=>handleDecrease(item)} />*/}
 
                                         <Button
-                                            variant="outline-secondary" className='w-100 fw-bold '
-                                            onClick={() => handleAjouterAuPanier(item)}
+                                            variant="outline-primary" className='fw-bold me-3'
+                                            onClick={() => handleIncrease(item)}
                                         >
-                                            Ajouter 1
+                                            +
+                                        </Button>
+                                        {item.quantite}
+                                        <Button
+                                            variant="outline-info" className=' fw-bold ms-3'
+                                            onClick={() => handleDecrease(item,'remove')}
+                                        >
+                                            -
                                         </Button>
                                     </Col>
                                 </Row>
                             </td>
-                            <td>{(item.prixUnitaire * item.quantite).toFixed(2)}€</td>
+                            <td>{(item.produit.prixVente * item.quantite).toFixed(2)}€</td>
                             <td>
                                 <Button
                                     variant="danger"
@@ -204,7 +231,7 @@ const Panier = () => {
             <br/>
             <br/>
 
-            <h3> Informations client </h3>
+            <span className='d-none d-md-block'>            <h3> Informations client </h3>
             <Form onSubmit={handleSubmitFormAAddLine} className={""}>
                 <Row className="">
                     <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="position-relative d-inline mt-2">
@@ -261,7 +288,7 @@ const Panier = () => {
                         />
                     </Col>
                     <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
-                        <Form.Label className={'fw-bold'}>Email</Form.Label>
+                        <Form.Label className={'fw-bold'}>Telephone</Form.Label>
                         <Form.Control
                             type="tel"
                             value={formClient.telephone}
@@ -283,13 +310,14 @@ const Panier = () => {
             </Form>
 
 
-            <br/>
-            <br/>
-            <h3>Total: {calculerTotal()}€</h3>
 
-            <div className={'mt-3'}>
+            <br/>
+            <br/>
+                 </span>
+
+            {!isMobile && <div className={'mt-3'}>
                 <QRCodeScanner scanAndAdd={true} setAlert={setShowAlert}/>
-            </div>
+            </div>}
 
             {/* Modal de recherche d'employé */}
             <Modal show={showModalClient} onHide={() => setshowModalClient(false)} size="lg" centered>

@@ -4,17 +4,24 @@ import {Button, Container, Nav, Navbar} from "react-bootstrap";
 import {usePanier} from "./context/PanierContext";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {useJwt} from "./context/JwtContext";
+import apiCrudService from "./services/ApiCrudService";
+import axios from "axios";
+import WebSocketClient from "./components/WebSocketClient";
+import useMobile from "./context/useMobile";
 
 
 const App = () => {
     const {panier} = usePanier()
-    const {jwt, setJwt, setLoggedEmployee} = useJwt();
+    const {jwt} = useJwt();
     const navigate = useNavigate();
     const location = useLocation();
+    const isMobile = useMobile(); // Utilisation du hook
 
     const handleLogout = () => {
         localStorage.removeItem("jwt"); // Supprimer le JWT
         localStorage.removeItem("loggedEmployee"); // Supprimer le JWT
+        localStorage.removeItem("requestedUrl"); // Supprimer le JWT
+        localStorage.removeItem("panierId"); // Supprimer le JWT
         navigate("/login"); // Rediriger vers la page de connexion
     };
     useEffect(() => {
@@ -39,14 +46,17 @@ const App = () => {
                             <Nav className="me-auto">
                                 {jwt !== "" && (<>
                                     <Nav.Link as={Link} to="/produits">Produits</Nav.Link>
-                                    <Nav.Link as={Link} to="/achats">Achats</Nav.Link>
-                                    <Nav.Link as={Link} to="/ventes">Ventes</Nav.Link>
-                                    <Nav.Link as={Link} to="/mouvements-stock">Mouvements stocks</Nav.Link>
-                                    <Nav.Link as={Link} to="/employes">Employe</Nav.Link>
+                                    {!isMobile && <>
+                                        <Nav.Link as={Link} to="/achats">Achats</Nav.Link>
+                                        <Nav.Link as={Link} to="/ventes">Ventes</Nav.Link>
+                                        <Nav.Link as={Link} to="/mouvements-stock">Mouvements stocks</Nav.Link>
+                                        <Nav.Link as={Link} to="/employes">Employe</Nav.Link>
+                                        <Nav.Link as={Link} to="/categories">Categories</Nav.Link>
+                                        <Nav.Link as={Link} to="/roles">Roles</Nav.Link>
+                                    </>}
+
                                     <Nav.Link as={Link} to="/panier">Caisse 🛒 {panier && panier.length > 0 && (
                                         <span className={'text-primary'}> {panier.length} </span>)} </Nav.Link>
-                                    <Nav.Link as={Link} to="/categories">Categories</Nav.Link>
-                                    <Nav.Link as={Link} to="/roles">Roles</Nav.Link>
                                 </>)}
                             </Nav>
                             <Nav>
@@ -65,6 +75,8 @@ const App = () => {
                         </Navbar.Collapse>
                     </Container>
                 </Navbar>
+
+                {/*<WebSocketClient/>*/}
 
 
                 <AppRoutes/>

@@ -2,8 +2,9 @@ import React, {useEffect, useState} from "react";
 import {Button, Table} from "react-bootstrap";
 import ProduitService from "../../services/ProduitService";
 import {usePanier} from "../../context/PanierContext";
-import Pagination from "../../components/Pagination";
-import SearchProduitCritere from "../../components/SearchProduitCritere";
+import PaginationComp from "../../components/PaginationComp";
+import SearchProduitCritereComp from "../../components/SearchProduitCritereComp";
+import apiCrudService from "../../services/ApiCrudService";
 
 const SearchProduitPopup = ({ onSelect }) => {
     const [produits, setProduits] = useState([]); // Liste des employés
@@ -27,7 +28,7 @@ const SearchProduitPopup = ({ onSelect }) => {
     const fetchProduits = async () => {
         setLoading(true);
         try {
-            let data = await ProduitService.getProduit(currentPage, pageSize);
+            let data = await apiCrudService.get('produits',currentPage, pageSize);
             setProduits(data.content);  // Assuming 'content' is the array of products
             setTotalPages(data.totalPages); // Assuming 'totalPages' is the total page count
         } catch (error) {
@@ -121,7 +122,7 @@ const SearchProduitPopup = ({ onSelect }) => {
     return (
         <div>
 
-            <SearchProduitCritere
+            <SearchProduitCritereComp
                 handleSubmitSearch={handleSubmitSearch}
                 searchInput={searchInput}
                 handleSearchInput={handleSearchInput}
@@ -146,9 +147,9 @@ const SearchProduitPopup = ({ onSelect }) => {
                     <tr key={produit.id}>
                         <td>{produit.id}</td>
                         <td>{produit.nom}</td>
-                        <td>{produit.description}</td>
+                        <td>{produit.description} </td>
                         <td>
-                            <Button variant="primary" onClick={() => onSelect(produit.id, produit.nom, produit.prixUnitaire, )}>
+                            <Button variant="primary" onClick={() => onSelect(produit.id, produit.nom, produit.prixVente )}>
                                 Sélectionner
                             </Button>
                         </td>
@@ -160,7 +161,7 @@ const SearchProduitPopup = ({ onSelect }) => {
             {/* Pagination controls */}
 
 
-            <Pagination
+            <PaginationComp
                 currentPage = {currentPage}
                 handlePageChange = {handlePageChange}
                 totalPages = {totalPages}

@@ -3,10 +3,10 @@ import Table from "react-bootstrap/Table";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {Col, Row} from "react-bootstrap";
 import MouvementStockService from "../../services/MouvementStockService";
-import HeaderBtnElement from "../../components/HeaderBtnElement";
+import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
 import SearchMouvementStockCritere from "../../components/SearchMouvementStockCritere";
 import apiCrudService from "../../services/ApiCrudService";
-import Pagination from "../../components/Pagination";
+import PaginationComp from "../../components/PaginationComp";
 import {formatDate} from "../../utils/dateUtils";
 
 
@@ -131,8 +131,8 @@ const MouvementStock = () => {
                 className={"text-danger fw-bold"}>{mouvementStocks[0].produitNom}  </span> </>} </strong></h1>
 
 
-            <HeaderBtnElement titreFil='' variant='outline-primary' onClick={() => navigate('/creer-mouvementStock')}
-                              valueBtn='Créer mouvementStock'/>
+            <HeaderBtnElementComp titreFil='' variant='outline-primary' onClick={() => navigate('/creer-mouvementStock')}
+                                  valueBtn='Créer mouvementStock'/>
 
 
             <SearchMouvementStockCritere
@@ -198,7 +198,7 @@ const MouvementStock = () => {
 
             {/* Pagination controls */}
 
-            <Pagination
+            <PaginationComp
                 currentPage={currentPage}
                 handlePageChange={onHandlePageChange}
                 totalPages={totalPages}

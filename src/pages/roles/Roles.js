@@ -3,7 +3,7 @@ import Table from "react-bootstrap/Table";
 import {Link, useNavigate} from "react-router-dom";
 import apiCrudService from "../../services/ApiCrudService";
 import ErrorAlert from "../../exceptions/ErrorAlert";
-import HeaderBtnElement from "../../components/HeaderBtnElement";
+import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
 import {Pagination} from "react-bootstrap";
 
 
@@ -68,8 +68,8 @@ const ListRole = () => {
             <h1><strong>Role</strong></h1>
 
 
-            <HeaderBtnElement titreFil='' variant='outline-primary' onClick={() => navigate('/creer-role')}
-                              valueBtn='Créer role'/>
+            <HeaderBtnElementComp titreFil='' variant='outline-primary' onClick={() => navigate('/creer-role')}
+                                  valueBtn='Créer role'/>
 
 
 

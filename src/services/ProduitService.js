@@ -69,9 +69,6 @@ class ProduitService {
 
 
     getProduitDyn(params) {
-        console.log(params.actif);
-        console.log(params.actif ===true);
-        console.log(params.actif ==='true');
         let str = '?'
         str = str+= 'actif=' + params.actif ;
         if(params.nom) str+= 'nom=' + params.nom;
@@ -144,4 +141,4 @@ class ProduitService {
     }
 }
 
-export default new ProduitService();
+ export default new ProduitService();
