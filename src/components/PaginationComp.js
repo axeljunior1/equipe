@@ -1,8 +1,19 @@
 import React from 'react';
 import {Button, Col, Form, Row} from "react-bootstrap";
 
-const PaginationComp = ({currentPage,pageSize, handlePageChange, handlePageSizeChange, totalPages}) => {
+const PaginationComp = ({currentPage,pageSize, handlePageChange, handlePageSizeChange, totalPages, nombreElt}) => {
 
+
+    let optionPargination = []
+
+    for (let i = 5; i >= 1; i--) {
+        let nbreElement = (nombreElt/i).toFixed(0);
+
+        if(optionPargination.indexOf(nbreElement) < 0){
+            // console.log(nbreElement)
+            optionPargination.push(nbreElement)
+        }
+    }
 
     return (
         <div>
@@ -35,12 +46,9 @@ const PaginationComp = ({currentPage,pageSize, handlePageChange, handlePageSizeC
                             value={pageSize}
                             onChange={handlePageSizeChange}
                             className="ml-2 form-control">
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="15">15</option>
-                            <option value="15">50</option>
-                            <option value="15">100</option>
-                            <option value="15">200</option>
+                            {optionPargination.map((item, index) => (
+                                <option key={index} value={item}>{item}</option>
+                            ))}
                         </Form.Select>
                     </Col>
                 </Row>

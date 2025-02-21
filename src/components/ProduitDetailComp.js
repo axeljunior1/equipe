@@ -90,6 +90,7 @@ const ProduitDetailComp = (props) => {
                     <p><strong>Stock initial :</strong> {produit.stockInitial}</p>
                     <p><strong>Date de création :</strong> {formatDate(produit.createdAt)}</p>
                     <p><strong>Date de mise à jour :</strong> {formatDate(produit.updatedAt)}</p>
+                    <p><strong>Actif : </strong>  {produit.actif ? (<span className="text-success fw-bold"> Oui </span>) : (<span className=" fw-bold text-danger"> Non </span>) }</p>
                     {produit.qrCode && (
                         <div>
                             <p><strong>QR Code :</strong></p>

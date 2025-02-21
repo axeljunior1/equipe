@@ -19,11 +19,18 @@ const Panier = () => {
         panier,
         retirerDuPanier,
         calculerTotal,
-        updatePanier} = usePanier();
+        updatePanier
+    } = usePanier();
+
     const isMobile = useMobile(); // Utilisation du hook
     const [produitIdModal, setProduitIdModal] = useState("");
     const [showAlert, setShowAlert] = useState(false);
-    const { loggedEmployee, panierId} = useJwt();
+    const [validated, setValidated] = useState(false);
+    const {loggedEmployee, panierId} = useJwt();
+
+    const [loading, setLoading] = useState(true);
+
+    const [error, setError] = useState(null);
 
     const navigate = useNavigate();
 
@@ -67,6 +74,19 @@ const Panier = () => {
 
     const handleSubmitFormAAddLine = async (e) => {
         e.preventDefault();
+
+        const form = e.currentTarget;
+        if (form.checkValidity() === false) {
+            e.stopPropagation();
+
+        } else {
+            validerLaVente().then()
+            // Formulaire valide, procéder avec l'envoi des données
+            console.log('Données soumises:', formClient);
+        }
+
+        setValidated(true);
+
     }
     // Fonction pour gérer la sélection d'un employé
     const handleProductSelect = (param) => {
@@ -94,57 +114,34 @@ const Panier = () => {
         setShowModalDetailProduit(true);
     }
 
-    const postCaisse = async (caisse) => {
+    const validerLaVente = async () => {
+
+        let caisse = {
+            idClient: formClient.id,
+            idPanier: panierId,
+            idEmploye: JSON.parse(loggedEmployee)?.id
+        }
+
+        setLoading(true);
+        setError(null);
         try {
-            let response = await axiosInstance.post("/ventes/createVenteNLignes", caisse)
+            let response = await axiosInstance.post("/ventes/valide-panier", caisse)
 
             console.log(response.data)
 
             navigate(`/ventes/${response.data.id}`);
         } catch (error) {
-            console.log(error);
+            setError(error);
+        }
+        finally {
+            setLoading(false);
         }
     }
 
 
-    const validerLaVente = () => {
-        // on a un panier dans le quel on a des items
-        // on a un formulaire avec les info client
-        // creer une vente
-        // creer des ligne
-        //creer ou pas le client
-        let caisse = {
-            clientNom: formClient.nom,
-            clientPrenom: formClient.prenom,
-            clientEmail: formClient.email,
-            clientTelephone: formClient.telephone,
-            venteMontantTotal: 0,
-            venteClientId: formClient.id,
-            venteEmployeId: JSON.parse(loggedEmployee)?.id,
-            lignesCaisses: []
-        }
-
-        panier.map(item => {
-            caisse.lignesCaisses.push({
-                lVentePrixVenteUnitaire: item.prixUnitaire,
-                lVenteQuantite: item.quantite,
-                lVenteProduitId: item.id
-            });
-            caisse.venteMontantTotal = calculerTotal();
-        })
-
-        try {
-            console.log(caisse)
-
-            postCaisse(caisse);
-        } catch (error) {
-            console.log(error);
-        }
-
-    }
     const [isHovered, setIsHovered] = useState(false);
 
-    const test = ()=>{
+    const test = () => {
         return 10
     }
 
@@ -156,6 +153,10 @@ const Panier = () => {
             {isMobile && <div className={'my-3'}>
                 <QRCodeScanner scanAndAdd={true} setAlert={setShowAlert}/>
             </div>}
+
+            {error &&
+                <div className="alert alert-danger" role="alert"> {error.message} </div>
+            }
 
             <h3 className="my-4 text-danger">Total: {calculerTotal()}€</h3>
 
@@ -204,7 +205,7 @@ const Panier = () => {
                                         {item.quantite}
                                         <Button
                                             variant="outline-info" className=' fw-bold ms-3'
-                                            onClick={() => handleDecrease(item,'remove')}
+                                            onClick={() => handleDecrease(item, 'remove')}
                                         >
                                             -
                                         </Button>
@@ -232,7 +233,7 @@ const Panier = () => {
             <br/>
 
             <span className='d-none d-md-block'>            <h3> Informations client </h3>
-            <Form onSubmit={handleSubmitFormAAddLine} className={""}>
+            <Form onSubmit={handleSubmitFormAAddLine} className={""} validated={validated}>
                 <Row className="">
                     <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="position-relative d-inline mt-2">
                         <Form.Label className={'fw-bold'}>Id du client</Form.Label>
@@ -241,15 +242,21 @@ const Panier = () => {
                             type="number"
                             value={formClient.id}
                             onChange={handleInputChange}
-                            name='produitId'
+                            name='id'
                             className="my-1"
+                            required
+                            isInvalid={validated && !formClient.id}
                         />
+                <Form.Control.Feedback type="invalid">
+                    Ce champ est requis.
+                </Form.Control.Feedback>
                         <button
                             className="btn position-absolute top-50 end-0 me-10 pe-10 py-0 "
                             onClick={() => setshowModalClient(true)}
                             onMouseEnter={() => setIsHovered(true)}
                             onMouseLeave={() => setIsHovered(false)}
                             title="Rechercher"
+
                         >
                             <Search className={isHovered ? "text-success" : "text-info"} size={30}/>
                         </button>
@@ -263,7 +270,12 @@ const Panier = () => {
                             placeholder="Nom"
                             name='nom'
                             className="my-1"
+                            required
+                            isInvalid={validated && !formClient.nom}
                         />
+                <Form.Control.Feedback type="invalid">
+                    Ce champ est requis.
+                </Form.Control.Feedback>
                     </Col>
                     <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
                         <Form.Label className={'fw-bold'}>prenom</Form.Label>
@@ -274,7 +286,12 @@ const Panier = () => {
                             placeholder="Prénom"
                             name='prenom'
                             className="my-1"
+                            required
+                            isInvalid={validated && !formClient.prenom}
                         />
+                <Form.Control.Feedback type="invalid">
+                    Ce champ est requis.
+                </Form.Control.Feedback>
                     </Col>
                     <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
                         <Form.Label className={'fw-bold'}>Email</Form.Label>
@@ -296,13 +313,18 @@ const Panier = () => {
                             placeholder="Telephone"
                             name='telephone'
                             className="my-1"
+                            required
+                            isInvalid={validated && !formClient.telephone}
                         />
+                <Form.Control.Feedback type="invalid">
+                    Ce champ est requis.
+                </Form.Control.Feedback>
                     </Col>
                 </Row>
 
-                <Row className={'justify-content-end mt-3 '} >
+                <Row className={'justify-content-end mt-3 '}>
                     <Col xs={"3"}>
-                        <Button variant={"success"} onClick={validerLaVente} className='w-100'>
+                        <Button variant={"success"} type="submit" className='w-100'>
                             Valider la vente
                         </Button>
                     </Col>

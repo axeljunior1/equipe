@@ -1,4 +1,5 @@
 import axiosInstance from "../context/axiosInstance";
+import apiCrudService from "./ApiCrudService";
 
 
 const BASE_URL = '/produits';
@@ -8,7 +9,7 @@ class ProduitService {
      * Récupère la liste des produit.
      * @returns {Promise} Une promesse contenant les données des produit.
      */
-    async getProduit(page = 0 ,size = 15, sortCriteria) {
+    async getProduit(page = 0, size = 15, sortCriteria) {
         try {
             // Créer une chaîne de tri basée sur `sortCriteria`, qui est un tableau d'objets
             const sortString = sortCriteria ? sortCriteria.map(criterion => `${criterion.field},${criterion.direction}`)
@@ -24,7 +25,7 @@ class ProduitService {
                 }
             });
             return response.data
-        }catch (error) {
+        } catch (error) {
             console.error("Erreur lors de la récupération des produit :", error);
             throw error;
         }
@@ -40,7 +41,7 @@ class ProduitService {
         try {
             let axiosResponse = await axiosInstance.get(`${BASE_URL}/${id}`);
             return axiosResponse.data;
-        }catch(err) {
+        } catch (err) {
             throw err;
         }
 
@@ -50,7 +51,7 @@ class ProduitService {
         try {
             let axiosResponse = await axiosInstance.get(`${BASE_URL}/code-barre/${code}`);
             return axiosResponse.data;
-        }catch(err) {
+        } catch (err) {
             throw err;
         }
 
@@ -60,7 +61,7 @@ class ProduitService {
         try {
             let response = await axiosInstance.get(`${BASE_URL}/recherche?motCle=${motCle}`);
             return response.data;
-        }catch (error) {
+        } catch (error) {
             console.error(`Erreur lors de la récupération de l'produit avec l'ID ${motCle} :`, error);
             throw error;
         }
@@ -68,19 +69,17 @@ class ProduitService {
     }
 
 
-    getProduitDyn(params) {
-        let str = '?'
-        str = str+= 'actif=' + params.actif ;
-        if(params.nom) str+= 'nom=' + params.nom;
-        if(params.description) str+= '&' + 'description=' + params.description;
+    getProduitDyn = async (params) => {
+        // Générer proprement la query string
+        const queryString = new URLSearchParams(params).toString();
 
+        try {
+            return await apiCrudService.get(`${BASE_URL}/recherche-dynamique?${queryString}`);
+        } catch (error) {
+            console.error("Erreur lors de la récupération des produits:", error);
+            throw error;
+        }
 
-        return axiosInstance.get(`${BASE_URL}/recherche-dynamique${str}`)
-            .then(response => response.data)
-            .catch(error => {
-                console.error(`Erreur lors de la récupération de l'produit avec l'ID ${params.description} - ${params.nom} :`, error);
-                throw error;
-            });
     }
 
     /**
@@ -92,7 +91,7 @@ class ProduitService {
         try {
             let response = await axiosInstance.post(`${BASE_URL}`, produit);
             return response.data;
-        }catch (error) {
+        } catch (error) {
             console.error("Erreur lors de la création de l'produit :", error);
             throw error;
         }
@@ -134,11 +133,11 @@ class ProduitService {
         try {
             let response = await axiosInstance.delete(`${BASE_URL}/${id}`);
             return response.data;
-        }catch (error) {
+        } catch (error) {
             console.error(`Erreur lors de la suppression de l'produit avec l'ID ${id} :`, error);
             throw error;
         }
     }
 }
 
- export default new ProduitService();
+export default new ProduitService();

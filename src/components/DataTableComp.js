@@ -6,8 +6,8 @@ const DataTableComp = ({ data, columns, entetes }) => {
     return (
         <div>
             {entetes && entetes.length>0 && (
-                entetes.map((item) => (
-                    <h6>
+                entetes.map((item, index) => (
+                    <h6 key={index}>
                         {item.title} : <strong className="text-danger">{item.value}</strong>
                     </h6>
                 ))
@@ -16,15 +16,15 @@ const DataTableComp = ({ data, columns, entetes }) => {
                 <thead>
                 <tr className={"text-center align-middle " }>
                     {columns.map((col, index) => (
-                        <th key={index} className={"text-center align-middle index-" + index}>{col.header}</th>
+                        <th key={'th-'+index} className={"text-center align-middle index-" + index}>{col.header}</th>
                     ))}
                 </tr>
                 </thead>
                 <tbody>
-                {data.map((item, rowIndex) => (
-                    <tr key={rowIndex} className={"text-center align-middle rowIndex-" + rowIndex}>
+                {data.map((item, index) => (
+                    <tr key={'tr-'+index} className={"text-center align-middle rowIndex-" + index}>
                         {columns.map((col, colIndex) => (
-                            <td key={rowIndex*10+ colIndex} className={"text-center align-middle colIndex-" + colIndex}>
+                            <td key={'td-'+index*10 +colIndex} className={"text-center align-middle " }>
                                 {col.render ? col.render(item[col.accessor], item) : item[col.accessor]}
                             </td>
                         ))}

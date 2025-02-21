@@ -8,6 +8,7 @@ export const JwtProvider = ({ children }) => {
         return storedUser ? JSON.parse(storedUser) : null; // Convertir en objet ou null si absent
     });
     const [panierId, setPanierId] = useState(() => localStorage.getItem("panierId")  || null);
+    const [resetApp, setResetApp] = useState("initial");
 
 
     useEffect(() => {
@@ -35,7 +36,7 @@ export const JwtProvider = ({ children }) => {
     }, [panierId]);
 
     return (
-        <JwtContext.Provider value={{ jwt, setJwt, loggedEmployee, setLoggedEmployee, panierId, setPanierId }}>
+        <JwtContext.Provider value={{ jwt, setJwt, setResetApp, loggedEmployee, setLoggedEmployee, panierId, setPanierId }}>
             {children}
         </JwtContext.Provider>
     );

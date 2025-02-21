@@ -2,13 +2,12 @@ import React from 'react';
 import {Accordion, Button, Col, Container, Form, Row} from "react-bootstrap";
 
 const SearchCritereComp = ({
-                                  searchInput,
-                                  handleSearchInput,
-                                  handleSubmitSearch,
-                                  handleSubmitFilter,
-                                  handleInputChange,
-                                  filters, cols
-                              }) => {
+                               searchInput,
+                               handleSearchInput,
+                               handleSubmitSearch,
+                               handleSubmitFilter,
+                               cols
+                           }) => {
     return (
         <div>
 
@@ -30,7 +29,7 @@ const SearchCritereComp = ({
                 </Row>
             </form>
 
-            <Accordion className='my-3' defaultActiveKey='0'>
+            {cols && cols.length > 0 && <Accordion className='my-3' defaultActiveKey='0'>
                 <Accordion.Item eventKey="0">
                     <Accordion.Header> Filtre de recherche 🔍</Accordion.Header>
                     <Accordion.Body>
@@ -41,6 +40,13 @@ const SearchCritereComp = ({
 
                             <Container>
                                 <Row className="">
+                                    {cols.map((col, index) => (
+                                        <Col key={index} xs={12} sm={12} md={6} lg={4} xxl={3}>
+                                            {col}
+
+                                        </Col>
+                                    ))
+                                    }
 
                                 </Row>
 
@@ -57,7 +63,7 @@ const SearchCritereComp = ({
                     </Accordion.Body>
                 </Accordion.Item>
             </Accordion>
-
+            }
         </div>
     );
 };

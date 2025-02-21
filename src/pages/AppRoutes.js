@@ -25,6 +25,9 @@ import RoleDetail from "./roles/RoleDetails";
 import CreateEmployePage from "./CreateEmployePage";
 import QrScanner from "../components/QrScanner";
 import PanierComponent from "../components/PanierComponent";
+import FactureList from "../components/facture/FactureList";
+import FactureDetail from "../components/facture/FactureDetail";
+import FactureEdit from "../components/facture/FactureEdit";
 
 const AppRoutes = () => {
 
@@ -54,6 +57,9 @@ const AppRoutes = () => {
                     <Route path="/mouvements-stock/produit/:id" element={<MouvementStock/>}/>
                     <Route path="/roles" element={<Roles/>}/>
                     <Route path="/roles/:id" element={<RoleDetail/>}/>
+                    <Route path="/factures" element={<FactureList/>}/>
+                    <Route path="/factures/:id" element={<FactureDetail/>}/>
+                    <Route path="/factures/edit/:id" element={<FactureEdit/>}/>
                     <Route path="/login" element={<LoginForm/>}/>
                     <Route path="/qr" element={<QrScanner/>}/>
                     <Route path="/paniertest" element={<PanierComponent/>}/>

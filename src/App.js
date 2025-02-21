@@ -12,7 +12,7 @@ import useMobile from "./context/useMobile";
 
 const App = () => {
     const {panier} = usePanier()
-    const {jwt} = useJwt();
+    const {jwt,setJwt,setResetApp} = useJwt();
     const navigate = useNavigate();
     const location = useLocation();
     const isMobile = useMobile(); // Utilisation du hook
@@ -21,17 +21,17 @@ const App = () => {
         localStorage.removeItem("jwt"); // Supprimer le JWT
         localStorage.removeItem("loggedEmployee"); // Supprimer le JWT
         localStorage.removeItem("requestedUrl"); // Supprimer le JWT
-        localStorage.removeItem("panierId"); // Supprimer le JWT
+        localStorage.removeItem("panierId");
+        setJwt("")// Supprimer le JWT
         navigate("/login"); // Rediriger vers la page de connexion
     };
     useEffect(() => {
-
-
         // Mettre à jour localStorage avec l'URL courante
         if (location.pathname !== "/login") {
             localStorage.setItem("requestedUrl", location.pathname);
         }
     }, [location])
+
     return (
         <div>
             <div className="">
@@ -53,6 +53,7 @@ const App = () => {
                                         <Nav.Link as={Link} to="/employes">Employe</Nav.Link>
                                         <Nav.Link as={Link} to="/categories">Categories</Nav.Link>
                                         <Nav.Link as={Link} to="/roles">Roles</Nav.Link>
+                                        <Nav.Link as={Link} to="/factures">Factures</Nav.Link>
                                     </>}
 
                                     <Nav.Link as={Link} to="/panier">Caisse 🛒 {panier && panier.length > 0 && (
