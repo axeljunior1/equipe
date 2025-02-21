@@ -50,10 +50,11 @@ const App = () => {
                                         <Nav.Link as={Link} to="/achats">Achats</Nav.Link>
                                         <Nav.Link as={Link} to="/ventes">Ventes</Nav.Link>
                                         <Nav.Link as={Link} to="/mouvements-stock">Mouvements stocks</Nav.Link>
-                                        <Nav.Link as={Link} to="/employes">Employe</Nav.Link>
-                                        <Nav.Link as={Link} to="/categories">Categories</Nav.Link>
-                                        <Nav.Link as={Link} to="/roles">Roles</Nav.Link>
                                         <Nav.Link as={Link} to="/factures">Factures</Nav.Link>
+                                        <Nav.Link as={Link} to="/categories">Categories</Nav.Link>
+                                        <Nav.Link as={Link} to="/employes">Employe</Nav.Link>
+                                        <Nav.Link as={Link} to="/roles">Roles</Nav.Link>
+                                        <Nav.Link as={Link} to="/clients">Clients</Nav.Link>
                                     </>}
 
                                     <Nav.Link as={Link} to="/panier">Caisse 🛒 {panier && panier.length > 0 && (

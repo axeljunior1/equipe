@@ -57,7 +57,7 @@ const QRCodeScanner = (props) => {
                 </Col>
                 <Col xs={8}>
                     {texte && (
-                        // <ProduitDetailComp id={texte} codeBarre={texte} scanAndAdd={!!props.scanAndAdd} setTexte={setTexte} />
+                        // <DetailsComp id={texte} codeBarre={texte} scanAndAdd={!!props.scanAndAdd} setTexte={setTexte} />
                         <></>
                     )}
                 </Col>

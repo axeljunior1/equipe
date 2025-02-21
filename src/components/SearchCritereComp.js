@@ -13,7 +13,6 @@ const SearchCritereComp = ({
 
             <form className='my-3' onSubmit={handleSubmitSearch}>
                 <Row>
-
                     <Col xs="auto">
                         <input
                             type="text"

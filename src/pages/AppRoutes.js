@@ -1,9 +1,9 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {Route, Routes} from "react-router-dom";
 import Home from "./Home";
 import ListProduits from "./ListProduitsPage";
 import CreateProductPage from "./CreateProductPage";
-import ProduitDetail from "./DetailsProduit";
+import DetailsProduit from "./DetailsProduit";
 import Achats from "./achats/Achats";
 import AchatDetail from "./achats/AchatDetail";
 import Employe from "./employe/Employe";
@@ -28,6 +28,10 @@ import PanierComponent from "../components/PanierComponent";
 import FactureList from "../components/facture/FactureList";
 import FactureDetail from "../components/facture/FactureDetail";
 import FactureEdit from "../components/facture/FactureEdit";
+import ListClients from "./ListClients";
+import DetailsProduitEdit from "./DetailsProduitEdit";
+import ClientsDetails from "./ClientsDetails";
+import DetailsClientEdit from "./DetailsClientEdit";
 
 const AppRoutes = () => {
 
@@ -39,7 +43,8 @@ const AppRoutes = () => {
                     <Route path="/" element={<Redirect/>}/>
                     <Route path="/home" element={<Home/>}/>
                     <Route path="/produits" element={<ListProduits/>}/>
-                    <Route path="/produits/:id" element={<ProduitDetail/>}/>
+                    <Route path="/produits/:id" element={<DetailsProduit/>}/>
+                    <Route path="/produits/edit/:id" element={<DetailsProduitEdit/>}/>
                     <Route path="/creer-produit" element={<CreateProductPage/>}/>
                     <Route path="/creer-achat" element={<CreateAchatPage/>}/>
                     <Route path="/achats" element={<Achats/>}/>
@@ -60,6 +65,9 @@ const AppRoutes = () => {
                     <Route path="/factures" element={<FactureList/>}/>
                     <Route path="/factures/:id" element={<FactureDetail/>}/>
                     <Route path="/factures/edit/:id" element={<FactureEdit/>}/>
+                    <Route path="/clients" element={<ListClients/>}/>
+                    <Route path="/clients/:id" element={<ClientsDetails/>}/>
+                    <Route path="/clients/edit/:id" element={<DetailsClientEdit/>}/>
                     <Route path="/login" element={<LoginForm/>}/>
                     <Route path="/qr" element={<QrScanner/>}/>
                     <Route path="/paniertest" element={<PanierComponent/>}/>

@@ -50,7 +50,7 @@ const FactureEdit = () => {
         setLoading(true);
         setError(null);
         try {
-            await apiCrudService.put(`/factures/${id}`);
+            await apiCrudService.put(`factures`, id);
 
             navigate(`/factures/${id}`);  // Redirection vers la page de détail après modification
 
