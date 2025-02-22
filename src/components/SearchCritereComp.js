@@ -13,7 +13,11 @@ const SearchCritereComp = ({
 
             <form className='my-3' onSubmit={handleSubmitSearch}>
                 <Row>
-                    <Col xs="auto">
+
+                    <Col  xs={"auto"}>
+                        <Button className="mb-md-0 mb-xs-2" type="submit">Recherche</Button>
+                    </Col>
+                    <Col  md={""}>
                         <input
                             type="text"
                             value={searchInput}
@@ -22,13 +26,11 @@ const SearchCritereComp = ({
                             className="form-control mr-sm-2"
                         />
                     </Col>
-                    <Col xs="auto">
-                        <Button type="submit">Recherche</Button>
-                    </Col>
                 </Row>
             </form>
 
-            {cols && cols.length > 0 && <Accordion className='my-3' defaultActiveKey='0'>
+            {cols && cols.length > 0 &&
+                <Accordion className='my-5' defaultActiveKey='0'>
                 <Accordion.Item eventKey="0">
                     <Accordion.Header> Filtre de recherche 🔍</Accordion.Header>
                     <Accordion.Body>
@@ -37,7 +39,7 @@ const SearchCritereComp = ({
 
                         <Form onSubmit={handleSubmitFilter} className='my-3'>
 
-                            <Container>
+                            <div>
                                 <Row className="">
                                     {cols.map((col, index) => (
                                         <Col key={index} xs={12} sm={12} md={6} lg={4} xxl={3}>
@@ -56,7 +58,7 @@ const SearchCritereComp = ({
                                                 className={'my-2 w-100'}>Filtrer</Button>
                                     </Col>
                                 </Row>
-                            </Container>
+                            </div>
                         </Form>
 
                     </Accordion.Body>

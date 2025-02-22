@@ -1,14 +1,13 @@
 import React, {useEffect, useState} from "react";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import VenteService from "../../services/VenteService";
-import venteService from "../../services/VenteService";
 import Table from "react-bootstrap/Table";
 import LigneVenteService from "../../services/LigneVenteService";
-import {Button, Col, Form, Modal, Row} from "react-bootstrap";
+import {Alert, Button, Col, Form, Modal, Row} from "react-bootstrap";
 import InputGroup from "react-bootstrap/InputGroup";
-import SearchProduitPopup from "../test/SearchProduitPopup";
 import {formatDate} from "../../utils/dateUtils";
 import apiCrudService from "../../services/ApiCrudService";
+import ListProduitPage from "../ListProduitsPage";
 
 const VenteDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
@@ -148,9 +147,13 @@ const VenteDetail = () => {
     }
 
     // Fonction pour gérer la sélection d'un employé
-    const handleEmployeeSelect = (id, nom, prixVente) => {
-        console.log('prix Vente', id, nom, prixVente);
-        setFormAddLigne({...formAddLigne, 'produitId': id, "produitNom": nom, prixVente: prixVente});
+    const handleEmployeeSelect = (produit) => {
+
+        setFormAddLigne({...formAddLigne, 'produitId': produit.id,
+            "produitNom": produit.nom,
+            prixVente: produit.prixVente
+        });
+
         setShowModal(false); // Ferme le modal
     };
 
@@ -179,37 +182,44 @@ const VenteDetail = () => {
                         </button>
                     </div>
                     <br/>
-                    <h3> Lignes de l'vente</h3>
-                    <Table striped bordered hover className={"mt-2"}>
-                        <thead>
-                        <tr>
-                            <th>Numéro</th>
-                            <th>Produit</th>
-                            <th>Prix unitaire</th>
-                            <th>Qte</th>
-                            <th>Delete</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {lignesVentes?.map((ligne, index) => (
-                            <tr key={ligne.id}>
-                                <td>{index + 1}</td>
-                                <td><Link to={`/produits/${ligne.id}`}
-                                          className='text-decoration-none'>{ligne.produit.id} - {ligne.produit.nom}</Link>
-                                </td>
-                                <td>{ligne.prixVente}</td>
-                                <td>{ligne.quantite}</td>
-                                <td className={'justify-content-center align-items-center'}>
-                                    <Button variant={"outline-danger"} className={'w-100'} onClick={(e) => {
-                                        handleDeleteLigne(e, ligne.id)
-                                    }}> Supprimer 🚮</Button>
-
-                                </td>
+                    <h3> Lignes de la vente</h3>
+                    {lignesVentes && lignesVentes.length > 0 ? (
+                        <Table striped bordered hover className={"mt-2"}>
+                            <thead>
+                            <tr>
+                                <th>Numéro</th>
+                                <th>Produit</th>
+                                <th>Prix unitaire</th>
+                                <th>Qte</th>
+                                <th>Delete</th>
                             </tr>
-                        ))}
-                        </tbody>
-                    </Table>
-                    <Form onSubmit={handleSubmitFormAAddLine} className={"mt-5"}>
+                            </thead>
+                            <tbody>
+                            {lignesVentes?.map((ligne, index) => (
+                                <tr key={ligne.id}>
+                                    <td>{index + 1}</td>
+                                    <td><Link to={`/produits/${ligne.id}`}
+                                              className='text-decoration-none'>{ligne.produit.id} - {ligne.produit.nom}</Link>
+                                    </td>
+                                    <td>{ligne.prixVente}</td>
+                                    <td>{ligne.quantite}</td>
+                                    <td className={'justify-content-center align-items-center'}>
+                                        <Button variant={"outline-danger"} className={'w-100'} onClick={(e) => {
+                                            handleDeleteLigne(e, ligne.id)
+                                        }}> Supprimer 🚮</Button>
+
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </Table>
+                    ) : (
+                        <Alert severity="warning">
+                            <p>Aucun element trouvé </p>
+                        </Alert>
+                    )}
+                    <h3 className="mt-2"> Ajouter une vente ? ! ? (risque disparaitre )</h3>
+                    <Form onSubmit={handleSubmitFormAAddLine} className="mt-1">
                         {formAddLinesError && <Row>
                             <Col xs={12} className="text-danger my-1" >
                                 {formAddLinesError}
@@ -349,7 +359,7 @@ const VenteDetail = () => {
                     <Modal.Title>Rechercher un Produit</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <SearchProduitPopup onSelect={handleEmployeeSelect}/>
+                    <ListProduitPage onSelect={handleEmployeeSelect}/>
                 </Modal.Body>
             </Modal>
         </div>

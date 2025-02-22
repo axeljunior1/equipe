@@ -32,14 +32,15 @@ import ListClients from "./ListClients";
 import DetailsProduitEdit from "./DetailsProduitEdit";
 import ClientsDetails from "./ClientsDetails";
 import DetailsClientEdit from "./DetailsClientEdit";
+import '../App.css'
 
 const AppRoutes = () => {
 
     return (<>
-            <BreadcrumbNav/>
-            <div className="container">
+            <BreadcrumbNav className="p-3 m-3"/>
 
-                <Routes className="container">
+            <div className="custom-container">
+                <Routes className={""}>
                     <Route path="/" element={<Redirect/>}/>
                     <Route path="/home" element={<Home/>}/>
                     <Route path="/produits" element={<ListProduits/>}/>
@@ -73,7 +74,6 @@ const AppRoutes = () => {
                     <Route path="/paniertest" element={<PanierComponent/>}/>
                     <Route path="*" element={<NotFound/>}/>
                 </Routes>
-
             </div>
         </>
     );

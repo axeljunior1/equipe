@@ -1,9 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
 import {Button, Col, Form, Modal, Row, Table} from 'react-bootstrap';
-import {usePanier} from "../../context/PanierContext";
-import QRCodeScanner from "../../components/QRCodeScanner";
-import SearchClientPopup from "../test/SearchClientPopup";
 import axiosInstance from "../../context/axiosInstance";
 import {useNavigate} from "react-router-dom";
 import ModalDetailProduit from "../../modales/modalDetailProduit";
@@ -11,6 +8,10 @@ import AlertComp from "../../components/AlertComp";
 import {Search} from "lucide-react";
 import {useJwt} from "../../context/JwtContext";
 import useMobile from "../../context/useMobile";
+import {Scanner} from "@yudiel/react-qr-scanner";
+import produitService from "../../services/ProduitService";
+import {usePanier} from "../../context/PanierContext";
+import ListClients from "../ListClients";
 
 const Panier = () => {
     const [showModalClient, setshowModalClient] = useState(false); // Contrôle d'affichage du modal
@@ -19,6 +20,11 @@ const Panier = () => {
         panier,
         retirerDuPanier,
         calculerTotal,
+        ajouterAuPanier,
+        presentDansPanier,
+        refreshPanier,
+        nombreProduitDansPanier,
+        idPanierProduit,
         updatePanier
     } = usePanier();
 
@@ -27,6 +33,9 @@ const Panier = () => {
     const [showAlert, setShowAlert] = useState(false);
     const [validated, setValidated] = useState(false);
     const {loggedEmployee, panierId} = useJwt();
+    const [produit, setProduit] = useState(null);
+
+
 
     const [loading, setLoading] = useState(true);
 
@@ -54,16 +63,28 @@ const Panier = () => {
         updatePanier(data);
     };
 
+    useEffect(() => {
+        console.log("panier mis à jour :", panier);
+
+        for (const panierElement of panier) {
+            if (panierElement.produit.id === 47) {
+                console.log("panierElement après mise à jour:", panierElement);
+            }
+        }
+    }, [panier]); //
 
     const handleIncrease = (itemPanier) => {
-        console.log('itemPanier', itemPanier)
         itemPanier.quantite++;
         handleUpdatePanier(itemPanier)
     }
 
     const handleDecrease = (itemPanier) => {
-        itemPanier.quantite--;
-        handleUpdatePanier(itemPanier)
+        if (itemPanier.quantite === 1) {
+            retirerDuPanier(itemPanier.id);
+        } else {
+            itemPanier.quantite--;
+            handleUpdatePanier(itemPanier)
+        }
     }
 
     const handleInputChange = (e) => {
@@ -80,7 +101,11 @@ const Panier = () => {
             e.stopPropagation();
 
         } else {
-            validerLaVente().then()
+            if(panier.length > 0){
+                validerLaVente().then()
+            }else {
+                setError({message : "Le panier est vide ! "})
+            }
             // Formulaire valide, procéder avec l'envoi des données
             console.log('Données soumises:', formClient);
         }
@@ -132,8 +157,7 @@ const Panier = () => {
             navigate(`/ventes/${response.data.id}`);
         } catch (error) {
             setError(error);
-        }
-        finally {
+        } finally {
             setLoading(false);
         }
     }
@@ -141,9 +165,43 @@ const Panier = () => {
 
     const [isHovered, setIsHovered] = useState(false);
 
-    const test = () => {
-        return 10
+
+    const handleScan = async (texte) => {
+        let value = texte[0].rawValue;
+
+        let produit = await produitService.getProduitsByCodeBarre(value);
+        setProduit(produit);
+
+
     }
+
+    let rowQRCode = <Row>
+        <Col xs={4}>
+
+
+            <div style={{width: '20rem'}}>
+                <Scanner onScan={handleScan} allowMultiple={true} scanDelay={1500}
+                         style={{
+                             width: '100%',
+                             height: '100%'
+                         }} // Adapter le scanner à la taille du conteneur
+                />
+            </div>
+        </Col>
+    </Row>;
+
+    useEffect(() => {
+
+        if (produit !== null) {
+            let postData = {
+                "prixVente": produit.prixVente,
+                "produitId": produit.id,
+                "quantite": nombreProduitDansPanier(produit.id) + 1
+            };
+            ajouterAuPanier(postData);
+        }
+
+    }, [produit]);
 
 
     return (
@@ -151,7 +209,7 @@ const Panier = () => {
             <h2>Panier</h2>
 
             {isMobile && <div className={'my-3'}>
-                <QRCodeScanner scanAndAdd={true} setAlert={setShowAlert}/>
+                {rowQRCode}
             </div>}
 
             {error &&
@@ -186,7 +244,7 @@ const Panier = () => {
                     <tbody>
                     {panier.map((item) => (
                         <tr key={item.id || `${item.nom}-${item.prixVente}`}>
-                            <td>
+                            <td> {item.id}
                                 <Button variant={"outline-primary"} className={"w-100"}
                                         onClick={() => handleShowModalDetailProduit(item.produit.id)}>{item.produit.nom}</Button>
                             </td>
@@ -252,7 +310,10 @@ const Panier = () => {
                 </Form.Control.Feedback>
                         <button
                             className="btn position-absolute top-50 end-0 me-10 pe-10 py-0 "
-                            onClick={() => setshowModalClient(true)}
+                            onClick={(e) => {
+                                e.preventDefault()
+                                setshowModalClient(true)
+                            }}
                             onMouseEnter={() => setIsHovered(true)}
                             onMouseLeave={() => setIsHovered(false)}
                             title="Rechercher"
@@ -270,7 +331,7 @@ const Panier = () => {
                             placeholder="Nom"
                             name='nom'
                             className="my-1"
-                            required
+                            required readOnly
                             isInvalid={validated && !formClient.nom}
                         />
                 <Form.Control.Feedback type="invalid">
@@ -286,7 +347,7 @@ const Panier = () => {
                             placeholder="Prénom"
                             name='prenom'
                             className="my-1"
-                            required
+                            required readOnly
                             isInvalid={validated && !formClient.prenom}
                         />
                 <Form.Control.Feedback type="invalid">
@@ -300,7 +361,7 @@ const Panier = () => {
                             value={formClient.email}
                             onChange={handleInputChange}
                             placeholder="Email"
-                            name='email'
+                            name='email' readOnly
                             className="my-1"
                         />
                     </Col>
@@ -313,7 +374,7 @@ const Panier = () => {
                             placeholder="Telephone"
                             name='telephone'
                             className="my-1"
-                            required
+                            required readOnly
                             isInvalid={validated && !formClient.telephone}
                         />
                 <Form.Control.Feedback type="invalid">
@@ -338,16 +399,18 @@ const Panier = () => {
                  </span>
 
             {!isMobile && <div className={'mt-3'}>
-                <QRCodeScanner scanAndAdd={true} setAlert={setShowAlert}/>
+
+                {rowQRCode}
+
             </div>}
 
-            {/* Modal de recherche d'employé */}
+            {/* Modal de recherche de client */}
             <Modal show={showModalClient} onHide={() => setshowModalClient(false)} size="lg" centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Rechercher un Client</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <SearchClientPopup onSelect={handleProductSelect}/>
+                    <ListClients onSelect={handleProductSelect}/>
                 </Modal.Body>
             </Modal>
 

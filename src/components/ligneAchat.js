@@ -16,21 +16,21 @@ const LigneAchat = ({LignesAchat}) => {
 
 
     // Fonction pour récupérer les données d'un produit
-    const fetchLigneAchat = async () => {
-        ProduitService.getProduitsById(LignesAchat.id).then(data => {
-            setLigneAchat(data);
-            setFormData(data);
-        }).catch(error => {
-            setError(error);
-        }).finally(
-            () => setLoading(false),
-        )
-    };
+    // const fetchLigneAchat = async () => {
+    //     // ProduitService.getProduitsById(LignesAchat.id).then(data => {
+    //         setLigneAchat(data);
+    //         setFormData(data);
+    //     }).catch(error => {
+    //         setError(error);
+    //     }).finally(
+    //         () => setLoading(false),
+    //     )
+    // };
 
 
 
     useEffect(() => {
-        fetchLigneAchat(); // Récupère les données lors du chargement du composant
+        // fetchLigneAchat(); // Récupère les données lors du chargement du composant
     }, []);
 
     if (loading) {

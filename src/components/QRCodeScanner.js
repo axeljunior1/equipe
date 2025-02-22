@@ -4,9 +4,8 @@ import {Col, Row} from "react-bootstrap";
 import {usePanier} from "../context/PanierContext";
 import produitService from "../services/ProduitService";
 
-const QRCodeScanner = (props) => {
+const  QRCodeScanner = (props) => {
     const [texte, setTexte] = useState('');
-    const {ajouterAuPanier, nombreProduitDansPanier} = usePanier();
     const [error, setError] = useState(null);
 
 
@@ -25,14 +24,13 @@ const QRCodeScanner = (props) => {
         try {
             const data = await produitService.getProduitsByCodeBarre(codeBarre)
             // console.log(data)
-            debugger
-            console.log('nombreProduitDansPanier(data.id)' ,nombreProduitDansPanier(data.id));
-            ajouterAuPanier({
+            console.log('nombreProduitDansPanier(data.id)' ,props.nombreProduitDansPanier(data.id));
+            props.ajouterAuPanier({
                 "prixVente": data.prixVente,
                 "produitId": data.id,
-                "quantite":  (Number(nombreProduitDansPanier(data.id)) + 1)
+                "quantite":  (props.nombreProduitDansPanier(data.id) + 1)
             });
-            // props.setTexte('')
+            props.setTexte('')
             props.setAlert(true);
 
         } catch (error) {
@@ -45,7 +43,7 @@ const QRCodeScanner = (props) => {
             <Row>
                 <Col xs={4}>
                     <div style={{width: '20rem'}}>
-                        <Scanner onScan={handleScan} allowMultiple={true} scanDelay={1500}
+                        <Scanner onScan={handleScan} allowMultiple={true} scanDelay={1000}
                                  style={{width: '100%', height: '100%'}} // Adapter le scanner à la taille du conteneur
                         />
                         {texte && (

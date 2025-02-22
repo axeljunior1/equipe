@@ -1,26 +1,25 @@
 import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {usePanier} from "../context/PanierContext";
+// import {usePanier} from "../context/PanierContext";
 import AlertComp from "../components/AlertComp";
-import ErrorAlert from "../exceptions/ErrorAlert";
 import apiCrudService from "../services/ApiCrudService";
-import {Button, Col, Row} from "react-bootstrap";
+import {Button} from "react-bootstrap";
 import {formatDate} from "../utils/dateUtils";
 import DetailsComp from "../components/DetailsComp";
 
 const DetailsClient = (props) => {
     const {id: rlt} = useParams(); // Récupère l'ID depuis l'URL*
     const id = rlt ?? props.id // id de l'url ou id dans props, ils'agit ici de l'id du client
-    const {
-        panier,
-        ajouterAuPanier,
-        retirerDuPanier,
-        calculerTotal,
-        refreshPanier,
-        nombreProduitDansPanier,
-        presentDansPanier,
-        updatePanier
-    } = usePanier();
+    // const {
+    //     panier,
+    //     ajouterAuPanier,
+    //     retirerDuPanier,
+    //     calculerTotal,
+    //     refreshPanier,
+    //     nombreProduitDansPanier,
+    //     presentDansPanier,
+    //     updatePanier
+    // } = usePanier();
 
 
     const navigate = useNavigate();

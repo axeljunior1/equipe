@@ -16,7 +16,7 @@ const BreadcrumbNav = () => {
     });
 
     return (
-        <Breadcrumb>
+        <Breadcrumb className="m-5">
             {/* Ajouter le lien vers "Accueil" */}
             <Breadcrumb.Item onClick={() => navigate('/')} style={{ cursor: 'pointer', textDecoration: 'none'  }}>
                 Accueil

@@ -17,7 +17,6 @@ export const PanierProvider = ({children}) => {
 
 
     const [client, setClient] = useState(null);
-    const [input, setInput] = useState("");
 
     const [panier, setPanier] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -25,11 +24,15 @@ export const PanierProvider = ({children}) => {
 
     useEffect(() => {
 
-
             fetchCart();
         },
         []);
 
+    useEffect(() => {
+
+            console.log('On recupere les données du panier panier et on le met a jour ', panier);
+        },
+        [panier]);
 
 
     useEffect(() => {
@@ -54,17 +57,17 @@ export const PanierProvider = ({children}) => {
     }, []);
 
     const sendMessage = (message) => {
-        if (client ) {
-            client.publish({ destination: "/app/send", body: message });
-            console.log('client.publish')
-            setInput("");
+        if (client) {
+            client.publish({destination: "/app/send", body: message});
         }
+        fetchCart()
     };
 
 
     const fetchCart = async () => {
         setLoading(true);
         try {
+
             const response = await axiosInstance.get(`panier-produit/panier/${panierId}`);
             setPanier(response.data);
         } catch (err) {
@@ -82,7 +85,6 @@ export const PanierProvider = ({children}) => {
                 produitId: lignePanier.produitId,
                 quantite: lignePanier.quantite
             };
-            console.log( 'postData', postData );
             await axiosInstance.post("panier-produit", postData);
             sendMessage('ajout')
         } catch (err) {
@@ -91,23 +93,24 @@ export const PanierProvider = ({children}) => {
     };
 
 
-
     // Rafraîchir le panier
     const refreshPanier = async () => {
         sendMessage('refresh')
     };
 
 
-
     // Mettre à jour un produit dans le panier
     const updatePanier = async (param) => {
 
-        const updateData = {"prixVente" : param.prixVente,
-            "quantite" : param.quantite};
-        console.log(updateData)
+        const updateData = {
+            "prixVente": param.prixVente,
+            "quantite": param.quantite
+        };
+
         try {
-            await apiCrudService.patch(`panier-produit`, param.id , updateData);
+            await apiCrudService.patch(`panier-produit`, param.id, updateData);
             sendMessage('update')
+
         } catch (error) {
             console.error("Erreur lors de la mise à jour du panier:", error);
         }
@@ -124,8 +127,6 @@ export const PanierProvider = ({children}) => {
     };
 
 
-
-
     const presentDansPanier = (productId) => {
         return panier.some((item) => item.produit.id === productId);
     };
@@ -140,7 +141,20 @@ export const PanierProvider = ({children}) => {
                 }
             }
         }
+        console.log("produit non present dans le panier (erreur )")
         return 0;
+    }
+
+    const idPanierProduit = (produitId) => {
+        if (presentDansPanier(produitId)) {
+            for (const panierElement of panier) {
+                if (panierElement.produit.id === produitId) {
+                    return panierElement.id;
+                }
+            }
+        }
+        console.log("produit non present dans le panier (erreur )")
+        return null ;
     }
 
     // Fonction pour calculer le total du panier
@@ -156,6 +170,7 @@ export const PanierProvider = ({children}) => {
             retirerDuPanier,
             calculerTotal,
             refreshPanier,
+            idPanierProduit,
             nombreProduitDansPanier,
             presentDansPanier, loading, error,
             updatePanier

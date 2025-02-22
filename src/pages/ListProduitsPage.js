@@ -14,7 +14,7 @@ import DataTableComp from "../components/DataTableComp";
 import SearchCritereComp from "../components/SearchCritereComp";
 
 
-const ListProduitPage = () => {
+const ListProduitPage = (props) => {
     const [produits, setProduits] = useState([]);
 
     const location = useLocation();
@@ -121,13 +121,36 @@ const ListProduitPage = () => {
         }
     };
 
-    const columns = [
+
+    const removeColumns = (baseColumns, excludedAccessors) => {
+        return baseColumns.filter(col => !excludedAccessors.includes(col.accessor));
+    };
+
+    const baseColumns = [
         {
             header: "Nom", accessor: "nom", render: (value, produit) => (
                 <Link to={`/produits/${produit.id}`} className="text-decoration-none">{value}</Link>
             )
         },
         {header: "Description", accessor: "description"},
+        {header: "Sélectionner", accessor: "onSelect",
+            render: (value, produit) => (
+                <Button
+                    variant="primary"
+                    onClick={() => {
+                        let pro = {
+                            id: produit.id,
+                            nom: produit.nom,
+                            prixAchat: produit.prixAchat
+                        };
+                        props.onSelect(pro);
+                    }}
+                >
+                    Sélectionner
+                </Button>
+            )
+        },
+
         {header: "Prix Unitaire", accessor: "prixVente"},
         {header: "Stock Initial", accessor: "stockInitial"},
         {
@@ -136,7 +159,7 @@ const ListProduitPage = () => {
             )
         },
         {
-            header: "Panier 🛒", accessor: "", render: (_, produit) => (
+            header: "Panier 🛒", accessor: "panier", render: (_, produit) => (
                 <Col sm={12}>
                     <Button
                         variant="outline-primary" className='fw-bold me-3'
@@ -152,6 +175,9 @@ const ListProduitPage = () => {
                     <span className="fw-bold">
                     {nombreProduitDansPanier(produit.id)}
                     </span>
+                    {/*
+                    Todo: ajouter le prix d'achat ici
+                    */}
                     <Button
                         variant="outline-info" className=' fw-bold ms-3'
                         onClick={() => ajouterAuPanier({
@@ -166,6 +192,17 @@ const ListProduitPage = () => {
             )
         }
     ];
+
+
+    let columns = removeColumns(baseColumns, []);
+
+    if(!props.onSelect  ){
+        columns = removeColumns(baseColumns, ['onSelect']);
+    }else{
+        columns = removeColumns(baseColumns, ['prixVente', 'stockInitial', 'panier']);
+    }
+
+
 
     let cols = [
         <Form.Select className="mb-3"

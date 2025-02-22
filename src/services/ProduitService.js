@@ -9,43 +9,9 @@ class ProduitService {
      * Récupère la liste des produit.
      * @returns {Promise} Une promesse contenant les données des produit.
      */
-    async getProduit(page = 0, size = 15, sortCriteria) {
-        try {
-            // Créer une chaîne de tri basée sur `sortCriteria`, qui est un tableau d'objets
-            const sortString = sortCriteria ? sortCriteria.map(criterion => `${criterion.field},${criterion.direction}`)
-                .join(',') : '';
 
 
-            const response = await axiosInstance.get(BASE_URL, {
-                params: {
-                    page: page, // Le numéro de la page (indexé à partir de 0)
-                    size: size, // Nombre d'éléments par page
-                    sort: sortString, // Champ et direction de tri
 
-                }
-            });
-            return response.data
-        } catch (error) {
-            console.error("Erreur lors de la récupération des produit :", error);
-            throw error;
-        }
-
-    }
-
-    /**
-     * Récupère les détails d'un produit spécifique par son ID.
-     * @param {string} id - L'ID de l'produit.
-     * @returns {Promise} Une promesse contenant les données de l'produit spécifique.
-     */
-    async getProduitsById(id) {
-        try {
-            let axiosResponse = await axiosInstance.get(`${BASE_URL}/${id}`);
-            return axiosResponse.data;
-        } catch (err) {
-            throw err;
-        }
-
-    }
 
     async getProduitsByCodeBarre(code) {
         try {

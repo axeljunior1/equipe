@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {usePanier} from "../context/PanierContext";
 import apiCrudService from "../services/ApiCrudService";
 import {Form, Button, Col} from "react-bootstrap"
@@ -13,8 +13,7 @@ import PaginationComp from "../components/PaginationComp";
 import {formatDate} from "../utils/dateUtils";
 
 
-
-const ListClientPage = () => {
+const ListClientPage = (props) => {
     const [clients, setClients] = useState([]);
 
     const location = useLocation();
@@ -68,7 +67,6 @@ const ListClientPage = () => {
     }, [currentPage, pageSize]);
 
 
-
     const handleInputChange = (e) => {
         const {name, value} = e.target;
         setFilters({...filters, [name]: value});
@@ -100,7 +98,24 @@ const ListClientPage = () => {
         }
     };
 
-    const columns = [
+
+    const removeColumns = (baseColumns, excludedAccessors) => {
+        return baseColumns.filter(col => !excludedAccessors.includes(col.accessor));
+    };
+
+    const addColumns = (newColumns, baseColumns, includedAccessors) => {
+        const columnsToAdd = baseColumns.filter(col => includedAccessors.includes(col.accessor));
+
+        // Ajouter uniquement les colonnes qui ne sont pas déjà dans newColumns
+        const updatedColumns = [...newColumns, ...columnsToAdd.filter(col => !newColumns.some(c => c.accessor === col.accessor))];
+
+        return updatedColumns;
+    };
+
+
+
+
+    const baseColumns = [
         {
             header: "Nom", accessor: "nom", render: (value, client) => (
                 <Link to={`/clients/${client.id}`} className="text-decoration-none">{value}</Link>
@@ -109,8 +124,27 @@ const ListClientPage = () => {
         {header: "Prénom", accessor: "prenom"},
         {header: "Telephone", accessor: "telephone"},
         {header: "Email", accessor: "email"},
-        {header: "Date de creation", accessor: "dateCreation", render: (value, client) => (<> {formatDate(value)} </>)},
-        {header: "Actif ?", accessor: "actif", render: (value, client) => ( <span> {value  ? 'Oui' : 'Non'} </span>)},
+        {header: "Date de creation", accessor: "createdAt", render: (value, client) => (<> {formatDate(value)} </>)},
+        {header: "Sélectionner", accessor: "onSelect",
+            render: (value, client) => (
+                <Button
+                    variant="primary"
+                    onClick={() => {
+                        let cli = {
+                            id: client.id,
+                            nom: client.nom,
+                            prenom: client.prenom,
+                            email: client.email,
+                            telephone: client.telephone
+                        };
+                        props.onSelect(cli);
+                    }}
+                >
+                    Sélectionner
+                </Button>
+            )
+        },
+        {header: "Actif ?", accessor: "actif", render: (value, client) => (<span> {value ? 'Oui' : 'Non'} </span>)},
         {
             header: "Cree une vente", accessor: "creerVente", render: (value) => (
                 <span className="fw-bold text-success">
@@ -121,6 +155,15 @@ const ListClientPage = () => {
             )
         }
     ];
+
+    let columns = removeColumns(baseColumns, []);
+
+
+    if(!props.onSelect  ){
+        columns = removeColumns(baseColumns, ['onSelect']);
+    }else{
+        columns = removeColumns(baseColumns, ['actif', 'creerVente']);
+    }
 
     let cols = [
         <Form.Select className="mb-3"
@@ -211,7 +254,6 @@ const ListClientPage = () => {
                                   valueBtn='Créer client'/>
 
 
-
             <SearchCritereComp cols={cols}
                                handleSubmitSearch={handleSubmitSearch}
                                searchInput={searchBar}
@@ -220,7 +262,7 @@ const ListClientPage = () => {
             />
 
             {clients.length > 0 ? (
-                <DataTableComp data={clients} columns={columns} entetes={entetes} />
+                <DataTableComp data={clients} columns={columns} entetes={entetes}/>
             ) : (
                 <div className="text-center text-muted">Aucun client trouvé.</div>
             )}

@@ -36,3 +36,9 @@
     transform: rotate(360deg);
   }
 }
+
+.custom-container {
+  margin-left: 10%;
+  margin-right: 10%;
+  max-width: 80%; /* La largeur totale est de 100% - 7% - 7% = 86% */
+}
