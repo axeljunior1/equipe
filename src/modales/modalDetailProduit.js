@@ -1,6 +1,5 @@
 import React from 'react';
 import {Modal} from "react-bootstrap";
-import SearchProduitPopup from "../pages/test/SearchProduitPopup";
 import DetailsProduit from "../pages/DetailsProduit";
 
 const ModalDetailProduit = (props) => {
