@@ -1,10 +1,10 @@
 import React, {useCallback, useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
-import CategorieService from "../services/CategorieService";
-import categorieService from "../services/CategorieService";
-import {usePanier} from "../context/PanierContext";
+import CategorieService from "../../services/CategorieService";
+import categorieService from "../../services/CategorieService";
+import {usePanier} from "../../context/PanierContext";
 import * as PropTypes from "prop-types";
-import CategorieDetailComp from "../components/CategoriesDetailComp";
+import CategorieDetailComp from "../../components/CategoriesDetailComp";
 
 
 

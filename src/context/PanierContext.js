@@ -36,7 +36,7 @@ export const PanierProvider = ({children}) => {
 
 
     useEffect(() => {
-        const socket = new SockJS("http://192.168.1.82:8080/ws");
+        const socket = new SockJS("http://localhost:8080/ws");
         const stompClient = new Client({
             webSocketFactory: () => socket,
             reconnectDelay: 5000,

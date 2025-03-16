@@ -20,7 +20,7 @@ const ListRole = () => {
     const [nombreTotalDeLigne, setNombreTotalDeLigne] = useState(0); // Nombre total de pages
     const navigate = useNavigate();
 
-    // Fonction pour récupérer les roles avec pagination
+    // Fonction pour récupérer les role avec pagination
     const fetchRoles = async () => {
         setLoading(true);
         try {

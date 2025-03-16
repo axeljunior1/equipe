@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
-import SelectMultiple from "../roles/SelectMultiple";
+import SelectMultiple from "../../components/SelectMultiple";
 import apiCrudService from "../../services/ApiCrudService";
 import ErrorAlert from "../../exceptions/ErrorAlert";
 

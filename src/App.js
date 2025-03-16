@@ -12,7 +12,7 @@ import useMobile from "./context/useMobile";
 
 const App = () => {
     const {panier} = usePanier()
-    const {jwt,setJwt,setResetApp} = useJwt();
+    const {jwt,setJwt, setPanierId, setLoggedEmployee} = useJwt();
     const navigate = useNavigate();
     const location = useLocation();
     const isMobile = useMobile(); // Utilisation du hook
@@ -23,6 +23,9 @@ const App = () => {
         localStorage.removeItem("requestedUrl"); // Supprimer le JWT
         localStorage.removeItem("panierId");
         setJwt("")// Supprimer le JWT
+        setLoggedEmployee(null); // Réinitialiser l'utilisateur
+        setPanierId(0);  // Réinitialiser le panier
+
         navigate("/login"); // Rediriger vers la page de connexion
     };
     useEffect(() => {

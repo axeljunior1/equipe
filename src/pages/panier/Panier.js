@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {Button, Col, Form, Modal, Row, Table} from 'react-bootstrap';
 import axiosInstance from "../../context/axiosInstance";
@@ -8,10 +8,10 @@ import AlertComp from "../../components/AlertComp";
 import {Search} from "lucide-react";
 import {useJwt} from "../../context/JwtContext";
 import useMobile from "../../context/useMobile";
-import {Scanner} from "@yudiel/react-qr-scanner";
-import produitService from "../../services/ProduitService";
 import {usePanier} from "../../context/PanierContext";
-import ListClients from "../ListClients";
+import ListClients from "../client/ClientList";
+import produitService from "../../services/ProduitService";
+import BarcodeReader from "../../components/BarcodeReader";
 
 const Panier = () => {
     const [showModalClient, setshowModalClient] = useState(false); // Contrôle d'affichage du modal
@@ -34,6 +34,9 @@ const Panier = () => {
     const [validated, setValidated] = useState(false);
     const {loggedEmployee, panierId} = useJwt();
     const [produit, setProduit] = useState(null);
+    const [texte, setTexte] = useState('');
+    const [result, setResult] = useState("Aucun résultat");
+    const videoRef = useRef(null);
 
 
 
@@ -167,25 +170,49 @@ const Panier = () => {
 
 
     const handleScan = async (texte) => {
-        let value = texte[0].rawValue;
+        console.log(texte)
 
-        let produit = await produitService.getProduitsByCodeBarre(value);
-        setProduit(produit);
+        setLoading(true);
+        try {
+
+            let produit = await produitService.getProduitsByCodeBarre(texte);
+            setProduit(produit);
+
+        }catch(err) {
+            setError(err);
+        }finally {
+            setLoading(false);
+        }
+
 
 
     }
+
+
 
     let rowQRCode = <Row>
         <Col xs={4}>
 
 
             <div style={{width: '20rem'}}>
-                <Scanner onScan={handleScan} allowMultiple={true} scanDelay={1500}
-                         style={{
-                             width: '100%',
-                             height: '100%'
-                         }} // Adapter le scanner à la taille du conteneur
+                {/*<Scanner onScan={handleScan} allowMultiple={true} scanDelay={1500}*/}
+                {/*         style={{*/}
+                {/*             width: '100%',*/}
+                {/*             height: '100%'*/}
+                {/*         }} // Adapter le scanner à la taille du conteneur*/}
+                {/*/>*/}
+
+                <BarcodeReader onScan={handleScan} setError={setError} />
+                <Form.Control
+                    type="number"
+                    value={formClient.email}
+                    onChange={handleInputChange}
+                    name='id'
+                    className="my-1"
+                    required
+                    isInvalid={validated && !formClient.id}
                 />
+
             </div>
         </Col>
     </Row>;
@@ -244,7 +271,7 @@ const Panier = () => {
                     <tbody>
                     {panier.map((item) => (
                         <tr key={item.id || `${item.nom}-${item.prixVente}`}>
-                            <td> {item.id}
+                            <td>
                                 <Button variant={"outline-primary"} className={"w-100"}
                                         onClick={() => handleShowModalDetailProduit(item.produit.id)}>{item.produit.nom}</Button>
                             </td>

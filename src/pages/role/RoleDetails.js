@@ -3,7 +3,7 @@ import {useLocation, useParams} from "react-router-dom";
 import apiCrudService from "../../services/ApiCrudService";
 import RoleDetailComp from "../../components/RoleDetailComp";
 import ErrorAlert from "../../exceptions/ErrorAlert";
-import SelectMultiple from "./SelectMultiple";
+import SelectMultiple from "../../components/SelectMultiple";
 
 const RoleDetail = (props) => {
     const {id:rlt} = useParams(); // Récupère l'ID depuis l'URL*
@@ -31,7 +31,7 @@ const RoleDetail = (props) => {
     const fetchRole = async () => {
         setLoading(true);
         try {
-            const data = await apiCrudService.getById('roles', id)
+            const data = await apiCrudService.getById('role', id)
             // console.log(data)
             setRole(data);
             let preFormData = formData;

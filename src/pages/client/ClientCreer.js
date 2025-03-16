@@ -1,19 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
-import CategorieService from "../services/CategorieService";
-import apiCrudService from "../services/ApiCrudService";
+import CategorieService from "../../services/CategorieService";
+import apiCrudService from "../../services/ApiCrudService";
 
-const CreateProductPage = () => {
+const ClientCreer = () => {
     const [formData, setFormData] = useState({
         nom: '',
-        description: '',
-        image: '',
-        quantity: 0,
-        prixUnitaire: 0,
-        categorieId: '',
-        qrCode: [''],
-        stockInitial: 0
+        prenom: '',
+        email: '',
+        telephone: ''
 
     });
     const [error, setError] = useState(null);
@@ -46,10 +42,11 @@ const CreateProductPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+        setError(null);
         try {
-            let response = await apiCrudService.post('produits',formData);
+            let response = await apiCrudService.post('clients',formData);
             debugger;
-            navigate(`/produits/${response.id}?showAlertCreation=true`);
+            navigate(`/clients/${response.id}?showAlertCreation=true`);
 
         }catch (error) {
             setError(error);
@@ -67,7 +64,7 @@ const CreateProductPage = () => {
     // if (error) return <ErrorAlert error={error} />;
     return (
         <div className="container mt-5">
-            <h3>Créer un nouveau produit</h3>
+            <h3>Créer un nouveau client</h3>
             {error && <div className="alert alert-danger">{error.message}</div>}
             <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
@@ -77,61 +74,50 @@ const CreateProductPage = () => {
                         name="nom"
                         value={formData.nom}
                         onChange={handleChange}
-                        placeholder="Entrez le nom du produit"
+                        placeholder="Entrez le nom du client"
                     />
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>Description</Form.Label>
+                    <Form.Label>Prénom</Form.Label>
                     <Form.Control
                         type="text"
-                        name="description"
-                        value={formData.description}
+                        name="prenom"
+                        value={formData.prenom}
                         onChange={handleChange}
-                        placeholder="Entrez la description"
+                        placeholder="Entrez la prenom"
                     />
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>Prix Unitaire</Form.Label>
+                    <Form.Label>Email</Form.Label>
                     <Form.Control
-                        type="number"
-                        name="prixUnitaire"
-                        value={formData.prixUnitaire}
+                        type="text"
+                        name="email"
+                        value={formData.email}
                         onChange={handleChange}
-                        placeholder="Entrez le prix unitaire"
+                        placeholder="Entrez l'email"
                     />
                 </Form.Group>
-
-                <Form.Select className="mb-3"
-                             name="categorieId"
-                             value={formData.categorieId}
-                             onChange={handleChange}
-                             placeholder="Entrez la catégorie">
-                    <option>Catégorie</option>
-                    <>
-                    {categories.map((item) => (
-                        <option key={item.id} value={item.id}>{item.nom}</option>
-                    ))}</>
-                </Form.Select>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>Stock Initial</Form.Label>
+                    <Form.Label>Telephone</Form.Label>
                     <Form.Control
-                        type="number"
-                        name="stockInitial"
-                        value={formData.stockInitial}
+                        type="text"
+                        name="telephone"
+                        value={formData.telephone}
                         onChange={handleChange}
-                        placeholder="Entrez le stock initial"
+                        placeholder="Entrez le telephone"
                     />
                 </Form.Group>
+
 
                 <Button variant="primary" type="submit" disabled={loading}>
-                    {loading ? 'Chargement...' : 'Créer le produit'}
+                    {loading ? 'Chargement...' : 'Créer le client'}
                 </Button>
             </Form>
         </div>
     );
 };
 
-export default CreateProductPage;
+export default ClientCreer;

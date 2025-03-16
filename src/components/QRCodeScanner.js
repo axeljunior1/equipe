@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
-import {Scanner} from '@yudiel/react-qr-scanner';
+// import {Scanner} from '@yudiel/react-qr-scanner';
 import {Col, Row} from "react-bootstrap";
-import {usePanier} from "../context/PanierContext";
 import produitService from "../services/ProduitService";
 
 const  QRCodeScanner = (props) => {
@@ -42,16 +41,16 @@ const  QRCodeScanner = (props) => {
         <div>
             <Row>
                 <Col xs={4}>
-                    <div style={{width: '20rem'}}>
-                        <Scanner onScan={handleScan} allowMultiple={true} scanDelay={1000}
-                                 style={{width: '100%', height: '100%'}} // Adapter le scanner à la taille du conteneur
-                        />
-                        {texte && (
-                            <span>
-                                Texte : {texte}
-                                </span>
-                        )}
-                    </div>
+                    {/*<div style={{width: '20rem'}}>*/}
+                    {/*    <Scanner onScan={handleScan} allowMultiple={true} scanDelay={1000}*/}
+                    {/*             style={{width: '100%', height: '100%'}} // Adapter le scanner à la taille du conteneur*/}
+                    {/*    />*/}
+                    {/*    {texte && (*/}
+                    {/*        <span>*/}
+                    {/*            Texte : {texte}*/}
+                    {/*            </span>*/}
+                    {/*    )}*/}
+                    {/*</div>*/}
                 </Col>
                 <Col xs={8}>
                     {texte && (

@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Button} from "react-bootstrap";
 import {useNavigate} from "react-router-dom";
 import apiCrudService from "../services/ApiCrudService";
-import SelectMultiple from "../pages/roles/SelectMultiple";
+import SelectMultiple from "./SelectMultiple";
 
 const RoleDetailComp = (props) => {
     const [role, setRole] = useState({});
@@ -13,7 +13,7 @@ const RoleDetailComp = (props) => {
     // Fonction pour récupérer les données d'un role
     const fetchRole = async (id) => {
         try {
-            const data = await apiCrudService.getById("roles", id)
+            const data = await apiCrudService.getById("role", id)
             console.log(data)
             setRole(data);
 

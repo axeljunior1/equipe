@@ -7,8 +7,12 @@ export const JwtProvider = ({ children }) => {
         const storedUser = localStorage.getItem("loggedEmployee");
         return storedUser ? JSON.parse(storedUser) : null; // Convertir en objet ou null si absent
     });
-    const [panierId, setPanierId] = useState(() => localStorage.getItem("panierId")  || null);
+    const [panierId, setPanierId] = useState(() => localStorage.getItem("panierId")  || 0);
     const [resetApp, setResetApp] = useState("initial");
+
+    useEffect(() => {
+        console.log('initial state: panier id ', panierId);
+    }, []);
 
 
     useEffect(() => {
@@ -33,6 +37,7 @@ export const JwtProvider = ({ children }) => {
         } else {
             localStorage.removeItem("panierId");
         }
+        console.log('changed panierId ', panierId);
     }, [panierId]);
 
     return (

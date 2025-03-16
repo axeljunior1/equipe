@@ -1,20 +1,17 @@
 import React, {useEffect, useState} from 'react';
-// import Table from "react-bootstrap/Table";
 import {Link, useLocation, useNavigate} from "react-router-dom";
-import ProduitService from "../services/ProduitService";
-import HeaderBtnElementComp from "../components/HeaderBtnElementComp";
-import {Button, Col, Form, Spinner} from "react-bootstrap";
-import {usePanier} from "../context/PanierContext";
-import PaginationComp from "../components/PaginationComp";
-// import SearchProduitCritereComp from "../components/SearchProduitCritereComp";
-import apiCrudService from "../services/ApiCrudService";
-import ErrorAlert from "../exceptions/ErrorAlert";
-import AlertComp from "../components/AlertComp";
-import DataTableComp from "../components/DataTableComp";
-import SearchCritereComp from "../components/SearchCritereComp";
+import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
+import {Button, Col, Form} from "react-bootstrap";
+import {usePanier} from "../../context/PanierContext";
+import PaginationComp from "../../components/PaginationComp";
+import apiCrudService from "../../services/ApiCrudService";
+import ErrorAlert from "../../exceptions/ErrorAlert";
+import AlertComp from "../../components/AlertComp";
+import DataTableComp from "../../components/DataTableComp";
+import SearchCritereComp from "../../components/SearchCritereComp";
 
 
-const ListProduitPage = (props) => {
+const ProduitListe = (props) => {
     const [produits, setProduits] = useState([]);
 
     const location = useLocation();
@@ -354,4 +351,4 @@ const ListProduitPage = (props) => {
     );
 };
 
-export default ListProduitPage;
+export default ProduitListe;

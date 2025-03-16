@@ -68,6 +68,7 @@ function Ventes() {
                     <th>Nom</th>
                     <th>Montant</th>
                     <th>Client</th>
+                    <th>Etat</th>
                     <th>Employé</th>
                     <th>Date de création</th>
                     <th>Date de mise à jour</th>
@@ -85,6 +86,7 @@ function Ventes() {
                         <td>
                             <Link to={`/clients/${vente.client.id}`} className='text-decoration-none'>{vente.client.id} - {vente.client.nom}</Link>
                         </td>
+                        <td>{vente.etat.libelle}</td>
                         <td>
                             <Link to={`/employes/${vente.employe.id}`} className='text-decoration-none'>{vente.employe.id} - {vente.employe.nom}</Link>
                         </td>

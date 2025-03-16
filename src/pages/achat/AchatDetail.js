@@ -1,57 +1,75 @@
 import React, {useEffect, useState} from "react";
-import {Link, useNavigate, useParams} from "react-router-dom";
-import VenteService from "../../services/VenteService";
-import Table from "react-bootstrap/Table";
-import LigneVenteService from "../../services/LigneVenteService";
-import {Alert, Button, Col, Form, Modal, Row} from "react-bootstrap";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
+import AchatService from "../../services/AchatService";
+import achatService from "../../services/AchatService";
+import LigneAchatService from "../../services/LigneAchatService";
+import {Button, Col, Form, Modal, Row} from "react-bootstrap";
 import InputGroup from "react-bootstrap/InputGroup";
+import AlertComp from "../../components/AlertComp";
+import DataTableComp from "../../components/DataTableComp";
+import PaginationComp from "../../components/PaginationComp";
 import {formatDate} from "../../utils/dateUtils";
+import DetailsComp from "../../components/DetailsComp";
+import ErrorAlert from "../../exceptions/ErrorAlert";
 import apiCrudService from "../../services/ApiCrudService";
-import ListProduitPage from "../ListProduitsPage";
+import ProduitListe from "../produit/ProduitsListe";
 
-const VenteDetail = () => {
+const AchatDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
-    const [vente, setVente] = useState(null);
-    const [lignesVentes, setLignesVentes] = useState([]);
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search); // Utilise URLSearchParams pour obtenir les paramètres de requête
+    const pShowAlert = queryParams.get("showAlert"); // Récupère la valeur de param1
+
+    const [achat, setAchat] = useState(null);
+    const [lignesAchats, setLignesAchats] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [formAddLinesError, setFormAddLinesError] = useState("");
     const [isEditing, setIsEditing] = useState(false); // État pour le mode édition
     const [formData, setFormData] = useState({}); // État pour stocker les données du formulaire
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
+    const [showAlert, setShowAlert] = useState(pShowAlert ? pShowAlert : false);
+    const [nombreTotalDeLigne, setNombreTotalDeLigne] = useState(0); // Nombre total de pages
+
+    //Pagination
+    const [currentPage, setCurrentPage] = useState(0); // Page actuelle
+    const [pageSize, setPageSize] = useState(15); // Taille de la page
+    const [totalPages, setTotalPages] = useState(0); // Nombre total de pages
 
     let initFormAddLigne = {
-        "prixVente": 0,
+        "prixAchat": 0,
         "quantite": 0,
-        "venteId": id,
+        "achatId": id,
         "produitId": 0,
         "produitNom": ""
     }
     const [formAddLigne, setFormAddLigne] = useState(initFormAddLigne);
 
 
+    useEffect(() => {
+        fetchAchat().then(r => null);
+
+    }, [currentPage, pageSize]);
+
     // Fonction pour récupérer les données de l'employé
-    const fetchVente = async () => {
+    const fetchAchat = async () => {
         setLoading(true);
         try {
-            let data = await VenteService.getVenteById(id)
-            setVente(data)
-            await fetchLigneVente(data)
+            let data = await AchatService.getAchatById(Number(id))
+            setAchat(data)
+            await fetchLigneAchat(data)
             // setFormData(data) // Pré-remplit le formulaire
         } catch (err) {
             setError(err);
         } finally {
-            setLoading(false);
-
             setIsEditing(false);
         }
     };
 
     // Fonction pour mettre à jour les données de l'employé
-    const updateVente = async () => {
-        VenteService.updateVente(id, formData).then(data => {
-            setVente(data)
+    const updateAchat = async () => {
+        AchatService.updateAchat(id, formData).then(data => {
+            setAchat(data)
             setFormData(data);
             setIsEditing(false);
         }).catch(err => setError('Une erreur est survenue lors de la mise à jour de l\'employé' + err));
@@ -59,12 +77,14 @@ const VenteDetail = () => {
     };
 
 
-    const fetchLigneVente = async () => {
-
+    const fetchLigneAchat = async () => {
+        setError(null)
         setLoading(true);
         try {
-            let data = await apiCrudService.get(`ventes/${id}/lignes`);
-            setLignesVentes(data.content); // Mise à jour de l'état après que toutes les données sont récupérées
+            let data = await achatService.getAchatLines(id);
+            setLignesAchats(data.content); // Mise à jour de l'état après que toutes les données sont récupérées
+            setTotalPages(data.totalPages); // Assuming 'totalPages' is the total page count
+            setNombreTotalDeLigne(data.totalElements)
         } catch (err) {
             setError(err);
         } finally {
@@ -73,16 +93,18 @@ const VenteDetail = () => {
     };
 
 
-    const handleDeleteVente = async () => {
-        await VenteService.deleteVente(id);
-        navigate('/ventes')
+    const handleDeleteAchat = async () => {
+        await AchatService.deleteAchat(id);
+        navigate('/achats')
 
     }
 
 
     useEffect(() => {
-        fetchVente();
-    }, [id]);
+            fetchAchat();
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [id]);
 
 
     // Gestion des modifications du formulaire
@@ -103,30 +125,23 @@ const VenteDetail = () => {
         );
     }
 
-    if (error) {
-        return <h1 className="text-danger">{error}</h1>;
-    }
-
-    if (!vente) {
-        return <h1 className="text-warning">Vente introuvable</h1>;
-    }
 
     const handleInputChange = (e) => {
         const {name, value} = e.target;
         setFormAddLigne({...formAddLigne, [name]: value});
     };
 
-    async function createVenteLine() {
+    async function createAchatLine() {
         setLoading(true)
+        setError(null)
         try {
-            await LigneVenteService.createLigneVente(formAddLigne);
-            setFormAddLigne({...formAddLigne, 'produitId': 0, "produitNom": "" });
-            fetchVente().then();
+            if (formAddLigne.quantite <= 0) throw new Error("Quantité doit être positive et > 0");
+            await apiCrudService.post('ligneAchats', formAddLigne);
+            setFormAddLigne({...formAddLigne, 'produitId': 0, "produitNom": ""});
+            fetchAchat();
         } catch (error) {
-            console.log(error)
-            if (error.response?.data?.message) {
-                setFormAddLinesError(error.response.data.message);
-            }
+            console.log(error.message);
+            setError(error.message);
         } finally {
             setIsEditing(false);
             setLoading(false)
@@ -134,97 +149,154 @@ const VenteDetail = () => {
         }
     }
 
+    const removeColumns = (baseColumns, excludedAccessors) => {
+        return baseColumns.filter(col => !excludedAccessors.includes(col.accessor));
+    };
+
+    const baseColumns = [
+
+        {
+            header: "Produit",
+            accessor: "produit",
+            render: (value, ligne) => (
+                <Link to={`/produits/${ligne.produitId}`} className="text-decoration-none">
+                    {ligne.produit?.id} - {ligne.produit?.nom}
+                </Link>
+            )
+        },
+        {
+            header: "Prix Achat",
+            accessor: "prixAchat",
+            render: (value, ligne) => <>{ligne.prixAchat}</>  // Affiche le prix unitaire du produit
+        },
+        {
+            header: "Quantité",
+            accessor: "quantite",
+            render: (value, ligne) => <>{ligne.quantite}</>  // Affiche la quantité
+        },
+        {
+            header: "Supprimer",
+            accessor: "delete",
+            render: (value, ligne) => (
+                <Button variant={"outline-danger"} className="w-100" onClick={(e) => handleDeleteLigne(e, ligne.id)}>
+                    Supprimer 🚮
+                </Button>
+            )  // Bouton de suppression
+        }
+    ];
+
+
+    let columns = removeColumns(baseColumns, []);
+
+
     const handleSubmitFormAAddLine = async (e) => {
         e.preventDefault();
-        await createVenteLine();
+        if (formAddLigne.quantite <= 0) {
+            setError("La quantité doit etre positive et > 0");
+            return;
+        }
+        await createAchatLine();
     }
 
     const handleDeleteLigne = async (e, id) => {
         e.preventDefault();
-        await LigneVenteService.deleteLigneVente(id)
+        await LigneAchatService.deleteLigneAchat(id)
 
-        await fetchVente();
+        await fetchAchat();
     }
 
     // Fonction pour gérer la sélection d'un employé
-    const handleEmployeeSelect = (produit) => {
-
-        setFormAddLigne({...formAddLigne, 'produitId': produit.id,
-            "produitNom": produit.nom,
-            prixVente: produit.prixVente
-        });
-
+    const handleProduitSelect = (produit) => {
+        console.log(produit)
+        setFormAddLigne({...formAddLigne, 'produitId': produit.id, "produitNom": produit.nom});
         setShowModal(false); // Ferme le modal
     };
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const handlePageSizeChange = (e) => {
+        setPageSize(Number(e.target.value));
+        setCurrentPage(0); // Reset to first page whenever page size changes
+    };
+    const lines = [
+        <p><strong>Employé :</strong> <Link to={`/employes/${achat.employe.id}`}
+                                            className='text-decoration-none'> {achat.employe.id} - {achat.employe.nom}</Link>
+        </p>,
+        <p><strong>Montant :</strong> {achat.montantTotal}</p>,
+        <p><strong>Date de Création :</strong> {formatDate(achat.dateCreation)}</p>
+    ]
+
+
+    const entetes = [
+        {title: "Nombre de ligne", value: nombreTotalDeLigne},
+    ];
+
+
+    if (!achat) {
+        return <h1 className="text-warning">Achat introuvable</h1>;
+    }
+
 
     return (
         <div className="">
 
-            <h1><strong>Détail de la vente</strong></h1>
-            {!isEditing ? (
-                <div className="card p-4 shadow">
-                    <h3 className="card-title text-center">Vente : {vente.id}</h3>
-                    <div className="card-body">
-                        <p><strong>Employé :</strong>
-                            <Link to={`/employes/${vente.employe.id}`}
-                                  className='text-decoration-none'> {vente.employe.id} - {vente.employe.prenom}</Link>
-                        </p>
-                        <p><strong>Montant :</strong> {vente.montantTotal}</p>
-                        <p><strong>Date de Création :</strong> { formatDate(vente.createdAt)}</p>
-                        <p><strong>Date de mise à jour :</strong> { formatDate(vente.updatedAt)}</p>
-                    </div>
-                    <div className="d-flex justify-content-center">
-                        <button
-                            className="btn btn-primary me-2"
-                            onClick={() => setIsEditing(true)}
-                        >
-                            Modifier
-                        </button>
-                    </div>
-                    <br/>
-                    <h3> Lignes de la vente</h3>
-                    {lignesVentes && lignesVentes.length > 0 ? (
-                        <Table striped bordered hover className={"mt-2"}>
-                            <thead>
-                            <tr>
-                                <th>Numéro</th>
-                                <th>Produit</th>
-                                <th>Prix unitaire</th>
-                                <th>Qte</th>
-                                <th>Delete</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {lignesVentes?.map((ligne, index) => (
-                                <tr key={ligne.id}>
-                                    <td>{index + 1}</td>
-                                    <td><Link to={`/produits/${ligne.id}`}
-                                              className='text-decoration-none'>{ligne.produit.id} - {ligne.produit.nom}</Link>
-                                    </td>
-                                    <td>{ligne.prixVente}</td>
-                                    <td>{ligne.quantite}</td>
-                                    <td className={'justify-content-center align-items-center'}>
-                                        <Button variant={"outline-danger"} className={'w-100'} onClick={(e) => {
-                                            handleDeleteLigne(e, ligne.id)
-                                        }}> Supprimer 🚮</Button>
+            {error &&
+                <ErrorAlert error={error} />
+            }
 
-                                    </td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </Table>
+
+            {showAlert && (
+                <AlertComp
+                    message="Opération réussie l'achat a été crée !"
+                    type="success"
+                    timeout={9500} // L'alerte disparaît après 5 secondes
+                    onClose={() => setShowAlert(false)}
+                />
+            )}
+
+            <h1><strong>Détail de l'achat</strong></h1>
+            {!isEditing ? (
+
+                <div className="">
+
+
+                    <DetailsComp horizontal={true}
+                                 lines={lines}
+                                 footerList={[]}
+                    />
+
+
+                    <h3 className="my-3"> Lignes de l'achat</h3>
+
+                    {lignesAchats.length > 0 ? (
+
+                        <DataTableComp data={lignesAchats} columns={columns} entetes={entetes}/>
                     ) : (
-                        <Alert severity="warning">
-                            <p>Aucun element trouvé </p>
-                        </Alert>
+                        <div className="text-center text-muted">Aucun element trouvé.</div>
                     )}
-                    <h3 className="mt-2"> Ajouter une vente ? ! ? (risque disparaitre )</h3>
-                    <Form onSubmit={handleSubmitFormAAddLine} className="mt-1">
-                        {formAddLinesError && <Row>
-                            <Col xs={12} className="text-danger my-1" >
-                                {formAddLinesError}
-                            </Col>
-                        </Row>}
+                    {/* Pagination controls */}
+
+                    <PaginationComp className={"mb-5"}
+                                    currentPage={currentPage}
+                                    handlePageChange={handlePageChange}
+                                    totalPages={totalPages}
+                                    pageSize={pageSize}
+                                    handlePageSizeChange={handlePageSizeChange}
+                                    nombreElt={nombreTotalDeLigne}
+
+                    />
+
+                    {/*Todo : passer le form sour formik*/}
+
+                    <Form onSubmit={handleSubmitFormAAddLine} className={"mt-5"}>
+                        {error &&
+                            <Row>
+                                <Col xs={12} className="text-danger my-1">
+                                    Erreur : {error}
+                                </Col>
+                            </Row>}
                         <Row className="">
                             <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
                                 <Form.Group className="mb-3">
@@ -248,6 +320,18 @@ const VenteDetail = () => {
                                 </Form.Group>
                             </Col>
                             <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
+
+                                <Form.Label className={'fw-bold'}>Nom</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={formAddLigne.produitNom}
+                                    onChange={handleInputChange}
+                                    placeholder="Nom du produit"
+                                    name='produitNom' readOnly
+                                    className="my-1"
+                                />
+                            </Col>
+                            <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
                                 <Form.Label className={'fw-bold'}>Quantité</Form.Label>
                                 <Form.Control
                                     type="number"
@@ -259,13 +343,13 @@ const VenteDetail = () => {
                                 />
                             </Col>
                             <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                                <Form.Label className={'fw-bold'}>Prix Unitaire</Form.Label>
+                                <Form.Label className={'fw-bold'}>Prix Achat</Form.Label>
                                 <Form.Control
                                     type="number"
-                                    value={formAddLigne.prixVente}
+                                    value={formAddLigne.prixAchat}
                                     onChange={handleInputChange}
-                                    placeholder="Prix unitaire d'vente"
-                                    name='prixVente'
+                                    placeholder="Prix unitaire d'achat"
+                                    name='prixAchat'
                                     className="my-1"
                                 />
                             </Col>
@@ -278,20 +362,24 @@ const VenteDetail = () => {
                         </Row>
                     </Form>
                     <hr/>
+
                     <Row className={'justify-content-end mt-3 '}>
                         <Col xs={"3"}>
-                            <Button variant={"danger"} className='w-100' onClick={handleDeleteVente}>Supprimmer
-                                l'vente</Button>
+                            <Button variant={"danger"} className='w-100' onClick={handleDeleteAchat}>Supprimmer
+                                l'achat</Button>
                         </Col>
                     </Row>
                 </div>
             ) : (
+                /*
+                * Ce n'est plus utile car pour l'instant il n'y a pas d'information à modifier
+                * */
                 <div className="card p-4 shadow bg-light">
-                    <h3 className="text-center mb-4">Modifier l'Vente</h3>
+                    <h3 className="text-center mb-4">Modifier l'Achat</h3>
                     <form
                         onSubmit={(e) => {
                             e.preventDefault(); // Empêche le rechargement de la page
-                            updateVente(); // Appelle la fonction de mise à jour
+                            updateAchat(); // Appelle la fonction de mise à jour
                         }}
                     >
                         {/* Nom */}
@@ -354,107 +442,16 @@ const VenteDetail = () => {
             )}
 
             {/* Modal de recherche d'employé */}
-            <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
+            <Modal show={showModal} onHide={() => setShowModal(false)} size="xl" centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Rechercher un Produit</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <ListProduitPage onSelect={handleEmployeeSelect}/>
+                    <ProduitListe onSelect={handleProduitSelect}/>
                 </Modal.Body>
             </Modal>
         </div>
     );
 };
 
-export default VenteDetail;
-
-
-/*
-
-{
-    "id": 42,
-    "montantTotal": 259.99,
-    "createdAt": "2025-02-12T18:55:49.738605",
-    "updatedAt": "2025-02-12T08:38:16.367019",
-    "clientId": null,
-    "clientNom": null,
-    "client": {
-        "id": 1,
-        "nom": "cli 1 ",
-        "prenom": "pre cli 1",
-        "email": "string@cli1.com",
-        "telephone": "0749482336",
-        "dateCreation": null
-    },
-    "actif": true,
-    "employeId": 12,
-    "employeNom": null,
-    "employe": {
-        "id": 12,
-        "nom": "junior",
-        "prenom": "junior",
-        "actif": true,
-        "rolesIds": [
-            1,
-            2,
-            3,
-            4
-        ],
-        "rolesNoms": [
-            "GESTIONNAIRE_STOCK",
-            "COMPTABLE",
-            "ADMIN",
-            "VENDEUR"
-        ],
-        "roles": [
-            {
-                "id": 1,
-                "nom": "ADMIN",
-                "description": "Administrateur ayant tous les droits",
-                "authorities": [
-                    {
-                        "id": 2,
-                        "nom": "SUPPRIMER_PRODUIT"
-                    },
-                    {
-                        "id": 4,
-                        "nom": "GERER_STOCK"
-                    }
-                ]
-            },
-            {
-                "id": 4,
-                "nom": "COMPTABLE",
-                "description": "Responsable des finances",
-                "authorities": []
-            },
-            {
-                "id": 3,
-                "nom": "VENDEUR",
-                "description": "Employé chargé des ventes",
-                "authorities": []
-            },
-            {
-                "id": 2,
-                "nom": "GESTIONNAIRE_STOCK",
-                "description": "Responsable de la gestion des stocks",
-                "authorities": []
-            }
-        ],
-        "dateCreation": "2025-02-10T22:39:42.907528"
-    },
-    "lignesVenteId": null,
-    "ligneVentes": [
-        {
-            "id": 57,
-            "prixUnitaire": null,
-            "quantite": 1,
-            "venteId": 42,
-            "actif": true,
-            "produitId": 51,
-            "produitNom": null
-        }
-    ]
-}
-
-*/
+export default AchatDetail;

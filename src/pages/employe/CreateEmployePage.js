@@ -1,15 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
-import AchatService from "../services/AchatService";
-import {useJwt} from "../context/JwtContext";
+import {useJwt} from "../../context/JwtContext";
+import EmployeService from "../../services/EmployeService";
 
-const CreateAchatPage = () => {
+const CreateEmployePage = () => {
     const {loggedEmployee} = useJwt();
 
     let formInitialState = {
-        montantTotal: 0,
-        employeId: 0
+        nom: "",
+        prenom: "",
+        password: ""
     };
     const [formData, setFormData] = useState(formInitialState);
 
@@ -31,9 +32,9 @@ const CreateAchatPage = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            let data = await AchatService.createAchat(formData);
+            let data = await EmployeService.createEmploye(formData);
             setFormData(formInitialState);
-            navigate(`/achats/${data.id}`);
+            navigate(`/employes/${data.id}`);
         }catch(error) {
             setError(error);
         }
@@ -45,41 +46,53 @@ const CreateAchatPage = () => {
     },[])
     return (
         <div className="container mt-5">
-            <h3>Entrée en stock</h3>
+            <h3>  Créer un employé </h3>
             {error && <div className="alert alert-danger">{error}</div>}
 
             <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
-                    <Form.Label>Employé</Form.Label>
+                    <Form.Label>Nom</Form.Label>
                     <Form.Control
-                        type="number"
-                        name="employeId"
-                        value={formData.employeId}
+                        type="text"
+                        name="nom"
+                        value={formData.nom}
                         onChange={handleChange}
-                        placeholder="Entrez l'employe"
+                        placeholder="Entrez le nom"
                     />
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>Montant total</Form.Label>
+                    <Form.Label>Prénom</Form.Label>
                     <Form.Control
-                        type="number"
-                        name="montantTotal"
-                        value={formData.montantTotal}
+                        type="text"
+                        name="prenom"
+                        value={formData.prenom}
                         onChange={handleChange}
                         defaultValue={0}
-                        placeholder="Entrez le montant total"
+                        placeholder="Entrez le prenom"
+                    />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                    <Form.Label>Mot de passe </Form.Label>
+                    <Form.Control
+                        type="text"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        defaultValue={0}
+                        placeholder="Entrez le mot de passe"
                     />
                 </Form.Group>
 
 
 
                 <Button variant="primary" type="submit" disabled={loading}>
-                    {loading ? 'Chargement...' : 'Entree en Stock'}
+                    {loading ? 'Chargement...' : 'Créer'}
                 </Button>
             </Form>
         </div>
     );
 };
 
-export default CreateAchatPage;
+export default CreateEmployePage;

@@ -122,8 +122,8 @@ const MouvementStock = () => {
     }
 
     const chooseTypeEveOrigine = (typeMouvementCode) => {
-        if (typeMouvementCode === "ACHAT_MARCHANDISE") return "achats"
-        if (typeMouvementCode === "VENTE_PRODUIT") return "ventes"
+        if (typeMouvementCode === "ACHAT_MARCHANDISE") return "achat"
+        if (typeMouvementCode === "VENTE_PRODUIT") return "vente"
     };
     return (
         <div>

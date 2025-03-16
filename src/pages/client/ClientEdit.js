@@ -1,16 +1,14 @@
 import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
-import ProduitService from "../services/ProduitService";
-import AlertComp from "../components/AlertComp";
-import ErrorAlert from "../exceptions/ErrorAlert";
-import apiCrudService from "../services/ApiCrudService";
+import ClientService from "../../services/ClientService";
+import AlertComp from "../../components/AlertComp";
+import ErrorAlert from "../../exceptions/ErrorAlert";
+import apiCrudService from "../../services/ApiCrudService";
 import {Form} from "react-bootstrap";
-import {useJwt} from "../context/JwtContext";
-import {updateObject} from "../utils/objectMapping";
+import {updateObject} from "../../utils/objectMapping";
 
-const ProduitDetail = (props) => {
-    const {id: rlt} = useParams(); // Récupère l'ID depuis l'URL*
-    const id = rlt ?? props.id // id de l'url ou id dans props, ils'agit ici de l'id du produit
+const ClientEdit = (props) => {
+    const id = useParams().id ?? props.id; // id de l'url ou id dans props, ils'agit ici de l'id du client
 
 
     const navigate = useNavigate();
@@ -18,30 +16,28 @@ const ProduitDetail = (props) => {
     const queryParams = new URLSearchParams(location.search);
     const pShowAlertCreation = queryParams.get("showAlertCreation");
 
-    let initialFormDetailProduit = {
+    let initialFormDetailClient = {
         nom: "",
-        description: "",
-        prixUnitaire: 0,
-        categorieId: 0,
-        stockInitial: 0,
-        prixVente: 0
+        prenom: "",
+        telephone: "",
+        email: ""
     };
 
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [formData, setFormData] = useState(initialFormDetailProduit); // État pour stocker les modifications
+    const [formData, setFormData] = useState(initialFormDetailClient); // État pour stocker les modifications
     const [showAlertCreation, setShowAlertCreation] = useState(!!pShowAlertCreation);
     const [categories, setCategories] = useState([]);
-    const [produit, setProduit] = useState({});
+    const [client, setClient] = useState({});
 
-    // Fonction pour récupérer les données d'un produit
-    const fetchProduit = async () => {
+    // Fonction pour récupérer les données d'un client
+    const fetchClient = async () => {
         setLoading(true);
         try {
-            const data = await apiCrudService.getById('produits', id)
+            const data = await apiCrudService.getById('clients', id)
             // console.log(data)
-            setProduit(data)
+            setClient(data)
             // Important pour ne retourner que les champs utiles pour la mise a jour
             setFormData((prev) => {
                 let copie = {...prev};
@@ -56,16 +52,17 @@ const ProduitDetail = (props) => {
     };
 
 
-    // Fonction pour mettre à jour un produit (PATCH)
-    const updateProduit = async () => {
+    // Fonction pour mettre à jour un client (PATCH)
+    const updateClient = async () => {
         setLoading(true);
         setError(null);
         try {
 
-            await ProduitService.updateProduit(id, formData);
+
+            await apiCrudService.patch(`clients`,id, formData);
 
             // si tout est ok, on navigue
-            navigate(`/produits/${id}`);
+            navigate(`/clients/${id}`);
 
         } catch (error) {
             setLoading(false);
@@ -103,7 +100,7 @@ const ProduitDetail = (props) => {
 
 
     useEffect(() => {
-        fetchProduit().then();
+        fetchClient().then();
 
     }, [id])
 
@@ -113,8 +110,8 @@ const ProduitDetail = (props) => {
     }
 
 
-    if (!produit) {
-        return <h1>Produit introuvable</h1>;
+    if (!client) {
+        return <h1>Client introuvable</h1>;
     }
 
 
@@ -124,7 +121,7 @@ const ProduitDetail = (props) => {
 
     const handleSubmitForm = (e) => {
         e.preventDefault(); // Empêche le rechargement de la page
-        updateProduit().then(); // Appelle la fonction de mise à jour
+        updateClient().then(); // Appelle la fonction de mise à jour
 
     }
 
@@ -133,17 +130,17 @@ const ProduitDetail = (props) => {
         <div className="">
             {showAlertCreation && (
                 <AlertComp
-                    message="Opération réussie le produit a été crée !"
+                    message="Opération réussie le client a été crée !"
                     type="success"
                     timeout={9500} // L'alerte disparaît après 5 secondes
                     onClose={() => setShowAlertCreation(false)}
                 />
             )}
 
-            <h1><strong>Détail du Produit</strong></h1>
+            <h1><strong>Détail du Client</strong></h1>
 
             <div className="card p-4 shadow bg-light">
-                <h3 className="text-center mb-4">Modifier le produit</h3>
+                <h3 className="text-center mb-4">Modifier le client</h3>
                 <form
                     onSubmit={handleSubmitForm}
                 >
@@ -163,61 +160,50 @@ const ProduitDetail = (props) => {
 
                     {/* Prénom */}
                     <div className="mb-3">
-                        <label htmlFor="description" className="form-label">Description :</label>
+                        <label htmlFor="prenom" className="form-label">Description :</label>
                         <input
                             type="text"
-                            id="description"
-                            name="description"
+                            id="prenom"
+                            name="prenom"
                             className="form-control"
-                            value={formData.description}
+                            value={formData.prenom}
                             onChange={handleChange}
-                            placeholder="Entrez la description"
+                            placeholder="Entrez le prenom"
                         />
                     </div>
+
                     {/* Prénom */}
                     <div className="mb-3">
-                        <label htmlFor="categorie" className="form-label">Catègorie :</label>
-
-                        <Form.Select className="mb-3"
-                                     name="categorieId"
-                                     value={formData.categorieId}
-                                     onChange={handleChange}
-                                     placeholder="Entrez la catégorie">
-                            <option>Catégorie</option>
-                            <>
-                                {categories.map((item) => (
-                                    <option key={item.id} value={item.id}>{item.nom}</option>
-                                ))}</>
-                        </Form.Select>
-                    </div>
-
-                    {/* Date de Création */}
-                    <div className="mb-3">
-                        <label htmlFor="stockInitial" className="form-label">Stock Initial :</label>
+                        <label htmlFor="email" className="form-label">Description :</label>
                         <input
-                            type="number"
-                            id="stockInitial"
-                            name="stockInitial"
+                            type="text"
+                            id="email"
+                            name="email"
                             className="form-control"
-                            value={formData.stockInitial}
+                            value={formData.email}
                             onChange={handleChange}
-                            placeholder="Entrez le stock initial"
+                            placeholder="Entrez l'email"
                         />
                     </div>
 
-                    {/* Date de Création */}
+                    {/* Prénom */}
                     <div className="mb-3">
-                        <label htmlFor="prixVente" className="form-label">Prix Unitaire :</label>
+                        <label htmlFor="telephone" className="form-label">Description :</label>
                         <input
-                            type="number"
-                            id="prixVente"
-                            name="prixVente"
+                            type="text"
+                            id="telephone"
+                            name="telephone"
                             className="form-control"
-                            value={formData.prixVente}
+                            value={formData.telephone}
                             onChange={handleChange}
-                            placeholder="Entrez le prix unitaire de vente"
+                            placeholder="Entrez le numéro de téléphone"
                         />
                     </div>
+
+
+
+
+
 
                     {/* Boutons */}
                     <div className="d-flex justify-content-between">
@@ -227,7 +213,7 @@ const ProduitDetail = (props) => {
                         <button
                             type="button"
                             className="btn btn-secondary"
-                            onClick={() => navigate(`/produits/${id}`)}
+                            onClick={() => navigate(`/clients/${id}`)}
                         >
                             Annuler
                         </button>
@@ -241,4 +227,4 @@ const ProduitDetail = (props) => {
     );
 };
 
-export default ProduitDetail;
+export default ClientEdit;

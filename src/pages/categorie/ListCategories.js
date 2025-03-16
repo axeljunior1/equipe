@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
 import {Link, useNavigate} from "react-router-dom";
-import CategorieService from "../services/CategorieService";
-import HeaderBtnElementComp from "../components/HeaderBtnElementComp";
+import CategorieService from "../../services/CategorieService";
+import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
 import {Accordion, Button, Col, Container, Form, Row} from "react-bootstrap";
-import {usePanier} from "../context/PanierContext";
-import PaginationComp from "../components/PaginationComp";
-import SearchCategorieCritere from "../components/SearchCategorieCritere";
+import {usePanier} from "../../context/PanierContext";
+import PaginationComp from "../../components/PaginationComp";
+import SearchCategorieCritere from "../../components/SearchCategorieCritere";
 
 
 const ListCategories = () => {

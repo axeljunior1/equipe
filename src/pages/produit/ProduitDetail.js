@@ -1,16 +1,16 @@
 import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {usePanier} from "../context/PanierContext";
-import AlertComp from "../components/AlertComp";
-import ErrorAlert from "../exceptions/ErrorAlert";
-import apiCrudService from "../services/ApiCrudService";
+import {usePanier} from "../../context/PanierContext";
+import AlertComp from "../../components/AlertComp";
+import ErrorAlert from "../../exceptions/ErrorAlert";
+import apiCrudService from "../../services/ApiCrudService";
 import {Button, Col, Row} from "react-bootstrap";
-import {formatDate} from "../utils/dateUtils";
-import DetailsComp from "../components/DetailsComp";
+import {formatDate} from "../../utils/dateUtils";
+import DetailsComp from "../../components/DetailsComp";
+import BarcodeDisplayComponent from "../../components/BarcodeDisplayComponent";
 
-const DetailsProduit = (props) => {
-    const {id: rlt} = useParams(); // Récupère l'ID depuis l'URL*
-    const id = rlt ?? props.id // id de l'url ou id dans props, ils'agit ici de l'id du produit
+const ProduitDetail = (props) => {
+    const id = useParams().id ?? props.id; // id de l'url ou id dans props, ils'agit ici de l'id du produit
     const {
         panier,
         ajouterAuPanier,
@@ -60,6 +60,7 @@ const DetailsProduit = (props) => {
     }
 
 
+
     if (!produit) {
         return <h1>Produit introuvable</h1>;
     }
@@ -74,16 +75,7 @@ const DetailsProduit = (props) => {
         <p><strong>Actif : </strong> {produit.actif ? (<span className="text-success fw-bold"> Oui </span>) : (
             <span className=" fw-bold text-danger"> Non </span>)}</p>,
         <>
-            {produit.qrCode && (
-                <>
-                    <span><strong>QR Code :</strong></span>
-                    <img
-                        src={`data:image/png;base64,${produit.qrCode}`}
-                        alt="QR Code"
-                        style={{width: "150px", height: "150px", objectFit: "cover"}}
-                    />
-                </>
-            )}
+            <BarcodeDisplayComponent ean13={produit.ean13 || '1234567890129'} />
         </>
     ]
 
@@ -185,4 +177,4 @@ const DetailsProduit = (props) => {
     );
 };
 
-export default DetailsProduit;
+export default ProduitDetail;

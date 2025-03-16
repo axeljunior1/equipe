@@ -1,6 +1,6 @@
 import React from 'react';
 import {Modal} from "react-bootstrap";
-import DetailsProduit from "../pages/DetailsProduit";
+import ProduitDetail from "../pages/produit/ProduitDetail";
 
 const ModalDetailProduit = (props) => {
     return (
@@ -10,7 +10,7 @@ const ModalDetailProduit = (props) => {
                     <Modal.Title>Modale détail produit</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <DetailsProduit id={props.produitId} />
+                    <ProduitDetail id={props.produitId} />
                 </Modal.Body>
             </Modal>
         </div>

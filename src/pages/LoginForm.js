@@ -33,7 +33,7 @@ const LoginForm = () => {
 
             let panierId = null;
             res.data.panier?.forEach(panier => {
-                if (panier.etat?.nom === 'cree') {
+                if (panier.etat?.libelle === 'EN_COURS') {
                     panierId = panier.id;
                 }
 

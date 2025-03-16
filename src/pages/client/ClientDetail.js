@@ -1,15 +1,13 @@
 import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
-// import {usePanier} from "../context/PanierContext";
-import AlertComp from "../components/AlertComp";
-import apiCrudService from "../services/ApiCrudService";
+import AlertComp from "../../components/AlertComp";
+import apiCrudService from "../../services/ApiCrudService";
 import {Button} from "react-bootstrap";
-import {formatDate} from "../utils/dateUtils";
-import DetailsComp from "../components/DetailsComp";
+import {formatDate} from "../../utils/dateUtils";
+import DetailsComp from "../../components/DetailsComp";
 
-const DetailsClient = (props) => {
-    const {id: rlt} = useParams(); // Récupère l'ID depuis l'URL*
-    const id = rlt ?? props.id // id de l'url ou id dans props, ils'agit ici de l'id du client
+const DetailClient = (props) => {
+    const id = useParams().id ?? props.id;
     // const {
     //     panier,
     //     ajouterAuPanier,
@@ -123,4 +121,4 @@ const DetailsClient = (props) => {
     );
 };
 
-export default DetailsClient;
+export default DetailClient;
