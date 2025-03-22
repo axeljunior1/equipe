@@ -3,28 +3,28 @@ import AchatService from "../../services/AchatService";
 import achatService from "../../services/AchatService";
 import Table from "react-bootstrap/Table";
 import {Link, useNavigate} from "react-router-dom";
-import {Button} from "react-bootstrap";
+import {Button, FormControl} from "react-bootstrap";
 import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
 import {useJwt} from "../../context/JwtContext";
 import {formatDate} from "../../utils/dateUtils";
 import ErrorAlert from "../../exceptions/ErrorAlert";
 import apiCrudService from "../../services/ApiCrudService";
 
-function Achats() {
-    const [achats, setAchats] = useState([]);
+function TarifAchat() {
+    const [tarifAchat, setTarifAchat] = useState([]);
     const [error, setError] = useState(null);
     const [createError, setCreateError] = useState("");
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const {loggedEmployee} = useJwt();
 
-    async function fetchAchats() {
+    async function fetchTarifAchat() {
         setLoading(true);
         setError(null);
 
         try {
-            let data = await AchatService.getAchats()
-            setAchats(data.content)
+            let data = await apiCrudService.get("tarif-achats")
+            setTarifAchat(data.content)
         } catch (e) {
             setError(e.response.data);
         }finally {
@@ -33,32 +33,17 @@ function Achats() {
     }
 
     useEffect( () => {
-         fetchAchats().then(r => {});
+         fetchTarifAchat().then(r => {});
     }, []);
 
 
-    const creeTA = async ()=>{
-        setLoading(true)
-        try {
-            setError(null)
-            let ta = await apiCrudService.post('tarif-achats', {produitId: '1', prixAchat: 223});
-            console.log(ta)
-
-        }catch(err){
-            console.log(err);
-
-        }finally{
-            setLoading(false)
-        }
-
-    }
 
     const handleDeleteAchat =async (id) => {
         setLoading(true);
         setError(null);
         try{
             await AchatService.deleteAchat(id);
-            fetchAchats().then(r => {});
+            fetchTarifAchat().then(r => {});
         }catch(err){
             setError(err);
         }finally {
@@ -69,6 +54,21 @@ function Achats() {
     if (error) {
         return <ErrorAlert error={error} />;
     }
+
+
+    const handleMassUpdate = (updatedTarifs) => {
+    };
+
+// Exemple : augmenter tous les tarifs de 10%
+    const handleIncreaseAllPrices = () => {
+        // const updatedTarifs = tarifs.map((tarif) => ({
+        //     id: tarif.id,
+        //     prixAchat: tarif.prixAchat * 1.1,
+        // }));
+        // handleMassUpdate(updatedTarifs);
+    };
+
+
 
     const handleCreateAchat = async (e) =>{
         e.preventDefault();
@@ -82,7 +82,7 @@ function Achats() {
                 employeId: JSON.parse(loggedEmployee).id
             };
             let restCreateAchat = await achatService.createAchat(achat)
-            navigate(`/achats/${restCreateAchat.id}?showAlert=true`);
+            navigate(`/tarifAchat/${restCreateAchat.id}?showAlert=true`);
 
         }catch(err){
             if (err.response?.data?.message)
@@ -93,9 +93,14 @@ function Achats() {
 
     }
 
+    function handleEditTarif(id, number) {
+        let preValue = tarifAchat;
+
+    }
+
     return (
         <div>
-            <h1><strong>Achats</strong></h1>
+            <h1><strong>TarifAchat</strong></h1>
 
             {createError &&
 
@@ -106,38 +111,52 @@ function Achats() {
             <HeaderBtnElementComp titreFil='' variant='outline-primary' onClick={handleCreateAchat}
                                   valueBtn='Créer Achat' />
 
+
             <Table striped bordered hover>
                 <thead>
                 <tr>
-                    <th></th>
-                    <th>Nom</th>
-                    <th>Montant</th>
-                    <th>Date de création/modification</th>
-                    <th>Employé</th>
-                    <th>Supprimer ? 🚮</th>
+                    <th>ID Tarif</th>
+                    <th>ID Produit</th>
+                    <th>Prix Achat</th>
+                    <th>Modifier</th>
                 </tr>
                 </thead>
                 <tbody>
-                {achats.map((achat, index) => (
-                    <tr key={achat.id}>
-                        <td>{index + 1}</td>
+                {tarifAchat.map((tarif) => (
+                    <tr key={tarif.id}>
+                        <td>{tarif.id}</td>
+                        <td>{tarif.produit.id} - {tarif.produit.nom} </td>
                         <td>
-                            <Link to={`/achats/${achat.id}`} className='text-decoration-none'> Achat - {achat.id}</Link>
+                            <FormControl
+                                type="number"
+                                id={"atar-" + tarif.id}
+                                name={"atar-" + tarif.id}
+                                value={tarif.prixAchat}
+                                onChange={(e) =>
+                                    handleEditTarif(tarif.id, parseFloat(e.target.value))
+                                }
+                            />
                         </td>
-                        <td>{achat.montantTotal}</td>
-                        <td>{formatDate(achat.dateCreation)}</td>
                         <td>
-                            <Link to={`/employes/${achat.employeId}`} className='text-decoration-none'>{achat.employe.id} - {achat.employe.nom}</Link>
-                        </td>
-                        <td>
-                            <Button variant={"outline-danger"} className={"w-100"} onClick={()=>handleDeleteAchat(achat.id)}> Supprimer la ligne </Button>
+                            <Button
+                                variant="warning"
+                                onClick={() =>
+                                    handleEditTarif(tarif.id, tarif.prixAchat)
+                                }
+                            >
+                                Modifier
+                            </Button>
                         </td>
                     </tr>
                 ))}
                 </tbody>
             </Table>
+            <Button variant="success" onClick={handleIncreaseAllPrices} disabled>
+                Augmenter tous les prix
+            </Button>
+
         </div>
     );
 }
 
-export default Achats;
+export default TarifAchat;

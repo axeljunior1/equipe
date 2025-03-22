@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import apiCrudService from "../../services/ApiCrudService";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 
 
 const POSPaymentScreen = (props) => {
@@ -10,6 +10,7 @@ const POSPaymentScreen = (props) => {
     const [paymentMethod, setPaymentMethod] = useState("cash");
     const [vente, setVente] = useState({});
     const {id} = useParams();
+    const navigate = useNavigate();
 
     const fetch = async (id) => {
         setError("");
@@ -38,8 +39,10 @@ const POSPaymentScreen = (props) => {
         try {
             let res = apiCrudService.get(`ventes/payer/${id}`)
 
-            alert('Paiement réussi !!!')
 
+            setTimeout(() => {
+                navigate(`/ventes/${id}?pShowAlertPaiement=true`)
+            }, 100)
         } catch (err) {
             setError(err)
         } finally {

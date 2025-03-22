@@ -24,15 +24,12 @@ export const PanierProvider = ({children}) => {
 
     useEffect(() => {
 
+            console.log("panier id a changé", panierId);
             fetchCart();
         },
-        []);
+        [panierId]);
 
-    useEffect(() => {
 
-            console.log('On recupere les données du panier panier et on le met a jour ', panier);
-        },
-        [panier]);
 
 
     useEffect(() => {
@@ -67,7 +64,7 @@ export const PanierProvider = ({children}) => {
     const fetchCart = async () => {
         setLoading(true);
         try {
-
+            if(!panierId) throw new Error("No panier");
             const response = await axiosInstance.get(`panier-produit/panier/${panierId}`);
             setPanier(response.data);
         } catch (err) {
@@ -85,6 +82,7 @@ export const PanierProvider = ({children}) => {
                 produitId: lignePanier.produitId,
                 quantite: lignePanier.quantite
             };
+            if (!panierId) throw new Error("No panierId existe");
             await axiosInstance.post("panier-produit", postData);
             sendMessage('ajout')
         } catch (err) {

@@ -27,7 +27,15 @@ axiosInstance.interceptors.response.use(
             // Récupérer l'URL demandée depuis localStorage
             const requestedUrl = localStorage.getItem("requestedUrl") || "/"; // Valeur par défaut si non trouvée
 
-            localStorage.removeItem("jwt"); // Supprimer le JWT
+            const handleLogout = () => {
+                localStorage.removeItem("jwt"); // Supprimer le JWT
+                localStorage.removeItem("loggedEmployee"); // Supprimer le JWT
+                localStorage.removeItem("requestedUrl"); // Supprimer le JWT
+                localStorage.removeItem("panierId");
+
+            };
+
+            handleLogout();
             window.location.href = "/login"; // Rediriger vers la connexion
         }
         return Promise.reject(error);

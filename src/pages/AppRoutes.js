@@ -34,6 +34,8 @@ import DetailsClientEdit from "./client/ClientEdit";
 import '../App.css'
 import ClientCreer from "./client/ClientCreer";
 import POSPaymentScreen from "./paiement/POSPaymentScreen";
+import TarifAchat from "./tarifAchat/TarifAchat";
+import RapportVente from "./rapportVente/RapportVente";
 
 const AppRoutes = () => {
 
@@ -53,6 +55,7 @@ const AppRoutes = () => {
                     <Route path="/achats/:id" element={<AchatDetail/>}/>
                     <Route path="/ventes" element={<Ventes/>}/>
                     <Route path="/ventes/:id" element={<VenteDetail/>}/>
+                    <Route path="/rapport-ventes" element={<RapportVente/>}/>
                     <Route path="/paiement/vente/:id" element={<POSPaymentScreen/>}/>
                     <Route path="/employes" element={<Employe/>}/>
                     <Route path="/employes/:id" element={<EmployeDetail/>}/>
@@ -75,6 +78,7 @@ const AppRoutes = () => {
                     <Route path="/login" element={<LoginForm/>}/>
                     <Route path="/qr" element={<QrScanner/>}/>
                     <Route path="/paniertest" element={<PanierComponent/>}/>
+                    <Route path="/tarif-achat" element={<TarifAchat/>}/>
                     <Route path="*" element={<NotFound/>}/>
                 </Routes>
             </div>

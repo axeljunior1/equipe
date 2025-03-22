@@ -47,7 +47,7 @@ const Panier = () => {
     const navigate = useNavigate();
 
     let initFormClient = {
-        "id": 0,
+        "id": undefined,
         "nom": '',
         "prenom": "",
         "email": '',
@@ -144,6 +144,7 @@ const Panier = () => {
 
     const validerLaVente = async () => {
 
+        if(!formClient.id) throw new Error('No client ')
         let caisse = {
             idClient: formClient.id,
             idPanier: panierId,

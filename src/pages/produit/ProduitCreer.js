@@ -92,7 +92,7 @@ const ProduitCreer = () => {
                         name="nom"
                         value={formData.nom}
                         onChange={handleChange}
-                        placeholder="Entrez le nom du produit"
+                        placeholder="Entrez le nom du produit" required
                     />
                 </Form.Group>
 
@@ -103,7 +103,7 @@ const ProduitCreer = () => {
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
-                        placeholder="Entrez la description"
+                        placeholder="Entrez la description" required
                     />
                 </Form.Group>
                 <Form.Group className="mb-3">
@@ -124,13 +124,24 @@ const ProduitCreer = () => {
                         name="prixVente"
                         value={formData.prixVente}
                         onChange={handleChange}
-                        placeholder="Entrez le prix Vente"
+                        placeholder="Entrez le prix Vente" required
+                    />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                    <Form.Label>Prix Achat</Form.Label>
+                    <Form.Control
+                        type="number"
+                        name="prixAchat"
+                        value={formData.prixAchat}
+                        onChange={handleChange}
+                        placeholder="Entrez le prix Achat" required
                     />
                 </Form.Group>
 
                 <Form.Select className="mb-3"
                              name="categorieId"
-                             value={formData.categorieId}
+                             value={formData.categorieId} required
                              onChange={handleChange}
                              placeholder="Entrez la catégorie">
                     <option>Catégorie</option>
@@ -157,7 +168,7 @@ const ProduitCreer = () => {
             </Form>
 
 
-            <BarcodeScanner width="100" onScan={handleChangeEan13}   />
+            <BarcodeScanner width="200" onScan={handleChangeEan13}   />
         </div>
     );
 };

@@ -7,7 +7,7 @@ export const JwtProvider = ({ children }) => {
         const storedUser = localStorage.getItem("loggedEmployee");
         return storedUser ? JSON.parse(storedUser) : null; // Convertir en objet ou null si absent
     });
-    const [panierId, setPanierId] = useState(() => localStorage.getItem("panierId")  || 0);
+    const [panierId, setPanierId] = useState(() => localStorage.getItem("panierId")  || undefined);
     const [resetApp, setResetApp] = useState("initial");
 
     useEffect(() => {

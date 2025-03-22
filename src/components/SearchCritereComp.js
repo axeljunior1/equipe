@@ -11,6 +11,7 @@ const SearchCritereComp = ({
     return (
         <div>
 
+            {handleSubmitSearch &&
             <form className='my-3' onSubmit={handleSubmitSearch}>
                 <Row>
 
@@ -27,7 +28,7 @@ const SearchCritereComp = ({
                         />
                     </Col>
                 </Row>
-            </form>
+            </form>}
 
             {cols && cols.length > 0 &&
                 <Accordion className='my-5' defaultActiveKey='0'>

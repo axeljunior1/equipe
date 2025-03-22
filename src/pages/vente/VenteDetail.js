@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Link, useNavigate, useParams} from "react-router-dom";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import VenteService from "../../services/VenteService";
 import Table from "react-bootstrap/Table";
 import LigneVenteService from "../../services/LigneVenteService";
@@ -8,6 +8,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import {formatDate} from "../../utils/dateUtils";
 import apiCrudService from "../../services/ApiCrudService";
 import ProduitListe from "../produit/ProduitsListe";
+import AlertComp from "../../components/AlertComp";
 
 const VenteDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
@@ -20,6 +21,12 @@ const VenteDetail = () => {
     const [formData, setFormData] = useState({}); // État pour stocker les données du formulaire
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
+
+
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const pShowAlertPaiement = queryParams.get("pShowAlertPaiement");
+    const [showAlertPaiement, setShowAlertPaiement] = useState(!!pShowAlertPaiement);
 
     let initFormAddLigne = {
         "prixVente": 0,
@@ -135,7 +142,7 @@ const VenteDetail = () => {
         setLoading(true)
         try {
             await LigneVenteService.createLigneVente(formAddLigne);
-            setFormAddLigne({...formAddLigne, 'produitId': 0, "produitNom": "" });
+            setFormAddLigne({...formAddLigne, 'produitId': 0, "produitNom": ""});
             fetchVente().then();
         } catch (error) {
             console.log(error)
@@ -164,7 +171,8 @@ const VenteDetail = () => {
     // Fonction pour gérer la sélection d'un employé
     const handleEmployeeSelect = (produit) => {
 
-        setFormAddLigne({...formAddLigne, 'produitId': produit.id,
+        setFormAddLigne({
+            ...formAddLigne, 'produitId': produit.id,
             "produitNom": produit.nom,
             prixVente: produit.prixVente
         });
@@ -175,154 +183,81 @@ const VenteDetail = () => {
     return (
         <div className="">
 
-            <h1><strong>Détail de la vente</strong></h1>
-            {!isEditing ? (
-                <div className="card p-4 shadow">
-                    <h3 className="card-title text-center">Vente : {vente.id}</h3>
-                    <div className="card-body">
-                        <p><strong>Employé :</strong>
-                            <Link to={`/employes/${vente.employe.id}`}
-                                  className='text-decoration-none'> {vente.employe.id} - {vente.employe.prenom}</Link>
-                        </p>
-                        <p><strong>Montant :</strong> {vente.montantTotal}</p>
-                        <p><strong>Date de Création :</strong> { formatDate(vente.createdAt)}</p>
-                        <p><strong>Date de mise à jour :</strong> { formatDate(vente.updatedAt)}</p>
-                        <p><strong>Etat :</strong> { vente.etat.libelle}</p>
-                    </div>
-                    <div className="d-flex justify-content-center">
-                        <button
-                            className="btn btn-primary me-2"
-                            onClick={() => setIsEditing(true)}
-                        >
-                            Modifier
-                        </button>
-                    </div>
-                    <br/>
-                    <h3> Lignes de la vente</h3>
-                    {lignesVentes && lignesVentes.length > 0 ? (
-                        <Table striped bordered hover className={"mt-2"}>
-                            <thead>
-                            <tr>
-                                <th>Numéro</th>
-                                <th>Produit</th>
-                                <th>Prix unitaire</th>
-                                <th>Qte</th>
-                                <th>Delete</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {lignesVentes?.map((ligne, index) => (
-                                <tr key={ligne.id}>
-                                    <td>{index + 1}</td>
-                                    <td><Link to={`/produits/${ligne.id}`}
-                                              className='text-decoration-none'>{ligne.produit.id} - {ligne.produit.nom}</Link>
-                                    </td>
-                                    <td>{ligne.prixVente}</td>
-                                    <td>{ligne.quantite}</td>
-                                    <td className={'justify-content-center align-items-center'}>
-                                        <Button variant={"outline-danger"} className={'w-100'} onClick={(e) => {
-                                            handleDeleteLigne(e, ligne.id)
-                                        }}> Supprimer 🚮</Button>
-
-                                    </td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </Table>
-                    ) : (
-                        <Alert severity="warning">
-                            <p>Aucun element trouvé </p>
-                        </Alert>
-                    )}
-
-
-                    <hr/>
-
-                    <Row className={'justify-content-end mt-3 '}>
-                        {vente.etat?.libelle !== 'CONFIRME' &&
-                        <Col xs={"3"}>
-                            <Button variant={"primary"} className='w-100' onClick={payerVente}>Valider et Imprimer la facture </Button>
-                        </Col>
-                            }
-                        <Col xs={"3"}>
-                            <Button variant={"secondary"} className='w-100' onClick={anulerVente}>Annuler</Button>
-                        </Col>
-                        {/*<Col xs={"3"}>*/}
-                        {/*    <Button variant={"info"} className='w-100' onClick={rembourserVente}>Rembourser</Button>*/}
-                        {/*</Col>*/}
-                        {/*<Col xs={"3"}>*/}
-                        {/*    <Button variant={"danger"} className='w-100' onClick={handleDeleteVente}>Supprimmer*/}
-                        {/*        l'vente</Button>*/}
-                        {/*</Col>*/}
-                    </Row>
-                </div>
-            ) : (
-                <div className="card p-4 shadow bg-light">
-                    <h3 className="text-center mb-4">Modifier l'Vente</h3>
-                    <form
-                        onSubmit={(e) => {
-                            e.preventDefault(); // Empêche le rechargement de la page
-                            updateVente(); // Appelle la fonction de mise à jour
-                        }}
-                    >
-                        {/* Nom */}
-                        <div className="mb-3">
-                            <label htmlFor="nom" className="form-label">Montant Total :</label>
-                            <input
-                                type="text"
-                                id=""
-                                name="nom"
-                                className="form-control"
-                                value={formData.montantTotal}
-                                onChange={handleChange}
-                                placeholder="Entrez le montant total"
-                            />
-                        </div>
-
-                        {/* Prénom */}
-                        <div className="mb-3">
-                            <label htmlFor="prenom" className="form-label">Prénom :</label>
-                            <input
-                                type="text"
-                                id="prenom"
-                                name="prenom"
-                                className="form-control"
-                                value={formData.employe.prenom}
-                                onChange={handleChange}
-                                placeholder="Entrez le prénom"
-                            />
-                        </div>
-
-                        {/* Date de Création */}
-                        <div className="mb-3">
-                            <label htmlFor="dateCreation" className="form-label">Date de Création :</label>
-                            <input
-                                type="date"
-                                id="dateCreation"
-                                name="dateCreation"
-                                className="form-control"
-                                value={formData.dateCreation ? formData.dateCreation.split("T")[0] : ""}
-                                onChange={handleChange}
-                                placeholder="Entrez la date de création"
-                            />
-                        </div>
-
-                        {/* Boutons */}
-                        <div className="d-flex justify-content-between">
-                            <button type="submit" className="btn btn-success">
-                                Enregistrer
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-secondary"
-                                onClick={() => setIsEditing(false)}
-                            >
-                                Annuler
-                            </button>
-                        </div>
-                    </form>
-                </div>
+            {showAlertPaiement && (
+                <AlertComp
+                    message="Opération réussie le Paiement a été enregistré !"
+                    type="success"
+                    timeout={9500} // L'alerte disparaît après 5 secondes
+                    onClose={() => setShowAlertPaiement(false)}
+                />
             )}
+
+            <h1><strong>Détail de la vente</strong></h1>
+            <div className="card p-4 shadow">
+                <h3 className="card-title text-center">Vente : {vente.id}</h3>
+                <div className="card-body">
+                    <p><strong>Employé :</strong>
+                        <Link to={`/employes/${vente.employe.id}`}
+                              className='text-decoration-none'> {vente.employe.id} - {vente.employe.prenom}</Link>
+                    </p>
+                    <p><strong>Montant :</strong> {vente.montantTotal}</p>
+                    <p><strong>Date de Création :</strong> {formatDate(vente.createdAt)}</p>
+                    <p><strong>Date de mise à jour :</strong> {formatDate(vente.updatedAt)}</p>
+                    <p><strong>Etat :</strong> {vente.etat.libelle}</p>
+                </div>
+                <br/>
+                <h3> Lignes de la vente</h3>
+                {lignesVentes && lignesVentes.length > 0 ? (
+                    <Table striped bordered hover className={"mt-2"}>
+                        <thead>
+                        <tr>
+                            <th>Numéro</th>
+                            <th>Produit</th>
+                            <th>Prix unitaire</th>
+                            <th>Qte</th>
+                            <th>Delete</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {lignesVentes?.map((ligne, index) => (
+                            <tr key={ligne.id}>
+                                <td>{index + 1}</td>
+                                <td><Link to={`/produits/${ligne.id}`}
+                                          className='text-decoration-none'>{ligne.produit.id} - {ligne.produit.nom}</Link>
+                                </td>
+                                <td>{ligne.prixVente}</td>
+                                <td>{ligne.quantite}</td>
+                                <td className={'justify-content-center align-items-center'}>
+                                    <Button variant={"outline-danger"} className={'w-100'} onClick={(e) => {
+                                        handleDeleteLigne(e, ligne.id)
+                                    }}> Supprimer 🚮</Button>
+
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </Table>
+                ) : (
+                    <Alert severity="warning">
+                        <p>Aucun element trouvé </p>
+                    </Alert>
+                )}
+
+
+                <hr/>
+
+                <Row className={'justify-content-end mt-3 '}>
+                    {vente.etat?.libelle !== 'CONFIRME' &&
+                        <Col xs={"3"}>
+                            <Button variant={"primary"} className='w-100' onClick={payerVente}>Valider et Imprimer la
+                                facture </Button>
+                        </Col>
+                    }
+                    <Col xs={"3"}>
+                        <Button variant={"secondary"} className='w-100' onClick={anulerVente}>Annuler</Button>
+                    </Col>
+                </Row>
+            </div>
 
             {/* Modal de recherche d'employé */}
             <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>

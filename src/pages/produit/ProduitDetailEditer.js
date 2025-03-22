@@ -22,7 +22,8 @@ const ProduitDetailEditer = (props) => {
         prixUnitaire: 0,
         categorieId: 0,
         stockInitial: 0,
-        prixVente: 0
+        prixVente: 0,
+        prixAchat: 0
     };
 
 
@@ -214,6 +215,20 @@ const ProduitDetailEditer = (props) => {
                             value={formData.prixVente}
                             onChange={handleChange}
                             placeholder="Entrez le prix unitaire de vente"
+                        />
+                    </div>
+
+                    {/* Date de Création */}
+                    <div className="mb-3">
+                        <label htmlFor="prixVente" className="form-label">Prix Unitaire Achat :</label>
+                        <input
+                            type="number"
+                            id="prixAchat"
+                            name="prixAchat"
+                            className="form-control"
+                            value={formData.prixAchat}
+                            onChange={handleChange}
+                            placeholder="Entrez le prix unitaire d'achat"
                         />
                     </div>
 

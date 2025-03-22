@@ -38,6 +38,7 @@ const AchatDetail = () => {
 
     let initFormAddLigne = {
         "prixAchat": 0,
+        "prixAchatF": "",
         "quantite": 0,
         "achatId": id,
         "produitId": 0,
@@ -136,8 +137,10 @@ const AchatDetail = () => {
         setError(null)
         try {
             if (formAddLigne.quantite <= 0) throw new Error("Quantité doit être positive et > 0");
+            console.log(formAddLigne);
+
             await apiCrudService.post('ligneAchats', formAddLigne);
-            setFormAddLigne({...formAddLigne, 'produitId': 0, "produitNom": ""});
+            setFormAddLigne({...formAddLigne, 'produitId': 0, "produitNom": "", "prixAchatF": ""});
             fetchAchat();
         } catch (error) {
             console.log(error.message);
@@ -208,7 +211,7 @@ const AchatDetail = () => {
     // Fonction pour gérer la sélection d'un employé
     const handleProduitSelect = (produit) => {
         console.log(produit)
-        setFormAddLigne({...formAddLigne, 'produitId': produit.id, "produitNom": produit.nom});
+        setFormAddLigne({...formAddLigne, 'produitId': produit.id, "produitNom": produit.nom, "prixAchat": produit.prixAchat});
         setShowModal(false); // Ferme le modal
     };
 
@@ -232,6 +235,8 @@ const AchatDetail = () => {
     const entetes = [
         {title: "Nombre de ligne", value: nombreTotalDeLigne},
     ];
+
+
 
 
     if (!achat) {
@@ -350,6 +355,17 @@ const AchatDetail = () => {
                                     onChange={handleInputChange}
                                     placeholder="Prix unitaire d'achat"
                                     name='prixAchat'
+                                    className="my-1" disabled
+                                />
+                            </Col>
+                            <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
+                                <Form.Label className={'fw-bold'}>Prix Achat Forcé</Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    value={formAddLigne.prixAchatF}
+                                    onChange={handleInputChange}
+                                    placeholder="Forcer le prix d'achat"
+                                    name='prixAchatF'
                                     className="my-1"
                                 />
                             </Col>

@@ -8,6 +8,7 @@ import apiCrudService from "./services/ApiCrudService";
 import axios from "axios";
 import WebSocketClient from "./components/WebSocketClient";
 import useMobile from "./context/useMobile";
+import Footer from "./pages/footer/Footer";
 
 
 const App = () => {
@@ -37,7 +38,7 @@ const App = () => {
 
     return (
         <div>
-            <div className="">
+            <div className="d-flex flex-column  min-vh-100">
                 <Navbar expand="lg" className="bg-body-tertiary" bg="dark" data-bs-theme="dark">
                     <Container>
 
@@ -51,7 +52,9 @@ const App = () => {
                                     <Nav.Link as={Link} to="/produits">Produits</Nav.Link>
                                     {!isMobile && <>
                                         <Nav.Link as={Link} to="/achats">Achats</Nav.Link>
+                                        <Nav.Link as={Link} to="/tarif-achat">Tarif Achats</Nav.Link>
                                         <Nav.Link as={Link} to="/ventes">Ventes</Nav.Link>
+                                        <Nav.Link as={Link} to="/rapport-ventes">Rapport de Ventes</Nav.Link>
                                         <Nav.Link as={Link} to="/mouvements-stock">Mouvements stocks</Nav.Link>
                                         <Nav.Link as={Link} to="/factures">Factures</Nav.Link>
                                         <Nav.Link as={Link} to="/categories">Categories</Nav.Link>
@@ -85,6 +88,12 @@ const App = () => {
 
 
                 <AppRoutes/>
+
+                <br/>
+                <br/>
+                <Footer />
+
+
             </div>
         </div>
     );
