@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {Button, Col, Form, Modal, Row, Table} from 'react-bootstrap';
 import axiosInstance from "../../context/axiosInstance";
@@ -7,7 +7,6 @@ import ModalDetailProduit from "../../modales/modalDetailProduit";
 import AlertComp from "../../components/AlertComp";
 import {Search} from "lucide-react";
 import {useJwt} from "../../context/JwtContext";
-import useMobile from "../../context/useMobile";
 import {usePanier} from "../../context/PanierContext";
 import ListClients from "../client/ClientList";
 import produitService from "../../services/ProduitService";
@@ -28,15 +27,11 @@ const Panier = () => {
         updatePanier
     } = usePanier();
 
-    const isMobile = useMobile(); // Utilisation du hook
     const [produitIdModal, setProduitIdModal] = useState("");
     const [showAlert, setShowAlert] = useState(false);
     const [validated, setValidated] = useState(false);
     const {loggedEmployee, panierId} = useJwt();
     const [produit, setProduit] = useState(null);
-    const [texte, setTexte] = useState('');
-    const [result, setResult] = useState("Aucun résultat");
-    const videoRef = useRef(null);
 
 
 
@@ -191,32 +186,7 @@ const Panier = () => {
 
 
 
-    let rowQRCode = <Row>
-        <Col xs={4}>
 
-
-            <div style={{width: '20rem'}}>
-                {/*<Scanner onScan={handleScan} allowMultiple={true} scanDelay={1500}*/}
-                {/*         style={{*/}
-                {/*             width: '100%',*/}
-                {/*             height: '100%'*/}
-                {/*         }} // Adapter le scanner à la taille du conteneur*/}
-                {/*/>*/}
-
-                <BarcodeReader onScan={handleScan} setError={setError} />
-                <Form.Control
-                    type="number"
-                    value={formClient.email}
-                    onChange={handleInputChange}
-                    name='id'
-                    className="my-1"
-                    required
-                    isInvalid={validated && !formClient.id}
-                />
-
-            </div>
-        </Col>
-    </Row>;
 
     useEffect(() => {
 
@@ -236,15 +206,16 @@ const Panier = () => {
         <div>
             <h2>Panier</h2>
 
-            {isMobile && <div className={'my-3'}>
-                {rowQRCode}
-            </div>}
+
 
             {error &&
                 <div className="alert alert-danger" role="alert"> {error.message} </div>
             }
 
             <h3 className="my-4 text-danger">Total: {calculerTotal()}€</h3>
+
+            <BarcodeReader  />
+
 
             {showAlert && (
                 <AlertComp
@@ -426,11 +397,7 @@ const Panier = () => {
             <br/>
                  </span>
 
-            {!isMobile && <div className={'mt-3'}>
 
-                {rowQRCode}
-
-            </div>}
 
             {/* Modal de recherche de client */}
             <Modal show={showModalClient} onHide={() => setshowModalClient(false)} size="lg" centered>

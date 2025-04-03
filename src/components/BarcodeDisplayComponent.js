@@ -1,42 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import bwipjs from "bwip-js";
 
-const BarcodeComponent = ({ ean13 }) => {
-    const [barcode, setBarcode] = useState("");
+const BarcodeComponent = ({ text, type = "code128", scale = 3, height = 10 }) => {
+    const canvasRef = useRef(null);
 
     useEffect(() => {
-        if (ean13) {
+        if (text) {
             try {
-                const canvas = document.createElement("canvas");
-                bwipjs.toCanvas(canvas, {
-                    bcid: "ean13", // Type de code-barres
-                    text: ean13, // Le texte à encoder
-                    scale: 3, // Échelle
-                    height: 10, // Hauteur des barres
-                    includetext: true, // Afficher le texte sous le code-barres
+                bwipjs.toCanvas(canvasRef.current, {
+                    bcid: type, // Type de code-barres (code128, ean13, ean8, qrcode, etc.)
+                    text: text, // Texte à encoder
+                    scale: scale, // Échelle
+                    height: height, // Hauteur des barres
+                    includetext: true, // Inclure le texte sous le code-barres
                     textxalign: "center", // Alignement du texte
                 });
-
-                setBarcode(canvas.toDataURL("image/png"));
             } catch (err) {
                 console.error("Erreur génération code-barres:", err);
             }
         }
-    }, [ean13]);
+    }, [text, type, scale, height]);
 
     return (
-        <>
-            {barcode && (
-                <>
-                    <span><strong>Code-Barres :   </strong></span>
-                    <img
-                        src={barcode}
-                        alt="Code-Barres"
-                        style={{ height: "100px", objectFit: "cover" }}
-                    />
-                </>
+        <div style={{ textAlign: "center", padding: "10px" }}>
+            <strong>Code-Barres :</strong>
+            <br />
+            {text ? (
+                <canvas ref={canvasRef} style={{ maxWidth: "100%" }} />
+            ) : (
+                <p style={{ color: "red" }}>Aucun code à afficher</p>
             )}
-        </>
+        </div>
     );
 };
 

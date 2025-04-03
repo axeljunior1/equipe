@@ -8,6 +8,17 @@ import {Client} from "@stomp/stompjs";
 // Création du contexte
 const PanierContext = createContext();
 
+// const loadConfig = async () => {
+//     try {
+//         const response = await fetch("/config.json");
+//         const config = await response.json();
+//         return config.BACK_URL;
+//     } catch (error) {
+//         console.error("Erreur chargement config:", error);
+//         return "http://localhost:8080"; // Fallback en cas d'erreur
+//     }
+// };
+
 // Hook personnalisé pour accéder au panier
 export const usePanier = () => useContext(PanierContext);
 
@@ -32,26 +43,31 @@ export const PanierProvider = ({children}) => {
 
 
 
-    useEffect(() => {
-        const socket = new SockJS("http://localhost:8080/ws");
-        const stompClient = new Client({
-            webSocketFactory: () => socket,
-            reconnectDelay: 5000,
-            onConnect: () => {
-                console.log("Connecté");
-                stompClient.subscribe("/topic/messages", (message) => {
-                    fetchCart().then()
-                });
-            },
-        });
-
-        stompClient.activate();
-        setClient(stompClient);
-
-        return () => {
-            stompClient.deactivate();
-        };
-    }, []);
+    // useEffect(() => {
+    //     async function webSocket() {
+    //         const socketUrl = await loadConfig()
+    //         const socket = new SockJS(`${socketUrl}/ws`);
+    //         const stompClient = new Client({
+    //             webSocketFactory: () => socket,
+    //             reconnectDelay: 5000,
+    //             onConnect: () => {
+    //                 console.log("Connecté");
+    //                 stompClient.subscribe("/topic/messages", (message) => {
+    //                     fetchCart().then()
+    //                 });
+    //             },
+    //         });
+    //
+    //         stompClient.activate();
+    //         setClient(stompClient);
+    //
+    //         return () => {
+    //             stompClient.deactivate();
+    //         };
+    //     }
+    //
+    //       webSocket().then();
+    // }, []);
 
     const sendMessage = (message) => {
         if (client) {
@@ -139,7 +155,6 @@ export const PanierProvider = ({children}) => {
                 }
             }
         }
-        console.log("produit non present dans le panier (erreur )")
         return 0;
     }
 
@@ -151,7 +166,6 @@ export const PanierProvider = ({children}) => {
                 }
             }
         }
-        console.log("produit non present dans le panier (erreur )")
         return null ;
     }
 

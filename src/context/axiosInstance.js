@@ -1,19 +1,34 @@
 import axios from "axios";
 
-const apiUrl = "http://localhost:8080/";
+const loadConfig = async () => {
+    try {
+        const response = await fetch("/config.json");
+        const config = await response.json();
+        return config.BACK_URL;
+    } catch (error) {
+        console.error("Erreur de chargement de la config:", error);
+        return "http://localhost:8080"; // Valeur par défaut
+    }
+};
 
-
+// On initialise directement l'instance Axios avec une URL temporaire
 const axiosInstance = axios.create({
-    baseURL: apiUrl, // URL de votre backend
+    baseURL: "http://localhost:8080", // Temporaire le temps de charger la config
 });
 
+// Charge la config et met à jour l'instance
+loadConfig().then((baseUrl) => {
+    axiosInstance.defaults.baseURL = `${baseUrl}/`;
+    console.log("🚀 Axios configuré sur :", baseUrl);
+});
+
+// Intercepteurs
 axiosInstance.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem("jwt");
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
-
         return config;
     },
     (error) => Promise.reject(error)
@@ -22,25 +37,12 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response && (error.response.status === 401 )) {
-
-            // Récupérer l'URL demandée depuis localStorage
-            const requestedUrl = localStorage.getItem("requestedUrl") || "/"; // Valeur par défaut si non trouvée
-
-            const handleLogout = () => {
-                localStorage.removeItem("jwt"); // Supprimer le JWT
-                localStorage.removeItem("loggedEmployee"); // Supprimer le JWT
-                localStorage.removeItem("requestedUrl"); // Supprimer le JWT
-                localStorage.removeItem("panierId");
-
-            };
-
-            handleLogout();
-            window.location.href = "/login"; // Rediriger vers la connexion
+        if (error.response && error.response.status === 401) {
+            localStorage.clear();
+            window.location.href = "/login";
         }
         return Promise.reject(error);
     }
 );
-
 
 export default axiosInstance;

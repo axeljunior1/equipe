@@ -11,7 +11,7 @@ const DataTableComp = ({ data, columns, entetes }) => {
                     </h6>
                 ))
             )}
-            <Table striped bordered hover>
+            <Table striped bordered hover responsive="sm">
                 <thead>
                 <tr className={"text-center align-middle " }>
                     {columns.map((col, index) => (

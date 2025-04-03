@@ -9,14 +9,22 @@ import {useJwt} from "../../context/JwtContext";
 import {formatDate} from "../../utils/dateUtils";
 import ErrorAlert from "../../exceptions/ErrorAlert";
 import apiCrudService from "../../services/ApiCrudService";
+import AlertComp from "../../components/AlertComp";
 
 function TarifAchat() {
     const [tarifAchat, setTarifAchat] = useState([]);
     const [error, setError] = useState(null);
     const [createError, setCreateError] = useState("");
     const [loading, setLoading] = useState(true);
+    const [showAlertUpdateTA, setShowAlertUpdateTA] = useState(false);
     const navigate = useNavigate();
     const {loggedEmployee} = useJwt();
+
+    const [prixAchatValues, setPrixAchatValues] = useState( {});
+
+    const handleChange = (id, value) => {
+        setPrixAchatValues((prev) => ({ ...prev, [id]: value }));
+    };
 
     async function fetchTarifAchat() {
         setLoading(true);
@@ -25,12 +33,27 @@ function TarifAchat() {
         try {
             let data = await apiCrudService.get("tarif-achats")
             setTarifAchat(data.content)
+            let obj = {}
+            data.content.forEach(element => {
+                obj[element.id] = element.prixAchat;
+            })
+            setPrixAchatValues(obj)
         } catch (e) {
             setError(e.response.data);
         }finally {
             setLoading(false);
         }
     }
+    // useEffect(()=>{
+    //     if (tarifAchat.length > 0) {
+    //         let obj = {}
+    //         tarifAchat.forEach(element => {
+    //             obj[element.id] = element.prixAchat;
+    //         })
+    //         setPrixAchatValues(obj)
+    //     }
+    // }, [tarifAchat])
+
 
     useEffect( () => {
          fetchTarifAchat().then(r => {});
@@ -93,14 +116,36 @@ function TarifAchat() {
 
     }
 
-    function handleEditTarif(id, number) {
-        let preValue = tarifAchat;
+    const handleEditTarif = async (id, value) => {
+        console.log(id, value);
+        setLoading(true);
+        setError(null);
+
+        try {
+            await apiCrudService.patch("tarif-achats", id , {prixAchat: value});
+            await fetchTarifAchat();
+            setShowAlertUpdateTA(true)
+        } catch (e) {
+            setError(e.response.data);
+        }finally {
+            setLoading(false);
+        }
+
 
     }
 
     return (
         <div>
             <h1><strong>TarifAchat</strong></h1>
+
+            {showAlertUpdateTA && (
+                <AlertComp
+                    message="Opération réussie le Tarif d'achat a été mis a jour !"
+                    type="success"
+                    timeout={9500} // L'alerte disparaît après 5 secondes
+                    onClose={() => setShowAlertUpdateTA(false)}
+                />
+            )}
 
             {createError &&
 
@@ -125,24 +170,22 @@ function TarifAchat() {
                 {tarifAchat.map((tarif) => (
                     <tr key={tarif.id}>
                         <td>{tarif.id}</td>
-                        <td>{tarif.produit.id} - {tarif.produit.nom} </td>
+                        <td>
+                            {tarif.produit.id} - {tarif.produit.nom}
+                        </td>
                         <td>
                             <FormControl
                                 type="number"
-                                id={"atar-" + tarif.id}
-                                name={"atar-" + tarif.id}
-                                value={tarif.prixAchat}
-                                onChange={(e) =>
-                                    handleEditTarif(tarif.id, parseFloat(e.target.value))
-                                }
+                                id={`${tarif.id}`}
+                                name={`${tarif.id}`}
+                                value={prixAchatValues[tarif.id] || ""}
+                                onChange={(e) => handleChange(tarif.id, e.target.value)}
                             />
                         </td>
                         <td>
                             <Button
                                 variant="warning"
-                                onClick={() =>
-                                    handleEditTarif(tarif.id, tarif.prixAchat)
-                                }
+                                onClick={() => handleEditTarif(tarif.id, prixAchatValues[tarif.id])}
                             >
                                 Modifier
                             </Button>

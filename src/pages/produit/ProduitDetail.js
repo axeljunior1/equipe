@@ -76,7 +76,7 @@ const ProduitDetail = (props) => {
         <p><strong>Actif : </strong> {produit.actif ? (<span className="text-success fw-bold"> Oui </span>) : (
             <span className=" fw-bold text-danger"> Non </span>)}</p>,
         <>
-            <BarcodeDisplayComponent ean13={produit.ean13 || '1234567890129'} />
+            <BarcodeDisplayComponent text={produit.ean13 || '1234567890129'} />
         </>
     ]
 
