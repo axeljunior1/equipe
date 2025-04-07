@@ -8,7 +8,6 @@ import Achats from "./achat/Achats";
 import AchatDetail from "./achat/AchatDetail";
 import Employe from "./employe/Employe";
 import Panier from "./panier/Panier";
-import QRCodeScanner from "../components/QRCodeScanner";
 import EmployeDetail from "./employe/EmployeDetail";
 import NotFound from "./NotFound";
 import BreadcrumbNav from "../components/Breadcrumb";
@@ -61,7 +60,6 @@ const AppRoutes = () => {
                     <Route path="/employes/:id" element={<EmployeDetail/>}/>
                     <Route path="/creer-employe" element={<CreateEmployePage/>}/>
                     <Route path="/panier" element={<Panier/>}/>
-                    <Route path="/qr-code" element={<QRCodeScanner/>}/>
                     <Route path="/categories" element={<ListCategories/>}/>
                     <Route path="/categories/:id" element={<CategorieDetail/>}/>
                     <Route path="/mouvements-stock" element={<MouvementStock/>}/>

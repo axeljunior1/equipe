@@ -3,7 +3,7 @@ import Table from "react-bootstrap/Table";
 import {Link, useNavigate} from "react-router-dom";
 import EmployeService from "../../services/EmployeService";
 import axios from "axios";
-import apiService from "../../services/ApiCrudService";
+import ApiCrudService from "../../services/ApiCrudService";
 import {formatDate} from "../../utils/dateUtils";
 import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
 import ErrorAlert from "../../exceptions/ErrorAlert";
@@ -15,7 +15,7 @@ function Achats() {
 
     const fetchEmployes = async () => {
         try{
-            let data = await apiService.get("employes");
+            let data = await ApiCrudService.get("employes");
             setEmployes(data.content);
         }catch(e){
             setError(e);

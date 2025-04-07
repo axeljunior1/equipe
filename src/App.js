@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
 import AppRoutes from "./pages/AppRoutes";
-import {Button, Container, Nav, Navbar} from "react-bootstrap";
+import {Button, Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
 import {usePanier} from "./context/PanierContext";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {useJwt} from "./context/JwtContext";
@@ -13,7 +13,7 @@ import Footer from "./pages/footer/Footer";
 
 const App = () => {
     const {panier} = usePanier()
-    const {jwt,setJwt, setPanierId, setLoggedEmployee} = useJwt();
+    const {jwt,setJwt, setPanierId, setLoggedEmployee, loggedEmployee} = useJwt();
     const navigate = useNavigate();
     const location = useLocation();
     const isMobile = useMobile(); // Utilisation du hook
@@ -51,16 +51,36 @@ const App = () => {
                                 {jwt !== "" && (<>
                                     <Nav.Link as={Link} to="/produits">Produits</Nav.Link>
                                     {!isMobile && <>
-                                        <Nav.Link as={Link} to="/achats">Achats</Nav.Link>
-                                        <Nav.Link as={Link} to="/tarif-achat">Tarif Achats</Nav.Link>
-                                        <Nav.Link as={Link} to="/ventes">Ventes</Nav.Link>
-                                        <Nav.Link as={Link} to="/rapport-ventes">Rapport de Ventes</Nav.Link>
-                                        <Nav.Link as={Link} to="/mouvements-stock">Mouvements stocks</Nav.Link>
-                                        <Nav.Link as={Link} to="/factures">Factures</Nav.Link>
-                                        <Nav.Link as={Link} to="/categories">Categories</Nav.Link>
-                                        <Nav.Link as={Link} to="/employes">Employe</Nav.Link>
-                                        <Nav.Link as={Link} to="/roles">Roles</Nav.Link>
-                                        <Nav.Link as={Link} to="/clients">Clients</Nav.Link>
+                                        {/* Achats Dropdown */}
+
+                                        <NavDropdown title="Achats" id="nav-dropdown-achats">
+                                            <NavDropdown.Item as={Link} to="/achats">Achats</NavDropdown.Item>
+                                            <NavDropdown.Item as={Link} to="/tarif-achat">Tarif Achats</NavDropdown.Item>
+                                        </NavDropdown>
+
+                                        {/* Ventes Dropdown */}
+                                        <NavDropdown title="Ventes" id="nav-dropdown-ventes">
+                                            <NavDropdown.Item as={Link} to="/ventes">Ventes</NavDropdown.Item>
+                                            <NavDropdown.Item as={Link} to="/rapport-ventes">Rapport de Ventes</NavDropdown.Item>
+                                            <NavDropdown.Item as={Link} to="/factures">Factures</NavDropdown.Item>
+                                        </NavDropdown>
+
+                                        {/* Stock Dropdown */}
+                                        <NavDropdown title="Stock" id="nav-dropdown-stock">
+                                            <NavDropdown.Item as={Link} to="/mouvements-stock">Mouvements stocks</NavDropdown.Item>
+                                        </NavDropdown>
+
+                                        {/* Gestion Dropdown */}
+                                        <NavDropdown title="Gestion" id="nav-dropdown-gestion">
+                                            <NavDropdown.Item as={Link} to="/categories">Catégories</NavDropdown.Item>
+                                            <NavDropdown.Item as={Link} to="/clients">Clients</NavDropdown.Item>
+                                        </NavDropdown>
+
+                                        {/* Employés Dropdown */}
+                                        <NavDropdown title="Employés" id="nav-dropdown-employes">
+                                            <NavDropdown.Item as={Link} to="/employes">Employés</NavDropdown.Item>
+                                            <NavDropdown.Item as={Link} to="/roles">Rôles</NavDropdown.Item>
+                                        </NavDropdown>
                                     </>}
 
                                     <Nav.Link as={Link} to="/panier">Caisse 🛒 {panier && panier.length > 0 && (
@@ -69,6 +89,10 @@ const App = () => {
                             </Nav>
                             <Nav>
                                 {jwt ? (
+                                    <>
+                                        <span className={'text-white'}>
+                                            Bonjour : {JSON.parse(loggedEmployee).nom.toUpperCase()}
+                                        </span>
                                     <Button
                                         variant="outline-light"
                                         onClick={handleLogout}
@@ -76,6 +100,8 @@ const App = () => {
                                     >
                                         Déconnexion
                                     </Button>
+                                    </>
+
                                 ) : (
                                     <Nav.Link as={Link} to="/login">Connexion</Nav.Link>
                                 )}

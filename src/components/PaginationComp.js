@@ -1,30 +1,29 @@
 import React from 'react';
 import {Button, Col, Form, Row} from "react-bootstrap";
-import {i} from "framer-motion/m";
 
-const PaginationComp = ({currentPage,pageSize, handlePageChange, handlePageSizeChange, totalPages, nombreElt}) => {
+const PaginationComp = ({currentPage, pageSize, handlePageChange, handlePageSizeChange, totalPages, nombreElt}) => {
 
 
-    let optionPargination = []
+    let optionPargination = [];
 
-    if (nombreElt > 10) {
+    if (nombreElt > pageSize) {
+        // Toujours inclure la valeur actuelle du pageSize
+        optionPargination.push(pageSize);
 
-        for (let i = 5; i >= 1; i--) {
-            let nbreElement = (nombreElt/i).toFixed(0);
+        for (let i = 4; i >= 1; i--) {
+            let nbreElement = Math.ceil(nombreElt / i);
 
-            if(optionPargination.indexOf(nbreElement) < 0){
-                // console.log(nbreElement)
-                optionPargination.push(nbreElement)
+            if (!optionPargination.includes(nbreElement)) {
+                optionPargination.push(nbreElement);
             }
         }
 
-    }else{
-        optionPargination.push(10);
+        // Trier les options par ordre croissant (optionnel mais recommandé)
+        optionPargination.sort((a, b) => a - b);
+    } else {
+        optionPargination = [pageSize];
     }
 
-    if(totalPages <= 1 ) {
-        return <></> ;
-    }
 
     return (
         <div>
@@ -57,9 +56,10 @@ const PaginationComp = ({currentPage,pageSize, handlePageChange, handlePageSizeC
                             value={pageSize}
                             onChange={handlePageSizeChange}
                             className="ml-2 form-control">
-                            {optionPargination.map((item, index) => (
-                                <option key={index} value={item}>{item}</option>
-                            ))}
+                            <option key={10} value={10}>10</option>
+                            <option key={50} value={50}>50</option>
+                            <option key={100} value={100}>100</option>
+                            <option key={200} value={200}>200</option>
                         </Form.Select>
                     </Col>
                 </Row>

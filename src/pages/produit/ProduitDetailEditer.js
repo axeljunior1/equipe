@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
-import ProduitService from "../../services/ProduitService";
 import AlertComp from "../../components/AlertComp";
 import ErrorAlert from "../../exceptions/ErrorAlert";
 import apiCrudService from "../../services/ApiCrudService";
@@ -60,8 +59,9 @@ const ProduitDetailEditer = (props) => {
         setLoading(true);
         setError(null);
         try {
+            //todo
 
-            await ProduitService.updateProduit(id, formData);
+            // await ProduitService.updateProduit(id, formData);
 
             // si tout est ok, on navigue
             navigate(`/produits/${id}`);

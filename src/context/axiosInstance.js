@@ -31,7 +31,7 @@ axiosInstance.interceptors.request.use(
         }
         return config;
     },
-    (error) => Promise.reject(error)
+    (error) => new Error(error),
 );
 
 axiosInstance.interceptors.response.use(
@@ -41,7 +41,7 @@ axiosInstance.interceptors.response.use(
             localStorage.clear();
             window.location.href = "/login";
         }
-        return Promise.reject(error);
+        return Promise.reject(new Error(error));
     }
 );
 

@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Link} from "react-router-dom";
 import Table from "react-bootstrap/Table";
-import ProduitService from "../services/ProduitService";
 
 const LigneAchat = ({LignesAchat}) => {
 

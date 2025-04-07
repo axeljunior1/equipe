@@ -4,15 +4,16 @@ import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
 import {Button, Col, Form} from "react-bootstrap";
 import {usePanier} from "../../context/PanierContext";
 import PaginationComp from "../../components/PaginationComp";
-import apiCrudService from "../../services/ApiCrudService";
 import ErrorAlert from "../../exceptions/ErrorAlert";
 import AlertComp from "../../components/AlertComp";
 import DataTableComp from "../../components/DataTableComp";
 import SearchCritereComp from "../../components/SearchCritereComp";
+import useProduct from "../../hooks/useProduct";
+import {DEFAULT_PAGINATION_SIZE} from "../../utils/constants";
+import {ToastContainer} from "react-toastify";
 
 
 const ProduitListe = (props) => {
-    const [produits, setProduits] = useState([]);
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -30,57 +31,35 @@ const ProduitListe = (props) => {
         prixUnitaireMin: "",
         prixUnitaireMax: "",
     });
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(0); // Page actuelle
-    const [pageSize, setPageSize] = useState(15); // Taille de la page
-    const [totalPages, setTotalPages] = useState(0); // Nombre total de pages
-    const [nombreTotalDeLigne, setNombreTotalDeLigne] = useState(0); // Nombre total de pages
+    const [pageSize, setPageSize] = useState(DEFAULT_PAGINATION_SIZE); // Taille de la page
     const navigate = useNavigate();
-    const {ajouterAuPanier, nombreProduitDansPanier} = usePanier();
+    const {panier, ajouterAuPanier, nombreProduitDansPanier} = usePanier();
+    const [quantites, setQuantites] = useState({});
+    const {produits, loading, error, totalElements, totalPages, fetchByMotCle, fetchByParams} = useProduct();
 
-    // Fonction pour récupérer les produits avec pagination
-    /*  const fetchProduits = async () => {
-          setLoading(true);
-          try {
-              // let data = await ProduitService.getProduit(currentPage, pageSize); // on peut ajouter des critères de filtre (nom : desc, description : asc)
-              let data = await apiCrudService.get('produits', currentPage, pageSize);
-              setProduits(data.content);  // Assuming 'content' is the array of products
-              setTotalPages(data.totalPages); // Assuming 'totalPages' is the total page count
-              setNombreTotalDeLigne(data.totalElements)
-          } catch (error) {
-              setError(error);
-          } finally {
-              setLoading(false);
-          }
 
-      };*/
     // Fonction pour récupérer les produits depuis l'API
     const fetchProduitByMotCle = async () => {
-        setLoading(true);
-        try {
-            // let data = await ProduitService.getProduitByMotCle(searchInput);
-            let data = await apiCrudService.get(`produits/recherche?motCle=${searchInput}`, currentPage, pageSize);
-            setProduits(data.content);  // Assuming 'content' is the array of products
-            setTotalPages(data.totalPages); // Assuming 'totalPages' is the total page count
-            setNombreTotalDeLigne(data.totalElements)
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
+
+        await fetchByMotCle(searchInput, currentPage, pageSize);
     };
 
 
-    // useEffect(() => {
-    //     fetchProduitByMotCle(searchInput).then(r => console.log(r));
-    // }, [searchInput]);
+    useEffect(() => {
+        const quantites = produits.reduce((acc, element) => {
+            acc[element.id] = nombreProduitDansPanier(element.id);
+            return acc;
+        }, {});
+        setQuantites(quantites);
+    }, [produits]);
 
 
     useEffect(() => {
         fetchProduitByMotCle().then(r => null);
+        console.log("le panier a changé")
 
-    }, [currentPage, pageSize]);
+    }, [currentPage, pageSize, panier]);
 
     if (loading) {
         return <h1>Chargement en cours...</h1>;
@@ -94,28 +73,17 @@ const ProduitListe = (props) => {
 
     const handleSubmitFilter = async (e) => {
         e.preventDefault();
-        setLoading(true);
         setCurrentPage(0);  // Revenir en première page après un filtre
 
+        // Filtrer dynamiquement les paramètres non vides
+        let params = Object.fromEntries(
+            Object.entries(filters).filter(([_, value]) => value)
+        );
+        console.log(params)
+        // const queryString = new URLSearchParams(params).toString();
+        // Appel API
+        await fetchByParams(params);
 
-        try {
-            // Filtrer dynamiquement les paramètres non vides
-            let params = Object.fromEntries(
-                Object.entries(filters).filter(([_, value]) => value)
-            );
-            console.log(params)
-            const queryString = new URLSearchParams(params).toString();
-            // Appel API
-            const data = await apiCrudService.get(`produits/recherche-dynamique?${queryString}`);
-            setProduits(data.content);  // Assuming 'content' is the array of products
-            setTotalPages(data.totalPages); // Assuming 'totalPages' is the total page count
-            setNombreTotalDeLigne(data.totalElements)
-
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
     };
 
 
@@ -130,7 +98,8 @@ const ProduitListe = (props) => {
             )
         },
         {header: "Description", accessor: "description"},
-        {header: "Sélectionner", accessor: "onSelect",
+        {
+            header: "Sélectionner", accessor: "onSelect",
             render: (value, produit) => (
                 <Button
                     variant="primary"
@@ -169,12 +138,21 @@ const ProduitListe = (props) => {
                     >
                         +
                     </Button>
-                    <span className="fw-bold">
-                    {nombreProduitDansPanier(produit.id)}
-                    </span>
-                    {/*
-                    Todo: ajouter le prix d'achat ici
-                    */}
+
+                    <Form.Control
+                        type="number"
+                        value={quantites[produit.id]}
+                        onChange={(e) => handleChangeNbProPanier(produit.id, e.target.value)}
+                        onBlur={() => handleBlur({
+
+                            prixVente: produit.prixVente,
+                            produitId: produit.id,
+                            quantite: quantites[produit.id]
+                        })}
+                        className="d-inline-block text-center"
+                        style={{width: "80px"}}
+                    />
+
                     <Button
                         variant="outline-info" className=' fw-bold ms-3'
                         onClick={() => ajouterAuPanier({
@@ -190,15 +168,27 @@ const ProduitListe = (props) => {
         }
     ];
 
+    const handleChangeNbProPanier = (id, val) => {
+        setQuantites({...quantites, [id]: val});
+    }
+    const handleBlur = (item) => {
+        ajouterAuPanier(item)
+    }
+
 
     let columns = removeColumns(baseColumns, []);
 
-    if(!props.onSelect  ){
+    if (!props.onSelect) {
         columns = removeColumns(baseColumns, ['onSelect']);
-    }else{
+    } else {
         columns = removeColumns(baseColumns, ['prixVente', 'stockInitial', 'panier']);
     }
 
+    if (!props.panierList) {
+        columns = removeColumns(baseColumns, ['panierList']);
+    } else {
+        columns = removeColumns(baseColumns, ['prixVente', 'stockInitial', 'onSelect']);
+    }
 
 
     let cols = [
@@ -266,7 +256,7 @@ const ProduitListe = (props) => {
 
     const handleSubmitSearch = async (e) => {
         e.preventDefault();
-        fetchProduitByMotCle(searchInput).then();
+        fetchProduitByMotCle().then();
     }
 
 
@@ -285,7 +275,7 @@ const ProduitListe = (props) => {
 
 
     const entetes = [
-        {title: "Nombre de ligne", value: nombreTotalDeLigne},
+        {title: "Nombre de ligne", value: totalElements},
     ];
 
 
@@ -294,6 +284,8 @@ const ProduitListe = (props) => {
     }
     return (
         <div>
+
+
             {showAlertSupprProduit && (
                 <AlertComp
                     message="Opération réussie le produit a été suprimé !"
@@ -303,22 +295,14 @@ const ProduitListe = (props) => {
                 />
             )}
 
-            <h1><strong>Produit</strong></h1>
+            <h1><strong>Produits</strong></h1>
+
+            <ToastContainer />
 
 
             <HeaderBtnElementComp titreFil='creer-produit' variant='outline-primary'
                                   valueBtn='Créer produit'/>
 
-
-            {/*<SearchProduitCritereComp*/}
-            {/*    handleSubmitSearch={handleSubmitSearch}*/}
-            {/*    searchInput={searchInput}*/}
-            {/*    handleSearchInput={handleSearchInput}*/}
-            {/*    handleSubmitFilter={handleSubmitFilter}*/}
-            {/*    filters={filters}*/}
-            {/*    handleInputChange={handleInputChange}*/}
-
-            {/*/>*/}
 
             <SearchCritereComp cols={cols}
                                handleSubmitSearch={handleSubmitSearch}
@@ -328,7 +312,7 @@ const ProduitListe = (props) => {
             />
 
             {produits.length > 0 ? (
-                <DataTableComp data={produits} columns={columns} entetes={entetes} />
+                <DataTableComp data={produits} columns={columns} entetes={entetes}/>
             ) : (
                 <div className="text-center text-muted">Aucun produit trouvé.</div>
             )}
@@ -340,7 +324,7 @@ const ProduitListe = (props) => {
                             totalPages={totalPages}
                             pageSize={pageSize}
                             handlePageSizeChange={handlePageSizeChange}
-                            nombreElt={nombreTotalDeLigne}
+                            nombreElt={totalElements}
 
             />
 

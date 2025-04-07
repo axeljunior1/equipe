@@ -9,21 +9,18 @@ import {Search} from "lucide-react";
 import {useJwt} from "../../context/JwtContext";
 import {usePanier} from "../../context/PanierContext";
 import ListClients from "../client/ClientList";
-import produitService from "../../services/ProduitService";
 import BarcodeReader from "../../components/BarcodeReader";
+import ProduitListe from "../produit/ProduitsListe";
 
 const Panier = () => {
-    const [showModalClient, setshowModalClient] = useState(false); // Contrôle d'affichage du modal
+    const [showModalClient, setShowModalClient] = useState(false); // Contrôle d'affichage du modal
     const [showModalDetailProduit, setShowModalDetailProduit] = useState(false); // Contrôle d'affichage du modal
     const {
+        fetchCart,
         panier,
         retirerDuPanier,
         calculerTotal,
         ajouterAuPanier,
-        presentDansPanier,
-        refreshPanier,
-        nombreProduitDansPanier,
-        idPanierProduit,
         updatePanier
     } = usePanier();
 
@@ -31,11 +28,10 @@ const Panier = () => {
     const [showAlert, setShowAlert] = useState(false);
     const [validated, setValidated] = useState(false);
     const {loggedEmployee, panierId} = useJwt();
-    const [produit, setProduit] = useState(null);
+    const [qtes, setQtes] = useState({});
 
 
-
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const [error, setError] = useState(null);
 
@@ -49,7 +45,6 @@ const Panier = () => {
         "telephone": ""
     }
     const [formClient, setFormClient] = useState(initFormClient);
-    //Todo => lors de la modification d'un article, il faut peut-etre mettre a jour les produits dans le panier
 
     const handleUpdatePanier = item => {
         let data =
@@ -61,13 +56,13 @@ const Panier = () => {
         updatePanier(data);
     };
 
+
     useEffect(() => {
-        console.log("panier mis à jour :", panier);
+        let obj = {}
 
         for (const panierElement of panier) {
-            if (panierElement.produit.id === 47) {
-                console.log("panierElement après mise à jour:", panierElement);
-            }
+            obj[panierElement["id"]] = panierElement["quantite"];
+            setQtes(obj)
         }
     }, [panier]); //
 
@@ -99,10 +94,10 @@ const Panier = () => {
             e.stopPropagation();
 
         } else {
-            if(panier.length > 0){
+            if (panier.length > 0) {
                 validerLaVente().then()
-            }else {
-                setError({message : "Le panier est vide ! "})
+            } else {
+                setError({message: "Le panier est vide ! "})
             }
             // Formulaire valide, procéder avec l'envoi des données
             console.log('Données soumises:', formClient);
@@ -129,7 +124,7 @@ const Panier = () => {
             telephone: param.telephone,
 
         });
-        setshowModalClient(false); // Ferme le modal
+        setShowModalClient(false); // Ferme le modal
     };
 
     const handleShowModalDetailProduit = async (produitId) => {
@@ -139,7 +134,7 @@ const Panier = () => {
 
     const validerLaVente = async () => {
 
-        if(!formClient.id) throw new Error('No client ')
+        if (!formClient.id) throw new Error('No client ')
         let caisse = {
             idClient: formClient.id,
             idPanier: panierId,
@@ -165,47 +160,23 @@ const Panier = () => {
     const [isHovered, setIsHovered] = useState(false);
 
 
-    const handleScan = async (texte) => {
-        console.log(texte)
+    const handleQteChange = (id, val) => {
+        setQtes({...qtes, [id]: val});
+    }
+    const handleQteBlur = (item) => {
 
-        setLoading(true);
-        try {
-
-            let produit = await produitService.getProduitsByCodeBarre(texte);
-            setProduit(produit);
-
-        }catch(err) {
-            setError(err);
-        }finally {
-            setLoading(false);
-        }
-
-
-
+        ajouterAuPanier(item)
     }
 
 
-
-
-
-    useEffect(() => {
-
-        if (produit !== null) {
-            let postData = {
-                "prixVente": produit.prixVente,
-                "produitId": produit.id,
-                "quantite": nombreProduitDansPanier(produit.id) + 1
-            };
-            ajouterAuPanier(postData);
-        }
-
-    }, [produit]);
+    if (loading) {
+        return <div>Loading...</div>
+    }
 
 
     return (
         <div>
             <h2>Panier</h2>
-
 
 
             {error &&
@@ -214,7 +185,7 @@ const Panier = () => {
 
             <h3 className="my-4 text-danger">Total: {calculerTotal()}€</h3>
 
-            <BarcodeReader  />
+            <BarcodeReader/>
 
 
             {showAlert && (
@@ -245,31 +216,55 @@ const Panier = () => {
                         <tr key={item.id || `${item.nom}-${item.prixVente}`}>
                             <td>
                                 <Button variant={"outline-primary"} className={"w-100"}
-                                        onClick={() => handleShowModalDetailProduit(item.produit.id)}>{item.produit.nom}</Button>
+                                        onClick={() => handleShowModalDetailProduit(item["produit"].id)}>{item["produit"].nom}</Button>
                             </td>
-                            <td>{item.produit.prixVente}€</td>
+                            <td>{item["produit"].prixVente}€</td>
                             <td>
                                 <Row>
-                                    <Col xs={"10"}>
+                                    <Col>
                                         {/*<ProductCartCounter quantity={item.quantite} handleIncrease={()=>handleIncrease(item)} handleDecrease={()=>handleDecrease(item)} />*/}
 
-                                        <Button
-                                            variant="outline-primary" className='fw-bold me-3'
-                                            onClick={() => handleIncrease(item)}
-                                        >
-                                            +
-                                        </Button>
-                                        {item.quantite}
-                                        <Button
-                                            variant="outline-info" className=' fw-bold ms-3'
-                                            onClick={() => handleDecrease(item, 'remove')}
-                                        >
-                                            -
-                                        </Button>
+                                        <Row className="d-flex justify-content-around">
+                                            <Col xs={4}>
+                                                <Button
+                                                    variant="outline-primary" className='fw-bold me-3'
+                                                    onClick={() => handleIncrease(item)}
+                                                >
+                                                    +
+                                                </Button>
+                                            </Col>
+                                            <Col xs={4}>
+                                                <Form.Control className="col-2"
+
+                                                              type={"number"}
+                                                              id={item.id}
+                                                              value={qtes[item.id]}
+                                                              onChange={(e) => handleQteChange(item.id, e.target.value)}
+                                                              onBlur={(e) => handleQteBlur(
+                                                                  {
+                                                                      "prixVente": item["produit"].prixVente,
+                                                                      "produitId": item["produit"].id,
+                                                                      "quantite": e.target.value,
+                                                                  }
+                                                              )}
+
+                                                />
+                                            </Col>
+                                            <Col xs={4}>
+                                                <Button
+                                                    variant="outline-info" className=' fw-bold ms-3'
+                                                    onClick={() => handleDecrease(item)}
+                                                >
+                                                    -
+                                                </Button>
+                                            </Col>
+                                        </Row>
+
+
                                     </Col>
                                 </Row>
                             </td>
-                            <td>{(item.produit.prixVente * item.quantite).toFixed(2)}€</td>
+                            <td>{(item["produit"].prixVente * item.quantite).toFixed(2)}€</td>
                             <td>
                                 <Button
                                     variant="danger"
@@ -289,118 +284,119 @@ const Panier = () => {
             <br/>
             <br/>
 
-            <span className='d-none d-md-block'>            <h3> Informations client </h3>
-            <Form onSubmit={handleSubmitFormAAddLine} className={""} validated={validated}>
-                <Row className="">
-                    <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="position-relative d-inline mt-2">
-                        <Form.Label className={'fw-bold'}>Id du client</Form.Label>
+            <span className='d-none d-md-block'>
+                <h3> Informations client </h3>
+                <Form onSubmit={handleSubmitFormAAddLine} className={""} validated={validated}>
+                    <Row className="">
+                        <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="position-relative d-inline mt-2">
+                            <Form.Label className={'fw-bold'}>Id du client</Form.Label>
 
-                        <Form.Control
-                            type="number"
-                            value={formClient.id}
-                            onChange={handleInputChange}
-                            name='id'
-                            className="my-1"
-                            required
-                            isInvalid={validated && !formClient.id}
-                        />
-                <Form.Control.Feedback type="invalid">
-                    Ce champ est requis.
-                </Form.Control.Feedback>
-                        <button
-                            className="btn position-absolute top-50 end-0 me-10 pe-10 py-0 "
-                            onClick={(e) => {
-                                e.preventDefault()
-                                setshowModalClient(true)
-                            }}
-                            onMouseEnter={() => setIsHovered(true)}
-                            onMouseLeave={() => setIsHovered(false)}
-                            title="Rechercher"
+                            <Form.Control
+                                type="number"
+                                value={formClient.id}
+                                onChange={handleInputChange}
+                                name='id'
+                                className="my-1"
+                                required
+                                isInvalid={validated && !formClient.id}
+                            />
+                    <Form.Control.Feedback type="invalid">
+                        Ce champ est requis.
+                    </Form.Control.Feedback>
+                            <button
+                                className="btn position-absolute top-50 end-0 me-10 pe-10 py-0 "
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    setShowModalClient(true)
+                                }}
+                                onMouseEnter={() => setIsHovered(true)}
+                                onMouseLeave={() => setIsHovered(false)}
+                                title="Rechercher"
 
-                        >
-                            <Search className={isHovered ? "text-success" : "text-info"} size={30}/>
-                        </button>
-                    </Col>
-                    <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
-                        <Form.Label className={'fw-bold'}>Nom</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formClient.nom}
-                            onChange={handleInputChange}
-                            placeholder="Nom"
-                            name='nom'
-                            className="my-1"
-                            required readOnly
-                            isInvalid={validated && !formClient.nom}
-                        />
-                <Form.Control.Feedback type="invalid">
-                    Ce champ est requis.
-                </Form.Control.Feedback>
-                    </Col>
-                    <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
-                        <Form.Label className={'fw-bold'}>prenom</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formClient.prenom}
-                            onChange={handleInputChange}
-                            placeholder="Prénom"
-                            name='prenom'
-                            className="my-1"
-                            required readOnly
-                            isInvalid={validated && !formClient.prenom}
-                        />
-                <Form.Control.Feedback type="invalid">
-                    Ce champ est requis.
-                </Form.Control.Feedback>
-                    </Col>
-                    <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
-                        <Form.Label className={'fw-bold'}>Email</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={formClient.email}
-                            onChange={handleInputChange}
-                            placeholder="Email"
-                            name='email' readOnly
-                            className="my-1"
-                        />
-                    </Col>
-                    <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
-                        <Form.Label className={'fw-bold'}>Telephone</Form.Label>
-                        <Form.Control
-                            type="tel"
-                            value={formClient.telephone}
-                            onChange={handleInputChange}
-                            placeholder="Telephone"
-                            name='telephone'
-                            className="my-1"
-                            required readOnly
-                            isInvalid={validated && !formClient.telephone}
-                        />
-                <Form.Control.Feedback type="invalid">
-                    Ce champ est requis.
-                </Form.Control.Feedback>
-                    </Col>
-                </Row>
+                            >
+                                <Search className={isHovered ? "text-success" : "text-info"} size={30}/>
+                            </button>
+                        </Col>
+                        <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
+                            <Form.Label className={'fw-bold'}>Nom</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={formClient.nom}
+                                onChange={handleInputChange}
+                                placeholder="Nom"
+                                name='nom'
+                                className="my-1"
+                                required readOnly
+                                isInvalid={validated && !formClient.nom}
+                            />
+                    <Form.Control.Feedback type="invalid">
+                        Ce champ est requis.
+                    </Form.Control.Feedback>
+                        </Col>
+                        <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
+                            <Form.Label className={'fw-bold'}>prenom</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={formClient.prenom}
+                                onChange={handleInputChange}
+                                placeholder="Prénom"
+                                name='prenom'
+                                className="my-1"
+                                required readOnly
+                                isInvalid={validated && !formClient.prenom}
+                            />
+                    <Form.Control.Feedback type="invalid">
+                        Ce champ est requis.
+                    </Form.Control.Feedback>
+                        </Col>
+                        <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
+                            <Form.Label className={'fw-bold'}>Email</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={formClient.email}
+                                onChange={handleInputChange}
+                                placeholder="Email"
+                                name='email' readOnly
+                                className="my-1"
+                            />
+                        </Col>
+                        <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
+                            <Form.Label className={'fw-bold'}>Telephone</Form.Label>
+                            <Form.Control
+                                type="tel"
+                                value={formClient.telephone}
+                                onChange={handleInputChange}
+                                placeholder="Telephone"
+                                name='telephone'
+                                className="my-1"
+                                required readOnly
+                                isInvalid={validated && !formClient.telephone}
+                            />
+                    <Form.Control.Feedback type="invalid">
+                        Ce champ est requis.
+                    </Form.Control.Feedback>
+                        </Col>
+                    </Row>
 
-                <Row className={'justify-content-end mt-3 '}>
-                    <Col xs={"3"}>
-                        <Button variant={"success"} type="submit" className='w-100'>
-                            Valider la vente
-                        </Button>
-                    </Col>
-                </Row>
-            </Form>
+                    <Row className={'justify-content-end mt-3 '}>
+                        <Col xs={"3"}>
+                            <Button variant={"success"} type="submit" className='w-100'>
+                                Valider la vente
+                            </Button>
+                        </Col>
+                    </Row>
+                </Form>
 
-
-
-            <br/>
-            <br/>
-                 </span>
-
+                <br/>
+                <br/>
+            </span>
+            <div className="my-3">
+                <ProduitListe panierList={true}/>
+            </div>
 
 
             {/* Modal de recherche de client */}
-            <Modal show={showModalClient} onHide={() => setshowModalClient(false)} size="lg" centered>
+            <Modal show={showModalClient} onHide={() => setShowModalClient(false)} size="lg" centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Rechercher un Client</Modal.Title>
                 </Modal.Header>

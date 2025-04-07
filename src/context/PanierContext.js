@@ -2,22 +2,13 @@ import React, {createContext, useContext, useEffect, useState} from 'react';
 import axiosInstance from "./axiosInstance";
 import {useJwt} from "./JwtContext";
 import apiCrudService from "../services/ApiCrudService";
-import SockJS from "sockjs-client";
-import {Client} from "@stomp/stompjs";
+import {Bounce, toast} from 'react-toastify';
+import useProduct from "../hooks/useProduct";
 
 // Création du contexte
 const PanierContext = createContext();
 
-// const loadConfig = async () => {
-//     try {
-//         const response = await fetch("/config.json");
-//         const config = await response.json();
-//         return config.BACK_URL;
-//     } catch (error) {
-//         console.error("Erreur chargement config:", error);
-//         return "http://localhost:8080"; // Fallback en cas d'erreur
-//     }
-// };
+
 
 // Hook personnalisé pour accéder au panier
 export const usePanier = () => useContext(PanierContext);
@@ -26,55 +17,18 @@ export const usePanier = () => useContext(PanierContext);
 export const PanierProvider = ({children}) => {
     const {panierId} = useJwt();
 
-
-    const [client, setClient] = useState(null);
-
     const [panier, setPanier] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    //todo
+    // const {panier : panierUse, loading:load, error: err, totalElements, totalPages, fetchByMotCle, fetchByParams} = useProduct();
+
 
     useEffect(() => {
 
-            console.log("panier id a changé", panierId);
             fetchCart();
         },
         [panierId]);
-
-
-
-
-    // useEffect(() => {
-    //     async function webSocket() {
-    //         const socketUrl = await loadConfig()
-    //         const socket = new SockJS(`${socketUrl}/ws`);
-    //         const stompClient = new Client({
-    //             webSocketFactory: () => socket,
-    //             reconnectDelay: 5000,
-    //             onConnect: () => {
-    //                 console.log("Connecté");
-    //                 stompClient.subscribe("/topic/messages", (message) => {
-    //                     fetchCart().then()
-    //                 });
-    //             },
-    //         });
-    //
-    //         stompClient.activate();
-    //         setClient(stompClient);
-    //
-    //         return () => {
-    //             stompClient.deactivate();
-    //         };
-    //     }
-    //
-    //       webSocket().then();
-    // }, []);
-
-    const sendMessage = (message) => {
-        if (client) {
-            client.publish({destination: "/app/send", body: message});
-        }
-        fetchCart()
-    };
 
 
     const fetchCart = async () => {
@@ -90,6 +44,8 @@ export const PanierProvider = ({children}) => {
         }
     };
 
+
+
     const ajouterAuPanier = async (lignePanier) => {
         try {
             const postData = {
@@ -100,16 +56,23 @@ export const PanierProvider = ({children}) => {
             };
             if (!panierId) throw new Error("No panierId existe");
             await axiosInstance.post("panier-produit", postData);
-            sendMessage('ajout')
+
+           await fetchCart()
+
+
         } catch (err) {
+            toast.error('🦄 Une erreur pendant l\'ajout dans le panier !', {
+                position: "top-right",
+                autoClose: false,
+                hideProgressBar: false,
+                pauseOnHover: true,
+                draggable: true,
+                progress: 1,
+                theme: "colored",
+                transition: Bounce,
+            });
             console.error("Error adding product:", err);
         }
-    };
-
-
-    // Rafraîchir le panier
-    const refreshPanier = async () => {
-        sendMessage('refresh')
     };
 
 
@@ -123,7 +86,8 @@ export const PanierProvider = ({children}) => {
 
         try {
             await apiCrudService.patch(`panier-produit`, param.id, updateData);
-            sendMessage('update')
+
+            await fetchCart()
 
         } catch (error) {
             console.error("Erreur lors de la mise à jour du panier:", error);
@@ -134,7 +98,7 @@ export const PanierProvider = ({children}) => {
     const retirerDuPanier = async (id) => {
         try {
             await apiCrudService.delete('panier-produit', id);
-            sendMessage('remove')
+            await fetchCart()
         } catch (error) {
             console.error("Erreur lors de la suppression du produit:", error);
         }
@@ -145,7 +109,6 @@ export const PanierProvider = ({children}) => {
         return panier.some((item) => item.produit.id === productId);
     };
 
-    const nombreLigneDansPanier = panier.length;
 
     const nombreProduitDansPanier = (produitId) => {
         if (presentDansPanier(produitId)) {
@@ -181,7 +144,6 @@ export const PanierProvider = ({children}) => {
             ajouterAuPanier,
             retirerDuPanier,
             calculerTotal,
-            refreshPanier,
             idPanierProduit,
             nombreProduitDansPanier,
             presentDansPanier, loading, error,

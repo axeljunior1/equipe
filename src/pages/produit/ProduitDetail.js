@@ -3,50 +3,40 @@ import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {usePanier} from "../../context/PanierContext";
 import AlertComp from "../../components/AlertComp";
 import ErrorAlert from "../../exceptions/ErrorAlert";
-import apiCrudService from "../../services/ApiCrudService";
 import {Button, Col, Row} from "react-bootstrap";
 import {formatDate} from "../../utils/dateUtils";
 import DetailsComp from "../../components/DetailsComp";
 import BarcodeDisplayComponent from "../../components/BarcodeDisplayComponent";
+import useProduct from "../../hooks/useProduct";
+import PropTypes from "prop-types";
+
 
 const ProduitDetail = (props) => {
     const id = useParams().id ?? props.id; // id de l'url ou id dans props, ils'agit ici de l'id du produit
     const {
-        panier,
         ajouterAuPanier,
-        retirerDuPanier,
-        calculerTotal,
-        refreshPanier,
         nombreProduitDansPanier,
-        presentDansPanier,
-        updatePanier
     } = usePanier();
 
+
+    ProduitDetail.propTypes = {
+        id: PropTypes.number,
+    };
 
     const navigate = useNavigate();
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const pShowAlertCreation = queryParams.get("showAlertCreation");
 
-    const [produit, setProduit] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const {produits, loading, error, fetchById, remove} = useProduct();
+
     const [showAlertCreation, setShowAlertCreation] = useState(!!pShowAlertCreation);
 
     // Fonction pour récupérer les données d'un produit
     const fetchProduit = async () => {
-        setLoading(true);
-        try {
-            const data = await apiCrudService.getById('produits', id)
-            // console.log(data)
-            setProduit(data);
-            // Important pour ne retourner que les champs utiles pour la mise a jour
 
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
+             await fetchById( id)
+
     };
 
 
@@ -60,85 +50,80 @@ const ProduitDetail = (props) => {
     }
 
 
-
-    if (!produit) {
+    if (!produits) {
         return <h1>Produit introuvable</h1>;
     }
 
     const lines = [
-        <p><strong>Prix Vente :</strong> {produit.prixVente} €</p>,
-        <p><strong>Prix Achat:</strong> {produit.prixAchat} €</p>,
-        <p><strong>Description :</strong> {produit.description}</p>,
-        <p><strong>Catégorie :</strong> {produit.categorieNom}</p>,
-        <p><strong>Stock initial :</strong> {produit.stockInitial}</p>,
-        <p><strong>Date de création :</strong> {formatDate(produit.createdAt)}</p>,
-        <p><strong>Date de mise à jour :</strong> {formatDate(produit.updatedAt)}</p>,
-        <p><strong>Actif : </strong> {produit.actif ? (<span className="text-success fw-bold"> Oui </span>) : (
+        <p key={produits.id}><strong>Prix Vente :</strong> {produits.prixVente} €</p>,
+        <p key={produits.id}><strong>Prix Achat:</strong> {produits.prixAchat} €</p>,
+        <p key={produits.id}><strong>Description :</strong> {produits.description}</p>,
+        <p key={produits.id}><strong>Catégorie :</strong> {produits.categorieNom}</p>,
+        <p key={produits.id}><strong>Stock initial :</strong> {produits.stockInitial}</p>,
+        <p key={produits.id}><strong>Date de création :</strong> {formatDate(produits.createdAt)}</p>,
+        <p key={produits.id}><strong>Date de mise à jour :</strong> {formatDate(produits.updatedAt)}</p>,
+        <p key={produits.id}><strong>Actif : </strong> {produits.actif ? (<span className="text-success fw-bold"> Oui </span>) : (
             <span className=" fw-bold text-danger"> Non </span>)}</p>,
-        <>
-            <BarcodeDisplayComponent text={produit.ean13 || '1234567890129'} />
-        </>
+        <span key={produits.id}>
+            <BarcodeDisplayComponent text={produits.ean13 || '1234567890129'} />
+        </span>
     ]
 
     const handleDeleteProduit = async (id) => {
-        try {
-            await apiCrudService.delete("produits", id);
+            await remove( id);
             navigate("/produits?showAlertSupprProduit=true");
-        } catch (err) {
-            setError(err);
-        }
     }
 
 
     const footerList = [
-        <button
+        <button key={produits.id}
             className="btn btn-outline-primary me-2 fw-bold"
-            // onClick={() => props.handleStockProduit(produit.id)}
+            // onClick={() => props.handleStockProduit(produits.id)}
         >
             Imprimer le qr code
         </button>,
 
-        <button
+        <button key={produits.id}
             className="btn btn-outline-primary me-2 fw-bold"
-            onClick={() => handleStockProduit(produit.id)}
+            onClick={() => handleStockProduit(produits.id)}
         >
             Stock du produit
         </button>,
-        <button
+        <button key={produits.id}
             className="btn btn-outline-primary me-2 fw-bold"
-            onClick={() => navigate(`/produits/edit/${produit.id}`)}
+            onClick={() => navigate(`/produits/edit/${produits.id}`)}
         >
             Modifier
         </button>,
-        <Row>
+        <Row key={produits.id}>
             <Col xm={12}>
                 <Button
                     variant="outline-primary" className='fw-bold me-3'
                     onClick={() => ajouterAuPanier({
 
-                        prixVente: produit.prixVente,
-                        produitId: produit.id,
-                        quantite: nombreProduitDansPanier(produit.id) + 1
+                        prixVente: produits.prixVente,
+                        produitId: produits.id,
+                        quantite: nombreProduitDansPanier(produits.id) + 1
                     })}
                 >
                     +
                 </Button>,
                 <span className="fw-bold">
-                    {nombreProduitDansPanier(produit.id)}
+                    {nombreProduitDansPanier(produits.id)}
                     </span>
                 <Button
                     variant="outline-info" className=' fw-bold ms-3'
                     onClick={() => ajouterAuPanier({
-                        prixVente: produit.prixVente,
-                        produitId: produit.id,
-                        quantite: nombreProduitDansPanier(produit.id) - 1
+                        prixVente: produits.prixVente,
+                        produitId: produits.id,
+                        quantite: nombreProduitDansPanier(produits.id) - 1
                     })}
                 >
                     -
                 </Button>
             </Col>
         </Row>,
-        <Button className="ms-3" variant={"danger"} onClick={() => handleDeleteProduit(id)}> Supprimer le
+        <Button key={produits.id} className="ms-3" variant={"danger"} onClick={() => handleDeleteProduit(id)}> Supprimer le
             produit
         </Button>
     ]
@@ -169,7 +154,7 @@ const ProduitDetail = (props) => {
                 lines={lines}
                 footerList={footerList}
                 title={<span
-                    className={produit.actif ? 'text-success' : 'text-danger'}> {produit.id} - {produit.nom} </span>}
+                    className={produits.actif ? 'text-success' : 'text-danger'}> {produits.id} - {produits.nom} </span>}
             />
 
         </div>

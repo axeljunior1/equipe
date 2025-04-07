@@ -2,7 +2,7 @@ import axiosInstance from "../context/axiosInstance";
 
 
 // Service API générique
-const apiService = {
+const ApiCrudService = {
     // Méthode GET : Récupérer une ressource par ID
     get: async (endpoint , page = 0, size = 50, sortCriteria) => {
         try {
@@ -20,7 +20,7 @@ const apiService = {
             });
             return response.data;
         } catch (error) {
-            throw error;
+            throw error.response?.data?.message;
         }
     },
 
@@ -30,7 +30,7 @@ const apiService = {
             const response = await axiosInstance.get(`/${endpoint}/${id}`);
             return response.data;
         } catch (error) {
-            throw error;
+            throw error.response?.data?.message;
         }
     },
 
@@ -40,7 +40,7 @@ const apiService = {
             const response = await axiosInstance.post(`/${endpoint}`, data);
             return response.data;
         } catch (error) {
-            throw error;
+            throw error.response?.data?.message || "Erreur inconnu";
         }
     },
 
@@ -50,7 +50,7 @@ const apiService = {
             const response = await axiosInstance.put(`/${endpoint}/${id}`, data);
             return response.data;
         } catch (error) {
-            throw error;
+            throw error.response?.data?.message || "Erreur inconnu";
         }
     },
 
@@ -71,9 +71,9 @@ const apiService = {
             await axiosInstance.delete(`/${endpoint}/${id}`);
             return { success: true, message: "Ressource supprimée avec succès" };
         } catch (error) {
-            throw error;
+            throw error.response?.data?.message || "Erreur inconnu";
         }
     }
 };
 
-export default apiService;
+export default ApiCrudService;

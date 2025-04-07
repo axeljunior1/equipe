@@ -13,7 +13,6 @@ const DetailClient = (props) => {
     //     ajouterAuPanier,
     //     retirerDuPanier,
     //     calculerTotal,
-    //     refreshPanier,
     //     nombreProduitDansPanier,
     //     presentDansPanier,
     //     updatePanier

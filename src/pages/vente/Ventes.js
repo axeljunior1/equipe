@@ -18,7 +18,8 @@ function Ventes() {
             let data = await VenteService.getVentes()
             setVentes(data.content)
         } catch (e) {
-            setError(e.response.data);
+            console.log('error', e);
+            setError( e.response?.data?.message || e.message);
         }finally {
             setLoading(false);
         }
@@ -53,7 +54,7 @@ function Ventes() {
     };
 
     if (error) {
-        return <p>Erreur : {error.message}</p>;
+        return <p>Erreur : {error}</p>;
     }
 
     return (
