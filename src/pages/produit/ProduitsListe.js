@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Link, useLocation, useNavigate} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
 import {Button, Col, Form} from "react-bootstrap";
 import {usePanier} from "../../context/PanierContext";
@@ -11,9 +11,14 @@ import SearchCritereComp from "../../components/SearchCritereComp";
 import useProduct from "../../hooks/useProduct";
 import {DEFAULT_PAGINATION_SIZE} from "../../utils/constants";
 import {ToastContainer} from "react-toastify";
+import PropTypes from "prop-types";
 
 
 const ProduitListe = (props) => {
+
+    ProduitListe.propTypes = {
+        onSelect: PropTypes.func,
+    };
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -21,7 +26,7 @@ const ProduitListe = (props) => {
     const [showAlertSupprProduit, setShowAlertSupprProduit] = useState(!!pShowAlertSupprProduit);
 
 
-    const [searchInput, SetSearchInput] = useState('');
+    const [searchInput,setSearchInput] = useState('');
     const [filters, setFilters] = useState({
         actif: true,
         nom: "",
@@ -33,7 +38,6 @@ const ProduitListe = (props) => {
     });
     const [currentPage, setCurrentPage] = useState(0); // Page actuelle
     const [pageSize, setPageSize] = useState(DEFAULT_PAGINATION_SIZE); // Taille de la page
-    const navigate = useNavigate();
     const {panier, ajouterAuPanier, nombreProduitDansPanier} = usePanier();
     const [quantites, setQuantites] = useState({});
     const {produits, loading, error, totalElements, totalPages, fetchByMotCle, fetchByParams} = useProduct();
@@ -56,8 +60,7 @@ const ProduitListe = (props) => {
 
 
     useEffect(() => {
-        fetchProduitByMotCle().then(r => null);
-        console.log("le panier a changé")
+        fetchProduitByMotCle().then();
 
     }, [currentPage, pageSize, panier]);
 
@@ -178,21 +181,18 @@ const ProduitListe = (props) => {
 
     let columns = removeColumns(baseColumns, []);
 
-    if (!props.onSelect) {
-        columns = removeColumns(baseColumns, ['onSelect']);
-    } else {
+    if (props.onSelect) {
         columns = removeColumns(baseColumns, ['prixVente', 'stockInitial', 'panier']);
     }
 
-    if (!props.panierList) {
-        columns = removeColumns(baseColumns, ['panierList']);
-    } else {
-        columns = removeColumns(baseColumns, ['prixVente', 'stockInitial', 'onSelect']);
+
+    if (!props.onSelect){
+        columns = removeColumns(baseColumns, ['onSelect']);
     }
 
 
     let cols = [
-        <Form.Select className="mb-3"
+        <Form.Select className="mb-3" key={"actif"}
                      name="actif"
                      value={filters.actif}
                      onChange={handleInputChange}
@@ -203,7 +203,7 @@ const ProduitListe = (props) => {
 
         </Form.Select>,
         <Form.Control
-            type="text"
+            type="text" key={"nom"}
             value={filters.nom}
             onChange={handleInputChange}
             placeholder="Nom"
@@ -211,7 +211,7 @@ const ProduitListe = (props) => {
             className="my-1"
         />
         ,
-        <Form.Control
+        <Form.Control key={"description"}
             type="text"
             value={filters.description}
             onChange={handleInputChange}
@@ -219,7 +219,7 @@ const ProduitListe = (props) => {
             name='description'
             className="my-1 "
         />,
-        <Form.Control
+        <Form.Control key={"prixUnitaireMin"}
             type="text"
             value={filters.prixUnitaireMin}
             onChange={handleInputChange}
@@ -227,7 +227,7 @@ const ProduitListe = (props) => {
             name='prixUnitaireMin'
             className="my-1 "
         />,
-        <Form.Control
+        <Form.Control key={"prixUnitaireMax"}
             type="text"
             value={filters.prixUnitaireMax}
             onChange={handleInputChange}
@@ -235,7 +235,7 @@ const ProduitListe = (props) => {
             name='prixUnitaireMax'
             className="my-1 "
         />,
-        <Form.Control
+        <Form.Control key={"stockInitialMin"}
             type="text"
             value={filters.stockInitialMin}
             onChange={handleInputChange}
@@ -243,7 +243,7 @@ const ProduitListe = (props) => {
             name='stockInitialMin'
             className="my-1 "
         />,
-        <Form.Control
+        <Form.Control key={"stockInitialMax"}
             type="text"
             value={filters.stockInitialMax}
             onChange={handleInputChange}
@@ -270,7 +270,7 @@ const ProduitListe = (props) => {
     };
 
     const handleSearchInput = (e) => {
-        SetSearchInput(e.target.value);
+        setSearchInput(e.target.value);
     }
 
 

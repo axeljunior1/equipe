@@ -1,46 +1,19 @@
-import React, {useEffect, useState} from 'react';
-import categorieService from "../services/CategorieService";
+import React from 'react';
+import PropTypes from "prop-types";
 
 const CategorieDetailComp = (props) => {
-    const [categorie, setCategorie] = useState({});
-    const [error, setError] = useState(null);
 
-
-
-
-    // Fonction pour récupérer les données d'un categorie
-    const fetchCategorie = async (id) => {
-        try {
-            const data = await categorieService.getCategoriesById(id)
-            console.log(data)
-            setCategorie(data);
-
-        } catch (error) {
-            setError(error);
-        }
+    CategorieDetailComp.propTypes = {
+        categories: PropTypes.object,
+        isEditing : PropTypes.func
     };
-
-    useEffect(() => {
-        fetchCategorie(props.id).then(r => null);
-    }, [props.id]);
-
 
 
     return (
         <div className="card p-4 shadow">
-            <h3 className="card-title text-center">{categorie.nom}</h3>
+            <h3 className="card-title text-center">{props.categories.nom}</h3>
             <div className="card-body">
-                <p><strong>Description :</strong> {categorie.description}</p>
-                {categorie.qrCode && (
-                    <div>
-                        <p><strong>QR Code :</strong></p>
-                        <img
-                            src={`data:image/png;base64,${categorie.qrCode}`}
-                            alt="QR Code"
-                            style={{width: "150px", height: "150px", objectFit: "cover"}}
-                        />
-                    </div>
-                )}
+                <p><strong>Description :</strong> {props.categories.description}</p>
             </div>
             <div className="d-flex justify-content-center">
                 {props.isEditing && <button

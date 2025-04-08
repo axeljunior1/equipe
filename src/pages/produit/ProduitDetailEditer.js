@@ -2,13 +2,18 @@ import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import AlertComp from "../../components/AlertComp";
 import ErrorAlert from "../../exceptions/ErrorAlert";
-import apiCrudService from "../../services/ApiCrudService";
 import {Form} from "react-bootstrap";
-import {updateObject} from "../../utils/objectMapping";
+import useProduct from "../../hooks/useProduct";
+import useCategory from "../../hooks/useCategory";
+import {DEFAULT_PAGINATION_SIZE} from "../../utils/constants";
+import PropTypes from "prop-types";
 
 const ProduitDetailEditer = (props) => {
     const id = useParams().id ?? props.id; // id de l'url ou id dans props, ils'agit ici de l'id du produit
 
+    ProduitDetailEditer.propTypes = {
+        id: PropTypes.string,
+    };
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -26,67 +31,31 @@ const ProduitDetailEditer = (props) => {
     };
 
 
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [formData, setFormData] = useState(initialFormDetailProduit); // État pour stocker les modifications
     const [showAlertCreation, setShowAlertCreation] = useState(!!pShowAlertCreation);
-    const [categories, setCategories] = useState([]);
-    const [produit, setProduit] = useState({});
+    const {
+        produits: produit,
+        loading: loadingPro,
+        error: errorPro,
+        fetchById,
+        update,
+    } = useProduct();
+    const {
+        categories,
+        loading: loadingCat,
+        error: errorCat,
+        fetchCategories,
+    } = useCategory();
+
 
     // Fonction pour récupérer les données d'un produit
-    const fetchProduit = async () => {
-        setLoading(true);
-        try {
-            const data = await apiCrudService.getById('produits', id)
-            // console.log(data)
-            setProduit(data)
-            // Important pour ne retourner que les champs utiles pour la mise a jour
-            setFormData((prev) => {
-                let copie = {...prev};
-                updateObject(copie, data);
-                return copie;
-            });
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
+    const fetchProduit = async (ide = id) => {
+        fetchById(ide)
     };
 
 
-    // Fonction pour mettre à jour un produit (PATCH)
-    const updateProduit = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            //todo
 
-            // await ProduitService.updateProduit(id, formData);
 
-            // si tout est ok, on navigue
-            navigate(`/produits/${id}`);
-
-        } catch (error) {
-            setLoading(false);
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchCategories = async () => {
-        setLoading(true);
-        setError(null)
-        try {
-            let data = await apiCrudService.get("categories", 0, 50);
-            setCategories(data.content);  // Assuming 'content' is the array of products
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
-
-    };
 
     // Fonction pour gérer les modifications dans le formulaire
     const handleChange = (e) => {
@@ -96,9 +65,13 @@ const ProduitDetailEditer = (props) => {
 
 
     useEffect(() => {
-        fetchCategories().then(response => response);
+        fetchCategories(0, DEFAULT_PAGINATION_SIZE).then();
 
     }, [])
+
+    useEffect(() => {
+        setFormData(produit);
+    }, [produit])
 
 
     useEffect(() => {
@@ -107,7 +80,11 @@ const ProduitDetailEditer = (props) => {
     }, [id])
 
 
-    if (loading) {
+    if (loadingPro) {
+        return <h1>Chargement en cours...</h1>;
+    }
+
+    if (loadingCat) {
         return <h1>Chargement en cours...</h1>;
     }
 
@@ -117,13 +94,20 @@ const ProduitDetailEditer = (props) => {
     }
 
 
-    if (error) {
-        return <ErrorAlert error={error}/>
+    if (errorPro) {
+        return <ErrorAlert error={errorPro}/>
     }
 
-    const handleSubmitForm = (e) => {
+    if (errorCat) {
+        return <ErrorAlert error={errorCat}/>
+    }
+
+    const handleSubmitForm = async (e) => {
         e.preventDefault(); // Empêche le rechargement de la page
-        updateProduit().then(); // Appelle la fonction de mise à jour
+
+        await update(id, formData); // Appelle la fonction de mise à jour
+
+        navigate(`/produits/${id}`);
 
     }
 

@@ -1,5 +1,6 @@
 import React from 'react';
-import {Accordion, Button, Col, Container, Form, Row} from "react-bootstrap";
+import {Accordion, Button, Col, Form, Row} from "react-bootstrap";
+import PropTypes from "prop-types";
 
 const SearchCritereComp = ({
                                searchInput,
@@ -8,6 +9,15 @@ const SearchCritereComp = ({
                                handleSubmitFilter,
                                cols
                            }) => {
+
+    SearchCritereComp.propTypes = {
+        searchInput: PropTypes.string,
+        handleSearchInput: PropTypes.func,
+        handleSubmitSearch: PropTypes.func,
+        handleSubmitFilter: PropTypes.func,
+        cols: PropTypes.arrayOf(PropTypes.node),
+    };
+
     return (
         <div>
 
@@ -18,7 +28,7 @@ const SearchCritereComp = ({
                     <Col  xs={"auto"}>
                         <Button className="mb-md-0 mb-xs-2" type="submit">Recherche</Button>
                     </Col>
-                    <Col  md={""}>
+                    <Col>
                         <input
                             type="text"
                             value={searchInput}
@@ -42,12 +52,12 @@ const SearchCritereComp = ({
 
                             <div>
                                 <Row className="">
-                                    {cols.map((col, index) => (
-                                        <Col key={index} xs={12} sm={12} md={6} lg={4} xxl={3}>
+                                    {cols && cols.length > 0 ? (cols.map((col, index) => (
+                                        <Col key={index + "test"} xs={12} sm={12} md={6} lg={4} xxl={3}>
                                             {col}
 
                                         </Col>
-                                    ))
+                                    ))) : null
                                     }
 
                                 </Row>

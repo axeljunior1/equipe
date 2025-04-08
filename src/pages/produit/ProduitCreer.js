@@ -1,9 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
-import CategorieService from "../../services/CategorieService";
 import apiCrudService from "../../services/ApiCrudService";
-import BarcodeScanner from "../../components/BarcodeReader";
+import useCategory from "../../hooks/useCategory";
 
 const ProduitCreer = () => {
     const [formData, setFormData] = useState({
@@ -20,7 +19,7 @@ const ProduitCreer = () => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const [categories, setCategories] = useState([]);
+    const {categories, fetchCategories, loading: loadingCat, error: errorCat} = useCategory();
 
     // Gestion des modifications du formulaire
     const handleChange = (e) => {
@@ -31,31 +30,8 @@ const ProduitCreer = () => {
         });
     };
 
-    // Gestion des modifications du ean
-    const handleChangeEan13 = (value) => {
-
-            setFormData((pData) => {
-                return {
-                    ...pData,
-                    ean13: value
-                }
-            });
-
-    };
 
 
-    const fetchCategories = async () => {
-        setLoading(true);
-        try {
-            let data = await CategorieService.getCategories(0, 50);
-            setCategories(data.content);  // Assuming 'content' is the array of products
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
-
-    };
 
     // Fonction pour soumettre les données à l'API
     const handleSubmit = async (e) => {
@@ -130,14 +106,18 @@ const ProduitCreer = () => {
     }
 
     useEffect(() => {
-        fetchCategories().then(response => response);
+        fetchCategories();
     },[])
 
-    // if (error) return <ErrorAlert error={error} />;
+    if (loadingCat) {
+        return <div>Loading...</div>
+    }
+
     return (
         <div className="container mt-5">
             <h3>Créer un nouveau produit</h3>
             {error && <div className="alert alert-danger">{error.message}</div>}
+            {errorCat && <div className="alert alert-danger">{errorCat.message}</div>}
             <Button variant={"outline-warning"} onClick={initProduct} >Initialiser</Button>
             <Form className=" mt-3 mb-4" onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">

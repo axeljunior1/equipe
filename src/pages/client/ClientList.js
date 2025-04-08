@@ -1,8 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {usePanier} from "../../context/PanierContext";
-import apiCrudService from "../../services/ApiCrudService";
-import {Form, Button, Col} from "react-bootstrap"
-import {Link, useLocation, useNavigate} from "react-router-dom";
+import {Button, Form} from "react-bootstrap"
+import {Link, useLocation} from "react-router-dom";
 
 import ErrorAlert from "../../exceptions/ErrorAlert";
 import AlertComp from "../../components/AlertComp";
@@ -11,10 +9,15 @@ import SearchCritereComp from "../../components/SearchCritereComp";
 import DataTableComp from "../../components/DataTableComp";
 import PaginationComp from "../../components/PaginationComp";
 import {formatDate} from "../../utils/dateUtils";
+import useClient from "../../hooks/useClients";
+import PropTypes from "prop-types";
 
 
 const ClientList = (props) => {
-    const [clients, setClients] = useState([]);
+    ClientList.propTypes = {
+        onSelect: PropTypes.func,
+    };
+
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -22,47 +25,33 @@ const ClientList = (props) => {
     const [showAlertSupprClient, setShowAlertSupprClient] = useState(!!pShowAlertSupprClient);
 
 
-    const [searchBar, SetSearchBar] = useState('');
+    const [searchBar, setSearchBar] = useState('');
     const [filters, setFilters] = useState({
         actif: true,
         nom: "",
         description: ""
     });
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(0); // Page actuelle
     const [pageSize, setPageSize] = useState(15); // Taille de la page
-    const [totalPages, setTotalPages] = useState(0); // Nombre total de pages
-    const [nombreTotalDeLigne, setNombreTotalDeLigne] = useState(0); // Nombre total de pages
-    const navigate = useNavigate();
-    const {ajouterAuPanier} = usePanier();
+    const {
+        clients,
+        loading,
+        error,
+        fetchByMotCle,
+        fetchByParams,
+        totalPages,
+        totalElements
+    } = useClient();
 
 
     // Fonction pour récupérer les clients depuis l'API
-    const fetchClientByMotCle = async () => {
-        setLoading(true);
-        try {
-            // let data = await ClientService.getClientByMotCle(searchBar);
-            let data = await apiCrudService.get(`clients/recherche?motCle=${searchBar}`, currentPage, pageSize);
-            console.log(data)
-            setClients(data.content);  // Assuming 'content' is the array of products
-            setTotalPages(data.totalPages); // Assuming 'totalPages' is the total page count
-            setNombreTotalDeLigne(data.totalElements)
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
+    const fetchClientByMotCle = async (motcle = searchBar) => {
+        await fetchByMotCle(motcle, currentPage, pageSize);
     };
 
 
-    // useEffect(() => {
-    //     fetchClientByMotCle(searchBar).then(r => console.log(r));
-    // }, [searchBar]);
-
-
     useEffect(() => {
-        fetchClientByMotCle().then(r => null);
+        fetchClientByMotCle().then();
 
     }, [currentPage, pageSize]);
 
@@ -74,42 +63,19 @@ const ClientList = (props) => {
 
     const handleSubmitFilter = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setCurrentPage(0);  // Revenir en première page après un filtre
 
+        // Filtrer dynamiquement les paramètres non vides
+        let params = Object.fromEntries(
+            Object.entries(filters).filter(([_, value]) => value && value !== "")
+        );
 
-        try {
-            // Filtrer dynamiquement les paramètres non vides
-            let params = Object.fromEntries(
-                Object.entries(filters).filter(([_, value]) => value)
-            );
-            console.log(params)
-            const queryString = new URLSearchParams(params).toString();
-            // Appel API
-            const data = await apiCrudService.get(`clients/recherche-dynamique?${queryString}`);
-            setClients(data.content);  // Assuming 'content' is the array of products
-            setTotalPages(data.totalPages); // Assuming 'totalPages' is the total page count
-            setNombreTotalDeLigne(data.totalElements)
-
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
+        // Appel API
+         await fetchByParams(params);
     };
 
 
     const removeColumns = (baseColumns, excludedAccessors) => {
         return baseColumns.filter(col => !excludedAccessors.includes(col.accessor));
-    };
-
-    const addColumns = (newColumns, baseColumns, includedAccessors) => {
-        const columnsToAdd = baseColumns.filter(col => includedAccessors.includes(col.accessor));
-
-        // Ajouter uniquement les colonnes qui ne sont pas déjà dans newColumns
-        const updatedColumns = [...newColumns, ...columnsToAdd.filter(col => !newColumns.some(c => c.accessor === col.accessor))];
-
-        return updatedColumns;
     };
 
 
@@ -125,7 +91,8 @@ const ClientList = (props) => {
         {header: "Telephone", accessor: "telephone"},
         {header: "Email", accessor: "email"},
         {header: "Date de creation", accessor: "createdAt", render: (value, client) => (<> {formatDate(value)} </>)},
-        {header: "Sélectionner", accessor: "onSelect",
+        {
+            header: "Sélectionner", accessor: "onSelect",
             render: (value, client) => (
                 <Button
                     variant="primary"
@@ -156,17 +123,17 @@ const ClientList = (props) => {
         }
     ];
 
-    let columns = removeColumns(baseColumns, []);
+    let columns;
 
 
-    if(!props.onSelect  ){
+    if (!props.onSelect) {
         columns = removeColumns(baseColumns, ['onSelect']);
-    }else{
+    } else {
         columns = removeColumns(baseColumns, ['actif', 'creerVente']);
     }
 
     let cols = [
-        <Form.Select className="mb-3"
+        <Form.Select className="mb-3" key={filters.actif}
                      name="actif"
                      value={filters.actif}
                      onChange={handleInputChange}
@@ -176,7 +143,7 @@ const ClientList = (props) => {
             <option value={"false"}>Non</option>
 
         </Form.Select>,
-        <Form.Control
+        <Form.Control key={filters.nom}
             type="text"
             value={filters.nom}
             onChange={handleInputChange}
@@ -184,7 +151,7 @@ const ClientList = (props) => {
             name='nom'
             className="my-1"
         />,
-        <Form.Control
+        <Form.Control key={filters.prenom}
             type="text"
             value={filters.prenom}
             onChange={handleInputChange}
@@ -193,7 +160,7 @@ const ClientList = (props) => {
             className="my-1"
         />
         ,
-        <Form.Control
+        <Form.Control key={filters.description}
             type="text"
             value={filters.description}
             onChange={handleInputChange}
@@ -220,12 +187,12 @@ const ClientList = (props) => {
     };
 
     const handleSearchInput = (e) => {
-        SetSearchBar(e.target.value);
+        setSearchBar(e.target.value);
     }
 
 
     const entetes = [
-        {title: "Nombre de ligne", value: nombreTotalDeLigne},
+        {title: "Nombre de ligne", value: totalElements()},
     ];
 
 
@@ -274,7 +241,7 @@ const ClientList = (props) => {
                             totalPages={totalPages}
                             pageSize={pageSize}
                             handlePageSizeChange={handlePageSizeChange}
-                            nombreElt={nombreTotalDeLigne}
+                            nombreElt={totalElements}
 
             />
 

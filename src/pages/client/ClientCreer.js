@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
-import CategorieService from "../../services/CategorieService";
 import apiCrudService from "../../services/ApiCrudService";
 
 const ClientCreer = () => {
@@ -15,7 +14,6 @@ const ClientCreer = () => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const [categories, setCategories] = useState([]);
     // Gestion des modifications du formulaire
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -25,18 +23,7 @@ const ClientCreer = () => {
         });
     };
 
-    const fetchCategories = async () => {
-        setLoading(true);
-        try {
-            let data = await CategorieService.getCategories(0, 50);
-            setCategories(data.content);  // Assuming 'content' is the array of products
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
 
-    };
 
     // Fonction pour soumettre les données à l'API
     const handleSubmit = async (e) => {
@@ -57,11 +44,8 @@ const ClientCreer = () => {
 
     };
 
-    useEffect(() => {
-        fetchCategories().then(response => response);
-    },[])
 
-    // if (error) return <ErrorAlert error={error} />;
+
     return (
         <div className="container mt-5">
             <h3>Créer un nouveau client</h3>

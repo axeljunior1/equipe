@@ -11,7 +11,6 @@ class LigneAchatService {
             try {
                 let res = await axiosInstance.get(BASE_URL)
                 return res.data;
-                return res.data;
             }catch(error) {
                 console.error("Erreur lors de la récupération des ligneAchats :", error);
                 throw error;

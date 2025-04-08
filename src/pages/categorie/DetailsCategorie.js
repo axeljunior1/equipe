@@ -1,60 +1,39 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
-import CategorieService from "../../services/CategorieService";
-import categorieService from "../../services/CategorieService";
-import {usePanier} from "../../context/PanierContext";
-import * as PropTypes from "prop-types";
 import CategorieDetailComp from "../../components/CategoriesDetailComp";
-
+import useCategory from "../../hooks/useCategory";
 
 
 const CategorieDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
-    const {panier, ajouterAuPanier} = usePanier();
 
 
-    const [categorie, setCategorie] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [isEditing, setIsEditing] = useState(false); // État pour basculer en mode édition
     const [formData, setFormData] = useState({}); // État pour stocker les modifications
+    const {
+        categories : categorie, loading, error,  fetchById, update
+        } = useCategory()
 
     // Fonction pour récupérer les données d'un categorie
-    const fetchCategorie = useCallback(async () => {
-        setLoading(true);
-        try {
-            const data = await categorieService.getCategoriesById(id)
-            // console.log(data)
-            setCategorie(data);
-            setFormData(data);
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
-    }, [id]);
+    const fetchCategorie = async () => {
+           await fetchById(id)
+    };
 
     // Fonction pour mettre à jour un categorie (PATCH)
-    const updateCategorie = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            let data = await CategorieService.updateCategorie(id, formData)
-            setCategorie(data);
-            setFormData(data);
-            setIsEditing(false);
-            console.log(data)
-        } catch (error) {
-            setLoading(false);
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
+    const updateCategorie =  () => {
+
+            update(id, formData)
     };
+
+    useEffect(() => {
+
+        setFormData(categorie);
+        setIsEditing(false);
+    }, [categorie])
 
 
     useEffect(() => {
-        fetchCategorie()// Appel de la fonction asynchrone
+        fetchCategorie().then()// Appel de la fonction asynchrone
     }, []);
 
     if (loading) {
@@ -76,10 +55,7 @@ const CategorieDetail = () => {
         setFormData({...formData, [name]: value});
     };
 
-    const handleAjouterAuPanier = (categorie) => {
-        // console.log(categorie)
-        ajouterAuPanier({...categorie, quantite: 1});
-    };
+
 
     function handeIsEditing() {
         console.log('isEditing')
@@ -94,7 +70,7 @@ const CategorieDetail = () => {
 
             {!isEditing ? (
 
-                <CategorieDetailComp id ={id} isEditing={handeIsEditing}  />
+                <CategorieDetailComp categories ={categorie} isEditing={handeIsEditing}  />
                 
             ) : (
                 <div className="card p-4 shadow bg-light">

@@ -9,7 +9,6 @@ import {
     deleteProduit, getProduitsById
 } from "../services/ProductService";
 import {number} from "sockjs-client/lib/utils/random";
-import {DEFAULT_PAGINATION_SIZE} from "../utils/constants";
 
 export default function useProduct() {
     const [produits, setProduits] = useState([]);
@@ -47,7 +46,7 @@ export default function useProduct() {
     };
 
     // Recherche par mot clé avec pagination
-    const fetchByMotCle = async (motCle, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
+    const fetchByMotCle = async (motCle, page = 0, size = 10) => {
         setLoading(true);
         setError(null);
         try {
@@ -63,7 +62,7 @@ export default function useProduct() {
     };
 
     // Recherche dynamique de produits
-    const fetchByParams = async (params, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
+    const fetchByParams = async (params, page = 0, size = 10) => {
         setLoading(true);
         setError(null);
         try {
@@ -97,13 +96,8 @@ export default function useProduct() {
         setLoading(true);
         setError(null);
         try {
-            await updateProduit(id, produitData);
-
-            if (Array.isArray(produits)) {
-                await fetchByParams();
-            } else if (produits && produits.id === id) {
-                await fetchById(id)
-            }
+            const response = await updateProduit(id, produitData);
+            setProduits(produits.map(produit => (produit.id === id ? response.data : produit))); // Mise à jour du produit dans la liste
         } catch (err) {
             setError(err.response?.data?.message || "Erreur lors de la mise à jour du produit");
         } finally {

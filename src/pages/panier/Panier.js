@@ -16,7 +16,6 @@ const Panier = () => {
     const [showModalClient, setShowModalClient] = useState(false); // Contrôle d'affichage du modal
     const [showModalDetailProduit, setShowModalDetailProduit] = useState(false); // Contrôle d'affichage du modal
     const {
-        fetchCart,
         panier,
         retirerDuPanier,
         calculerTotal,
@@ -38,7 +37,7 @@ const Panier = () => {
     const navigate = useNavigate();
 
     let initFormClient = {
-        "id": undefined,
+        "id": '',
         "nom": '',
         "prenom": "",
         "email": '',
@@ -238,7 +237,7 @@ const Panier = () => {
 
                                                               type={"number"}
                                                               id={item.id}
-                                                              value={qtes[item.id]}
+                                                              value={qtes[item.id] ?? ''}
                                                               onChange={(e) => handleQteChange(item.id, e.target.value)}
                                                               onBlur={(e) => handleQteBlur(
                                                                   {
@@ -286,107 +285,106 @@ const Panier = () => {
 
             <span className='d-none d-md-block'>
                 <h3> Informations client </h3>
-                <Form onSubmit={handleSubmitFormAAddLine} className={""} validated={validated}>
-                    <Row className="">
-                        <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="position-relative d-inline mt-2">
-                            <Form.Label className={'fw-bold'}>Id du client</Form.Label>
+                    <Form onSubmit={handleSubmitFormAAddLine} className={""} validated={validated}>
+                        <Row className="">
+                            <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="position-relative d-inline mt-2">
+                                <Form.Label className={'fw-bold'}>Id du client</Form.Label>
 
-                            <Form.Control
-                                type="number"
-                                value={formClient.id}
-                                onChange={handleInputChange}
-                                name='id'
-                                className="my-1"
-                                required
-                                isInvalid={validated && !formClient.id}
-                            />
-                    <Form.Control.Feedback type="invalid">
-                        Ce champ est requis.
-                    </Form.Control.Feedback>
-                            <button
-                                className="btn position-absolute top-50 end-0 me-10 pe-10 py-0 "
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    setShowModalClient(true)
-                                }}
-                                onMouseEnter={() => setIsHovered(true)}
-                                onMouseLeave={() => setIsHovered(false)}
-                                title="Rechercher"
+                                <Form.Control
+                                    type="number"
+                                    value={formClient.id}
+                                    onChange={handleInputChange}
+                                    name='id'
+                                    className="my-1"
+                                    required
+                                    isInvalid={validated && !formClient.id}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    Ce champ est requis.
+                                </Form.Control.Feedback>
+                                <button
+                                    className="btn position-absolute top-50 end-0 me-10 pe-10 py-0 "
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        setShowModalClient(true)
+                                    }}
+                                    onMouseEnter={() => setIsHovered(true)}
+                                    onMouseLeave={() => setIsHovered(false)}
+                                    title="Rechercher"
 
-                            >
-                                <Search className={isHovered ? "text-success" : "text-info"} size={30}/>
-                            </button>
-                        </Col>
-                        <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
-                            <Form.Label className={'fw-bold'}>Nom</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={formClient.nom}
-                                onChange={handleInputChange}
-                                placeholder="Nom"
-                                name='nom'
-                                className="my-1"
-                                required readOnly
-                                isInvalid={validated && !formClient.nom}
-                            />
-                    <Form.Control.Feedback type="invalid">
-                        Ce champ est requis.
-                    </Form.Control.Feedback>
-                        </Col>
-                        <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
-                            <Form.Label className={'fw-bold'}>prenom</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={formClient.prenom}
-                                onChange={handleInputChange}
-                                placeholder="Prénom"
-                                name='prenom'
-                                className="my-1"
-                                required readOnly
-                                isInvalid={validated && !formClient.prenom}
-                            />
-                    <Form.Control.Feedback type="invalid">
-                        Ce champ est requis.
-                    </Form.Control.Feedback>
-                        </Col>
-                        <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
-                            <Form.Label className={'fw-bold'}>Email</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={formClient.email}
-                                onChange={handleInputChange}
-                                placeholder="Email"
-                                name='email' readOnly
-                                className="my-1"
-                            />
-                        </Col>
-                        <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
-                            <Form.Label className={'fw-bold'}>Telephone</Form.Label>
-                            <Form.Control
-                                type="tel"
-                                value={formClient.telephone}
-                                onChange={handleInputChange}
-                                placeholder="Telephone"
-                                name='telephone'
-                                className="my-1"
-                                required readOnly
-                                isInvalid={validated && !formClient.telephone}
-                            />
-                    <Form.Control.Feedback type="invalid">
-                        Ce champ est requis.
-                    </Form.Control.Feedback>
-                        </Col>
-                    </Row>
+                                >
+                                    <Search className={isHovered ? "text-success" : "text-info"} size={30}/>
+                                </button>
+                            </Col>
+                            <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
+                                <Form.Label className={'fw-bold'}>Nom</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={formClient.nom}
+                                    onChange={handleInputChange}
+                                    placeholder="Nom"
+                                    name='nom'
+                                    className="my-1"
+                                    required readOnly
+                                    isInvalid={validated && !formClient.nom}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    Ce champ est requis.
+                                </Form.Control.Feedback>
+                            </Col>
+                            <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
+                                <Form.Label className={'fw-bold'}>prenom</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={formClient.prenom}
+                                    onChange={handleInputChange}
+                                    placeholder="Prénom"
+                                    name='prenom'
+                                    className="my-1"
+                                    required readOnly
+                                    isInvalid={validated && !formClient.prenom}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    Ce champ est requis.
+                                </Form.Control.Feedback>
+                            </Col>
+                            <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
+                                <Form.Label className={'fw-bold'}>Email</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={formClient.email}
+                                    onChange={handleInputChange}
+                                    placeholder="Email"
+                                    name='email' readOnly
+                                    className="my-1"
+                                />
+                            </Col>
+                            <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
+                                <Form.Label className={'fw-bold'}>Telephone</Form.Label>
+                                <Form.Control
+                                    type="tel"
+                                    value={formClient.telephone}
+                                    onChange={handleInputChange}
+                                    placeholder="Telephone"
+                                    name='telephone'
+                                    className="my-1"
+                                    required readOnly
+                                    isInvalid={validated && !formClient.telephone}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    Ce champ est requis.
+                                </Form.Control.Feedback>
+                            </Col>
+                        </Row>
 
-                    <Row className={'justify-content-end mt-3 '}>
-                        <Col xs={"3"}>
-                            <Button variant={"success"} type="submit" className='w-100'>
-                                Valider la vente
-                            </Button>
-                        </Col>
-                    </Row>
-                </Form>
-
+                        <Row className={'justify-content-end mt-3 '}>
+                            <Col xs={"3"}>
+                                <Button variant={"success"} type="submit" className='w-100'>
+                                    Valider la vente
+                                </Button>
+                            </Col>
+                        </Row>
+                    </Form>
                 <br/>
                 <br/>
             </span>
