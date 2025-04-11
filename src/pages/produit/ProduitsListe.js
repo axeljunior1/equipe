@@ -16,9 +16,6 @@ import PropTypes from "prop-types";
 
 const ProduitListe = (props) => {
 
-    ProduitListe.propTypes = {
-        onSelect: PropTypes.func,
-    };
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -334,5 +331,10 @@ const ProduitListe = (props) => {
         </div>
     );
 };
+
+ProduitListe.propTypes = {
+    onSelect: PropTypes.func,
+};
+
 
 export default ProduitListe;

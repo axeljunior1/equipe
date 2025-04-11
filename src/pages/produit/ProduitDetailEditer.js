@@ -2,25 +2,20 @@ import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import AlertComp from "../../components/AlertComp";
 import ErrorAlert from "../../exceptions/ErrorAlert";
-import {Form} from "react-bootstrap";
 import useProduct from "../../hooks/useProduct";
 import useCategory from "../../hooks/useCategory";
 import {DEFAULT_PAGINATION_SIZE} from "../../utils/constants";
 import PropTypes from "prop-types";
+import ProductEditForm from "./ProductEditForm";
 
 const ProduitDetailEditer = (props) => {
-    const id = useParams().id ?? props.id; // id de l'url ou id dans props, ils'agit ici de l'id du produit
-
-    ProduitDetailEditer.propTypes = {
-        id: PropTypes.string,
-    };
-
+    const id = useParams().id ?? props.id;
     const navigate = useNavigate();
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const pShowAlertCreation = queryParams.get("showAlertCreation");
 
-    let initialFormDetailProduit = {
+    const initialFormDetailProduit = {
         nom: "",
         description: "",
         prixUnitaire: 0,
@@ -30,9 +25,9 @@ const ProduitDetailEditer = (props) => {
         prixAchat: 0
     };
 
-
-    const [formData, setFormData] = useState(initialFormDetailProduit); // État pour stocker les modifications
+    const [formData, setFormData] = useState(initialFormDetailProduit);
     const [showAlertCreation, setShowAlertCreation] = useState(!!pShowAlertCreation);
+
     const {
         produits: produit,
         loading: loadingPro,
@@ -40,6 +35,7 @@ const ProduitDetailEditer = (props) => {
         fetchById,
         update,
     } = useProduct();
+
     const {
         categories,
         loading: loadingCat,
@@ -47,78 +43,44 @@ const ProduitDetailEditer = (props) => {
         fetchCategories,
     } = useCategory();
 
+    useEffect(() => {
+        fetchCategories(0, DEFAULT_PAGINATION_SIZE);
+        fetchById(id);
+    }, [id]);
 
-    // Fonction pour récupérer les données d'un produit
-    const fetchProduit = async (ide = id) => {
-        fetchById(ide)
-    };
+    useEffect(() => {
+        if (produit) {
+            setFormData(produit);
+        }
+    }, [produit]);
 
-
-
-
-
-    // Fonction pour gérer les modifications dans le formulaire
     const handleChange = (e) => {
-        const {name, value} = e.target;
-        setFormData({...formData, [name]: value});
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
     };
-
-
-    useEffect(() => {
-        fetchCategories(0, DEFAULT_PAGINATION_SIZE).then();
-
-    }, [])
-
-    useEffect(() => {
-        setFormData(produit);
-    }, [produit])
-
-
-    useEffect(() => {
-        fetchProduit().then();
-
-    }, [id])
-
-
-    if (loadingPro) {
-        return <h1>Chargement en cours...</h1>;
-    }
-
-    if (loadingCat) {
-        return <h1>Chargement en cours...</h1>;
-    }
-
-
-    if (!produit) {
-        return <h1>Produit introuvable</h1>;
-    }
-
-
-    if (errorPro) {
-        return <ErrorAlert error={errorPro}/>
-    }
-
-    if (errorCat) {
-        return <ErrorAlert error={errorCat}/>
-    }
 
     const handleSubmitForm = async (e) => {
-        e.preventDefault(); // Empêche le rechargement de la page
-
-        await update(id, formData); // Appelle la fonction de mise à jour
-
+        e.preventDefault();
+        await update(id, formData);
         navigate(`/produits/${id}`);
+    };
 
-    }
+    const handleCancel = () => {
+        navigate(`/produits/${id}`);
+    };
+
+    if (loadingPro || loadingCat) return <h1>Chargement en cours...</h1>;
+    if (errorPro) return <ErrorAlert error={errorPro} />;
+    if (errorCat) return <ErrorAlert error={errorCat} />;
+    if (!produit) return <h1>Produit introuvable</h1>;
 
     return (
-
-        <div className="">
+        <div>
             {showAlertCreation && (
                 <AlertComp
-                    message="Opération réussie le produit a été crée !"
+                    message="Opération réussie le produit a été créé !"
                     type="success"
-                    timeout={9500} // L'alerte disparaît après 5 secondes
+                    timeout={9500}
                     onClose={() => setShowAlertCreation(false)}
                 />
             )}
@@ -127,115 +89,20 @@ const ProduitDetailEditer = (props) => {
 
             <div className="card p-4 shadow bg-light">
                 <h3 className="text-center mb-4">Modifier le produit</h3>
-                <form
+                <ProductEditForm
+                    formData={formData}
+                    categories={categories}
+                    onChange={handleChange}
                     onSubmit={handleSubmitForm}
-                >
-                    {/* Nom */}
-                    <div className="mb-3">
-                        <label htmlFor="nom" className="form-label">Nom :</label>
-                        <input
-                            type="text"
-                            id="nom"
-                            name="nom"
-                            className="form-control"
-                            value={formData.nom}
-                            onChange={handleChange}
-                            placeholder="Entrez le nom"
-                        />
-                    </div>
-
-                    {/* Prénom */}
-                    <div className="mb-3">
-                        <label htmlFor="description" className="form-label">Description :</label>
-                        <input
-                            type="text"
-                            id="description"
-                            name="description"
-                            className="form-control"
-                            value={formData.description}
-                            onChange={handleChange}
-                            placeholder="Entrez la description"
-                        />
-                    </div>
-                    {/* Prénom */}
-                    <div className="mb-3">
-                        <label htmlFor="categorie" className="form-label">Catègorie :</label>
-
-                        <Form.Select className="mb-3"
-                                     name="categorieId"
-                                     value={formData.categorieId}
-                                     onChange={handleChange}
-                                     placeholder="Entrez la catégorie">
-                            <option>Catégorie</option>
-                            <>
-                                {categories.map((item) => (
-                                    <option key={item.id} value={item.id}>{item.nom}</option>
-                                ))}</>
-                        </Form.Select>
-                    </div>
-
-                    {/* Date de Création */}
-                    <div className="mb-3">
-                        <label htmlFor="stockInitial" className="form-label">Stock Initial :</label>
-                        <input
-                            type="number"
-                            id="stockInitial"
-                            name="stockInitial"
-                            className="form-control"
-                            value={formData.stockInitial}
-                            onChange={handleChange}
-                            placeholder="Entrez le stock initial"
-                        />
-                    </div>
-
-                    {/* Date de Création */}
-                    <div className="mb-3">
-                        <label htmlFor="prixVente" className="form-label">Prix Unitaire :</label>
-                        <input
-                            type="number"
-                            id="prixVente"
-                            name="prixVente"
-                            className="form-control"
-                            value={formData.prixVente}
-                            onChange={handleChange}
-                            placeholder="Entrez le prix unitaire de vente"
-                        />
-                    </div>
-
-                    {/* Date de Création */}
-                    <div className="mb-3">
-                        <label htmlFor="prixVente" className="form-label">Prix Unitaire Achat :</label>
-                        <input
-                            type="number"
-                            id="prixAchat"
-                            name="prixAchat"
-                            className="form-control"
-                            value={formData.prixAchat}
-                            onChange={handleChange}
-                            placeholder="Entrez le prix unitaire d'achat"
-                        />
-                    </div>
-
-                    {/* Boutons */}
-                    <div className="d-flex justify-content-between">
-                        <button type="submit" className="btn btn-success">
-                            Enregistrer
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-secondary"
-                            onClick={() => navigate(`/produits/${id}`)}
-                        >
-                            Annuler
-                        </button>
-                    </div>
-                </form>
+                    onCancel={handleCancel}
+                />
             </div>
-
         </div>
-
-
     );
+};
+
+ProduitDetailEditer.propTypes = {
+    id: PropTypes.string,
 };
 
 export default ProduitDetailEditer;

@@ -33,6 +33,7 @@ const ClientList = (props) => {
     });
     const [currentPage, setCurrentPage] = useState(0); // Page actuelle
     const [pageSize, setPageSize] = useState(15); // Taille de la page
+
     const {
         clients,
         loading,
@@ -192,7 +193,7 @@ const ClientList = (props) => {
 
 
     const entetes = [
-        {title: "Nombre de ligne", value: totalElements()},
+        {title: "Nombre de ligne", value: totalElements},
     ];
 
 

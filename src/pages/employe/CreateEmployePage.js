@@ -2,10 +2,12 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import {useJwt} from "../../context/JwtContext";
-import EmployeService from "../../services/EmployeService";
+import useEmploye from "../../hooks/useEmploye";
 
 const CreateEmployePage = () => {
     const {loggedEmployee} = useJwt();
+    const {employes: employe, error, loading, create} = useEmploye()
+
 
     let formInitialState = {
         nom: "",
@@ -14,13 +16,11 @@ const CreateEmployePage = () => {
     };
     const [formData, setFormData] = useState(formInitialState);
 
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     // Gestion des modifications du formulaire
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData({
             ...formData,
             [name]: value
@@ -30,23 +30,18 @@ const CreateEmployePage = () => {
     // Fonction pour soumettre les données à l'API
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        try {
-            let data = await EmployeService.createEmploye(formData);
-            setFormData(formInitialState);
-            navigate(`/employes/${data.id}`);
-        }catch(error) {
-            setError(error);
-        }
+        await create(formData)
+        setFormData(formInitialState);
+        navigate(`/employes/${employe['id']}`);
 
     };
 
     useEffect(() => {
         console.log(loggedEmployee)
-    },[])
+    }, [])
     return (
         <div className="container mt-5">
-            <h3>  Créer un employé </h3>
+            <h3> Créer un employé </h3>
             {error && <div className="alert alert-danger">{error}</div>}
 
             <Form onSubmit={handleSubmit}>
@@ -84,7 +79,6 @@ const CreateEmployePage = () => {
                         placeholder="Entrez le mot de passe"
                     />
                 </Form.Group>
-
 
 
                 <Button variant="primary" type="submit" disabled={loading}>

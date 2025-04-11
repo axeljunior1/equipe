@@ -1,27 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect} from 'react';
 import Table from "react-bootstrap/Table";
-import {Link, useNavigate} from "react-router-dom";
-import EmployeService from "../../services/EmployeService";
-import axios from "axios";
-import ApiCrudService from "../../services/ApiCrudService";
+import {Link} from "react-router-dom";
 import {formatDate} from "../../utils/dateUtils";
 import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
 import ErrorAlert from "../../exceptions/ErrorAlert";
+import useEmploye from "../../hooks/useEmploye";
 
 function Achats() {
-    const [employes, setEmployes] = useState([]);
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
+    const {fetchAllEmployes, employes, error, loading} = useEmploye()
 
     const fetchEmployes = async () => {
-        try{
-            let data = await ApiCrudService.get("employes");
-            setEmployes(data.content);
-        }catch(e){
-            setError(e);
-
-        }finally{
-        }
+        await fetchAllEmployes()
     }
 
     useEffect(() => {
@@ -29,6 +18,10 @@ function Achats() {
     }, []);
 
 
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     if (error) {
         return <ErrorAlert error={error}/>;
@@ -60,11 +53,11 @@ function Achats() {
                         </td>
                         <td>{employe.prenom}</td>
                         <td className="fw-bold">
-                            {employe.roles.length > 3
-                                ? employe.roles.slice(0, 3).map(r => r.nom).join(', ') + '...'
-                                : employe.roles.map(r => r.nom).join(', ')}
+                            {employe["roles"].length > 3
+                                ? employe["roles"].slice(0, 3).map(r => r.nom).join(', ') + '...'
+                                : employe["roles"].map(r => r.nom).join(', ')}
                         </td>
-                        <td>{formatDate(employe.dateCreation)}
+                        <td>{formatDate(employe["dateCreation"])}
                         </td>
                     </tr>
                 ))}

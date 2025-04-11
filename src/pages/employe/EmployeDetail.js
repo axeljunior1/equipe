@@ -1,59 +1,33 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import SelectMultiple from "../../components/SelectMultiple";
-import apiCrudService from "../../services/ApiCrudService";
 import ErrorAlert from "../../exceptions/ErrorAlert";
+import useEmploye from "../../hooks/useEmploye";
+import useRole from "../../hooks/useRole";
+import {Spinner} from "react-bootstrap";
 
 const EmployeDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
-    const [employe, setEmploye] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [isEditing, setIsEditing] = useState(false); // État pour le mode édition
     const [formData, setFormData] = useState({}); // État pour stocker les données du formulaire
-    const [roles, setRoles] = useState([]);
+    const { employes: employe, error, loading, fetchById, update} = useEmploye()
+    const {fetchAllRoles,roles, error: errorRole, loading: loadingRole} = useRole()
+
 
     // Fonction pour récupérer les données de l'employé
     const fetchEmploye = async () => {
-        try {
-            const data = await apiCrudService.getById('employes', id)
-            setEmploye(data)
-            setFormData(data); // Pré-remplit le formulaire
-            fetchRoles().then()
-        } catch (err) {
-            setError(err)
-        } finally {
-            setLoading(false);
-        }
+        fetchById(id)
     };
 
     // Fonction pour mettre à jour les données de l'employé
     const updateEmploye = async () => {
-        const data = await apiCrudService.put("employes", id, formData)
-        try {
-            setEmploye(data)
-            setFormData(data);
-            setIsEditing(false);
-        } catch (err) {
-            setError('Une err eur est survenue lors de la mise à jour de l\'employé' + err)
-
-        } finally {
-            setLoading(false);
-        }
+        update(id, formData)
+        setIsEditing(false);
 
     };
-    // Fonction pour récupérer les données d'un role
+
     const fetchRoles = async () => {
-        setLoading(true);
-        try {
-            const data = await apiCrudService.get('roles')
-            // console.log(data)
-            setRoles(data.content);
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
+        fetchAllRoles()
     };
 
 
@@ -64,10 +38,11 @@ const EmployeDetail = () => {
     };
 
     const setSelectedOptions = (selectedItems) => {
-        let newFormData = {...formData,
+        let newFormData = {
+            ...formData,
             rolesNoms: selectedItems.map(item => item.nom),
             rolesIds: selectedItems.map(item => item.id)
-            };
+        };
         console.log(newFormData.rolesNoms);
 
         setFormData(newFormData);
@@ -79,27 +54,53 @@ const EmployeDetail = () => {
     }
 
 
+
     useEffect(() => {
-        fetchRoles().then()
-    }, []);
+        if (employe){
+            setFormData(employe)
+        }
+
+    }, [employe]);
 
     useEffect(() => {
         fetchEmploye().then(); // Récupère les données à l'initialisation
+        fetchRoles().then()
     }, [])
+
+
     // Gestion des états
     if (loading) {
         return (
             <div className="text-center">
                 <h1>Chargement en cours...</h1>
-                <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Chargement...</span>
-                </div>
+                <Spinner animation="border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </Spinner>
+            </div>
+        );
+    }
+    // Gestion des états
+    if (loadingRole) {
+        return (
+            <div className="text-center">
+                <h1>Chargement en cours...</h1>
+                <Spinner animation="border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </Spinner>
             </div>
         );
     }
 
     if (!employe) {
         return <h1 className="text-warning">Employé introuvable</h1>;
+    }
+
+    if (error) {
+        return <ErrorAlert error={error}/>;
+    }
+
+    if (errorRole) {
+        return <ErrorAlert error={errorRole}/>;
     }
 
     return (
@@ -132,7 +133,7 @@ const EmployeDetail = () => {
                 </>
             ) : (
                 <div className="card p-4 shadow bg-light">
-                    <h3 className="text-center mb-4">Modifier l'Employé</h3>
+                    <h3 className="text-center mb-4">Modifier l'Employé :<span className="text-success"> {employe.nom} </span></h3>
                     <form
                         onSubmit={OnSubmitPutEmploye}
                     >

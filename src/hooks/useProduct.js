@@ -1,7 +1,7 @@
 // hooks/useProduct.js
 import {useState} from "react";
 import {
-    getProduitsByCodeBarre,
+    getProduitByCodeBarre,
     getProduitByMotCle,
     getProduitDyn,
     createProduit,
@@ -24,7 +24,7 @@ export default function useProduct() {
         setError(null);
         console.log("Enter fetchByCodeBarre", code);
         try {
-            const response = await getProduitsByCodeBarre(code);
+            const response = await getProduitByCodeBarre(code);
             setProduits(response.data);
         } catch (err) {
             setError(err.response?.data?.message || "Erreur lors de la récupération des produits");
@@ -101,7 +101,7 @@ export default function useProduct() {
 
             if (Array.isArray(produits)) {
                 await fetchByParams();
-            } else if (produits && produits.id === id) {
+            } else if (produits && produits.id === Number(id)) {
                 await fetchById(id)
             }
         } catch (err) {

@@ -105,7 +105,7 @@ export default function useClient() {
 
             if (Array.isArray(clients)) {
                 await fetchByParams();
-            } else if (clients && clients.id === id) {
+            } else if (clients && clients.id === Number(id)) {
                 await fetchById(id)
             }
         } catch (err) {

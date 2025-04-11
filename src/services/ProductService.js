@@ -5,7 +5,7 @@ import {DEFAULT_PAGINATION_SIZE} from "../utils/constants";
 const BASE_URL = '/produits';
 
 
-export const getProduitsByCodeBarre = async (code) => {
+export const getProduitByCodeBarre = async (code) => {
     return await axiosInstance.get(`${BASE_URL}/code-barre/${code}`);
 }
 

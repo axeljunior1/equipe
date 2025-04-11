@@ -380,7 +380,7 @@ const Panier = () => {
                         <Row className={'justify-content-end mt-3 '}>
                             <Col xs={"3"}>
                                 <Button variant={"success"} type="submit" className='w-100'>
-                                    Valider la vente
+                                    Valider le panier
                                 </Button>
                             </Col>
                         </Row>
