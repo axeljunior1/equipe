@@ -173,6 +173,11 @@ const Panier = () => {
     }
 
 
+    if (!panier) {
+        return <div>Panier Vide</div>
+    }
+
+
     return (
         <div>
             <h2>Panier</h2>
@@ -196,7 +201,7 @@ const Panier = () => {
                 />
             )}
 
-            {panier.length === 0 ? (
+            {panier && panier.length === 0 ? (
                 <p>Votre panier est vide.</p>
 
             ) : (

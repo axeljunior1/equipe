@@ -1,14 +1,6 @@
 // hooks/useProduct.js
 import {useState} from "react";
-import {
-    getRoleByMotCle,
-    getRoleDyn,
-    createRole,
-    updateRole,
-    deleteRole,
-    getRoleById,
-    getRoles
-} from "../services/RoleService";
+import {createRole, deleteRole, getRoleById, getRoles, updateRole} from "../services/RoleService";
 import {number} from "sockjs-client/lib/utils/random";
 import {DEFAULT_PAGINATION_SIZE} from "../utils/constants";
 
@@ -29,38 +21,6 @@ export default function useRole() {
             setRoles(response.data);
         } catch (err) {
             setError(err.response?.data?.message || "Erreur lors de la récupération de role");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Recherche par mot clé avec pagination
-    const fetchByMotCle = async (motCle, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await getRoleByMotCle(motCle, page, size);
-            setRoles(response.data.content);
-            setTotalPages(response.data.totalPages);
-            setTotalElements(response.data.totalElements);
-        } catch (err) {
-            setError(err.response?.data?.message || "Erreur lors de la recherche des roles");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Recherche dynamique des roles
-    const fetchByParams = async (params, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await getRoleDyn(params, page, size);
-            setRoles(response.data.content);
-            setTotalPages(response.data.totalPages);
-            setTotalElements(response.data.totalElements);
-        } catch (err) {
-            setError(err.response?.data?.message || "Erreur lors de la recherche dynamique des roles");
         } finally {
             setLoading(false);
         }
@@ -129,7 +89,7 @@ export default function useRole() {
     };
 
     return {
-        roles, loading, error, fetchAllRoles, fetchById, fetchByMotCle, fetchByParams, create, update, remove, totalElements,
+        roles, loading, error, fetchAllRoles, fetchById, create, update, remove, totalElements,
         totalPages
     };
 }

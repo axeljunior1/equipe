@@ -9,19 +9,19 @@ export const getCategories = async (page = 0, size = DEFAULT_PAGINATION_SIZE ) =
     return await axiosInstance.get(BASE_URL, {params: {page: page, size: size}});
 }
 
-export const getCategorieById = async (id) => {
+export const getCategoryById = async (id) => {
     return await axiosInstance.get(`${BASE_URL}/${id}`);
 }
 
-export const getCategorieByMotCle = async (motCle, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
+export const getCategoryByMotCle = async (motCle, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
 
     return await axiosInstance.get(`${BASE_URL}/recherche?motCle=${motCle}`, {params: {page: page, size: size}});
 
 }
 
 
-export const getCategorieDyn = async (params, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
-    // Générer proprement la query string
+export const getCategoryDyn = async (params, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
+
     const queryString = new URLSearchParams(params).toString();
 
     return await axiosInstance.get(`${BASE_URL}/recherche-dynamique?${queryString}`, {
@@ -38,7 +38,7 @@ export const getCategorieDyn = async (params, page = 0, size = DEFAULT_PAGINATIO
  * @param {Object} categorie - Les données du categorie à créer.
  * @returns {Promise} Une promesse contenant les données du categorie créé.
  */
-export const createCategorie = async (categorie) => {
+export const createCategory = async (categorie) => {
     return await axiosInstance.post(`${BASE_URL}`, categorie);
 }
 
@@ -48,7 +48,7 @@ export const createCategorie = async (categorie) => {
  * @param {Object} categorie - Les données à mettre à jour.
  * @returns {Promise} Une promesse contenant les données mises à jour.
  */
-export const updateCategorie = async (id, categorie) => {
+export const updateCategory = async (id, categorie) => {
     // Appel de la requête PATCH
     return await axiosInstance.patch(`${BASE_URL}/${id}`, categorie);
 }
@@ -59,7 +59,7 @@ export const updateCategorie = async (id, categorie) => {
  * @param {number} id - L'ID du categorie à supprimer.
  * @returns {Promise} Une promesse confirmant la suppression.
  */
-export const deleteCategorie = async (id) => {
+export const deleteCategory = async (id) => {
     return await axiosInstance.delete(`${BASE_URL}/${id}`);
 }
 

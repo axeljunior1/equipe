@@ -1,25 +1,17 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {Button} from "react-bootstrap";
 import {useNavigate} from "react-router-dom";
-import apiCrudService from "../services/ApiCrudService";
-import SelectMultiple from "./SelectMultiple";
+import useRole from "../hooks/useRole";
+import PropTypes from "prop-types";
 
 const RoleDetailComp = (props) => {
-    const [role, setRole] = useState({});
-    const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const {roles: role, error, loading, fetchById, remove} = useRole()
 
 
     // Fonction pour récupérer les données d'un role
     const fetchRole = async (id) => {
-        try {
-            const data = await apiCrudService.getById("role", id)
-            console.log(data)
-            setRole(data);
-
-        } catch (error) {
-            setError(error);
-        }
+        fetchById(id)
     };
 
     useEffect(() => {
@@ -28,12 +20,25 @@ const RoleDetailComp = (props) => {
 
 
     const handleDeleteRole = async (id) => {
-        try {
-            await apiCrudService.delete("roles", id);
-            navigate("/roles?showAlertSupprRole=true");
-        } catch (err) {
-            setError(err);
-        }
+        remove("roles", id);
+        navigate("/roles?showAlertSupprRole=true");
+    }
+
+
+    // Gestion des états
+    if (loading ) {
+        return (
+            <div className="text-center">
+                <h1>Chargement en cours...</h1>
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Chargement...</span>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return <h1 className="text-danger">{error}</h1>;
     }
 
 
@@ -43,14 +48,14 @@ const RoleDetailComp = (props) => {
             <div className="card-body">
                 <p><strong>Nom :</strong> {role.nom} </p>
                 <p><strong>Description :</strong> {role.description}</p>
-                <p><strong>Autorisations :</strong> {(role.authorityNoms)?.join(', ')}</p>
+                <p><strong>Autorisations :</strong> {(role['authorityNoms'])?.join(', ')}</p>
             </div>
             <div className="d-flex justify-content-center">
                 {/*Il n'est plus necessaire car c'est testé dans le parent*/}
 
                 <button
                     className="btn btn-outline-primary me-2 fw-bold"
-                    onClick={() => props.isEditing()}
+                    onClick={props.setIsEditing}
                 >
                     Modifier
                 </button>
@@ -60,5 +65,10 @@ const RoleDetailComp = (props) => {
         </div>
     );
 };
+
+RoleDetailComp.propTypes = {
+    id: PropTypes.number.isRequired,
+    setIsEditing: PropTypes.func.isRequired,
+}
 
 export default RoleDetailComp;

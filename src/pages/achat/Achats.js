@@ -1,6 +1,4 @@
-import React, {useEffect, useState} from 'react';
-import AchatService from "../../services/AchatService";
-import achatService from "../../services/AchatService";
+import React, {useEffect} from 'react';
 import Table from "react-bootstrap/Table";
 import {Link, useNavigate} from "react-router-dom";
 import {Button} from "react-bootstrap";
@@ -8,63 +6,29 @@ import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
 import {useJwt} from "../../context/JwtContext";
 import {formatDate} from "../../utils/dateUtils";
 import ErrorAlert from "../../exceptions/ErrorAlert";
-import apiCrudService from "../../services/ApiCrudService";
+import useAchat from "../../hooks/useAchat";
 
 function Achats() {
-    const [achats, setAchats] = useState([]);
-    const [error, setError] = useState(null);
-    const [createError, setCreateError] = useState("");
-    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const {loggedEmployee} = useJwt();
+    const {achats, error, loading, fetchAllAchats, create, remove} = useAchat()
 
     async function fetchAchats() {
-        setLoading(true);
-        setError(null);
-
-        try {
-            let data = await AchatService.getAchats()
-            setAchats(data.content)
-        } catch (e) {
-            setError(e.response.data);
-        }finally {
-            setLoading(false);
-        }
+        await fetchAllAchats()
     }
 
     useEffect( () => {
-         fetchAchats().then(r => {});
+         fetchAchats();
     }, []);
 
 
-    const creeTA = async ()=>{
-        setLoading(true)
-        try {
-            setError(null)
-            let ta = await apiCrudService.post('tarif-achats', {produitId: '1', prixAchat: 223});
-            console.log(ta)
-
-        }catch(err){
-            console.log(err);
-
-        }finally{
-            setLoading(false)
-        }
-
-    }
 
     const handleDeleteAchat =async (id) => {
-        setLoading(true);
-        setError(null);
-        try{
-            await AchatService.deleteAchat(id);
-            fetchAchats().then(r => {});
-        }catch(err){
-            setError(err);
-        }finally {
-            setLoading(false);
-        }
+        remove(id)
     };
+    if (loading){
+        return <div>Loading.....</div>;
+    }
 
     if (error) {
         return <ErrorAlert error={error} />;
@@ -72,24 +36,17 @@ function Achats() {
 
     const handleCreateAchat = async (e) =>{
         e.preventDefault();
-        setLoading(true);
-        setError(null);
-        try{
 
-            // let resIdEmploye = await employeService.getEmployesByUsername(username);
+        if (typeof loggedEmployee === 'string') {
+            const parsed = JSON.parse(loggedEmployee);
             let achat = {
-                montantTotal : 0,
-                employeId: JSON.parse(loggedEmployee).id
+                montantTotal: 0,
+                employeId: parsed.id,
             };
-            let restCreateAchat = await achatService.createAchat(achat)
-            navigate(`/achats/${restCreateAchat.id}?showAlert=true`);
-
-        }catch(err){
-            if (err.response?.data?.message)
-                setCreateError(err.response.data.message);
-        }finally {
-            setLoading(false);
+            await create(achat);
+            navigate(`/achats/${achat.id}?showAlert=true`);
         }
+
 
     }
 
@@ -97,10 +54,7 @@ function Achats() {
         <div>
             <h1><strong>Achats</strong></h1>
 
-            {createError &&
 
-                <p className={"mt-3 text-danger"}> Erreur :  {createError} </p>
-            }
 
 
             <HeaderBtnElementComp titreFil='' variant='outline-primary' onClick={handleCreateAchat}
@@ -125,9 +79,9 @@ function Achats() {
                             <Link to={`/achats/${achat.id}`} className='text-decoration-none'> Achat - {achat.id}</Link>
                         </td>
                         <td>{achat.montantTotal}</td>
-                        <td>{formatDate(achat.dateCreation)}</td>
+                        <td>{formatDate(achat['dateCreation'])}</td>
                         <td>
-                            <Link to={`/employes/${achat.employeId}`} className='text-decoration-none'>{achat.employe.id} - {achat.employe.nom}</Link>
+                            <Link to={`/employes/${achat.employeId}`} className='text-decoration-none'>{achat['employe'].id} - {achat['employe'].nom}</Link>
                         </td>
                         <td>
                             <Button variant={"outline-danger"} className={"w-100"} onClick={()=>handleDeleteAchat(achat.id)}> Supprimer la ligne </Button>

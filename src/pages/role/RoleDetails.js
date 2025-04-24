@@ -1,19 +1,16 @@
 import React, {useEffect, useState} from "react";
-import {useLocation, useParams} from "react-router-dom";
-import apiCrudService from "../../services/ApiCrudService";
+import {useParams} from "react-router-dom";
 import RoleDetailComp from "../../components/RoleDetailComp";
 import ErrorAlert from "../../exceptions/ErrorAlert";
 import SelectMultiple from "../../components/SelectMultiple";
+import PropTypes from "prop-types";
+import useRole from "../../hooks/useRole";
+import useAuthority from "../../hooks/useAuthority";
 
 const RoleDetail = (props) => {
     const {id:rlt} = useParams(); // Récupère l'ID depuis l'URL*
     const id = rlt??props.id // id de l'url ou id dans props, ils'agit ici de l'id du role
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const pShowAlertCreation = queryParams.get("showAlertCreation");
-    const [authorities, setAuthorities] = useState([]);
 
-    const [role, setRole] = useState(null);
 
 
     let initialFormDetailRole = {
@@ -21,70 +18,46 @@ const RoleDetail = (props) => {
         description : "",
         authoritiesNoms : [],
     };
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [isEditing, setIsEditing] = useState(false); // État pour basculer en mode édition
     const [formData, setFormData] = useState(initialFormDetailRole); // État pour stocker les modifications
-    const [showAlertCreation, setShowAlertCreation] = useState(!!pShowAlertCreation);
+    const {roles: role, error, loading, fetchById, update} = useRole()
+    const {authorities, error: errorA, loading: loadingA, fetchAllAuthorities} = useAuthority()
 
     // Fonction pour récupérer les données d'un role
+
     const fetchRole = async () => {
-        setLoading(true);
-        try {
-            const data = await apiCrudService.getById('role', id)
-            // console.log(data)
-            setRole(data);
-            let preFormData = formData;
-            preFormData.nom = data.nom;
-            preFormData.description = data.description;
-            preFormData.authoritiesNoms = data.authorityNoms ;
-            setFormData(preFormData);
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
+            fetchById(id)
     };
+
+    useEffect(() => {
+       if (role && role.length > 0) {
+           let preFormData = formData;
+           preFormData.nom = role.nom;
+           preFormData.description = role.description;
+           preFormData.authoritiesNoms = role.authorityNoms ;
+           setFormData(preFormData);
+       }
+    }, [role]);
 
     // Fonction pour récupérer les données d'un role
     const fetchAuthorities = async () => {
-        setLoading(true);
-        try {
-            const data = await apiCrudService.get('autorisations')
-            // console.log(data)
-            setAuthorities(data.content);
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
+        fetchAllAuthorities();
     };
 
     // Fonction pour mettre à jour un role (PATCH)
     const updateRole = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            let data = await apiCrudService.put("roles",id, formData)
-            setRole(data);
-            setFormData(data);
-            setIsEditing(false);
-        } catch (error) {
-            setLoading(false);
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
+        update(id, formData);
+        setIsEditing(false)
     };
 
 
     useEffect(() => {
-        fetchRole().then(r => r)// Appel de la fonction asynchrone
-        fetchAuthorities().then(r => r)// Appel de la fonction asynchrone
+        fetchRole().then()// Appel de la fonction asynchrone
+        fetchAuthorities().then()// Appel de la fonction asynchrone
 
     }, []);
 
-    if (loading) {
+    if (loading || loadingA) {
         return <h1>Chargement en cours...</h1>;
     }
 
@@ -111,6 +84,10 @@ const RoleDetail = (props) => {
         return <ErrorAlert error={error} />
     }
 
+    if(errorA){
+        return <ErrorAlert error={errorA} />
+    }
+
     const setSelectedOptions = (selectedItems) => {
         setFormData({...formData, authoritiesNoms : selectedItems});
     }
@@ -127,7 +104,7 @@ const RoleDetail = (props) => {
 
             {!isEditing ? (
 
-                <RoleDetailComp id ={id} isEditing={handeIsEditing} />
+                <RoleDetailComp id ={id} setIsEditing={handeIsEditing} />
             ) : (
                 <div className="card p-4 shadow bg-light">
                     <h3 className="text-center mb-4">Modifier le role</h3>
@@ -198,5 +175,9 @@ const RoleDetail = (props) => {
 
     );
 };
+
+RoleDetail.propTypes = {
+    id: PropTypes.number.isRequired
+}
 
 export default RoleDetail;

@@ -20,7 +20,7 @@ const CategorieDetail = () => {
     };
 
     // Fonction pour mettre à jour un categorie (PATCH)
-    const updateCategorie =  () => {
+    const updateCategory =  () => {
 
             update(id, formData)
     };
@@ -78,7 +78,7 @@ const CategorieDetail = () => {
                     <form
                         onSubmit={(e) => {
                             e.preventDefault(); // Empêche le rechargement de la page
-                            updateCategorie(); // Appelle la fonction de mise à jour
+                            updateCategory(); // Appelle la fonction de mise à jour
                         }}
                     >
                         {/* Nom */}

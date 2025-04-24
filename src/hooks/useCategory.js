@@ -2,12 +2,12 @@
 
 import {useState} from "react";
 import {
-    getCategorieByMotCle,
-    getCategorieDyn,
-    createCategorie,
-    updateCategorie,
-    deleteCategorie,
-    getCategorieById,
+    getCategoryByMotCle,
+    getCategoryDyn,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+    getCategoryById,
     getCategories
 } from "../services/CategoryService";
 import {DEFAULT_PAGINATION_SIZE} from "../utils/constants";
@@ -26,7 +26,7 @@ export default function useCategory() {
         setLoading(true);
         setError(null);
         try {
-            const response = await getCategorieById(id);
+            const response = await getCategoryById(id);
             setCategories(response.data);
         } catch (err) {
             setError(err.response?.data?.message || "Erreur lors de la récupération de categorie");
@@ -40,7 +40,7 @@ export default function useCategory() {
         setLoading(true);
         setError(null);
         try {
-            const response = await getCategorieByMotCle(motCle, page, size);
+            const response = await getCategoryByMotCle(motCle, page, size);
             setCategories(response.data.content);
             setTotalPages(response.data.totalPages);
             setTotalElements(response.data.totalElements);
@@ -72,7 +72,7 @@ export default function useCategory() {
         setLoading(true);
         setError(null);
         try {
-            const response = await getCategorieDyn(params, page, size);
+            const response = await getCategoryDyn(params, page, size);
             setCategories(response.data.content);
             setTotalPages(response.data.totalPages);
             setTotalElements(response.data.totalElements);
@@ -88,7 +88,7 @@ export default function useCategory() {
         setLoading(true);
         setError(null);
         try {
-            const response = await createCategorie(categorieData);
+            const response = await createCategory(categorieData);
             setCategories([...categories, response.data]); // Ajoute le categorie créé à la liste
         } catch (err) {
             setError(err.response?.data?.message || "Erreur lors de la création du categorie");
@@ -102,7 +102,7 @@ export default function useCategory() {
         setLoading(true);
         setError(null);
         try {
-              await updateCategorie(id, categorieData);
+              await updateCategory(id, categorieData);
 
             if (Array.isArray(categories)) {
                 await fetchCategories()
@@ -122,7 +122,7 @@ export default function useCategory() {
         setLoading(true);
         setError(null);
         try {
-            await deleteCategorie(id);
+            await deleteCategory(id);
             setCategories(categories.filter(categorie => categorie.id !== id)); // Retirer le categorie supprimé de la liste
         } catch (err) {
             setError(err.response?.data?.message || "Erreur lors de la suppression du categorie");

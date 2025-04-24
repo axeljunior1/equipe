@@ -1,3 +1,4 @@
+// noinspection DuplicatedCode
 import axiosInstance from "../context/axiosInstance";
 import {DEFAULT_PAGINATION_SIZE} from "../utils/constants";
 
@@ -21,7 +22,7 @@ export const getClientByMotCle = async (motCle, page = 0, size = DEFAULT_PAGINAT
 
 
 export const getClientDyn = async (params, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
-    // Générer proprement la query string
+
     const queryString = new URLSearchParams(params).toString();
 
     return await axiosInstance.get(`${BASE_URL}/recherche-dynamique?${queryString}`, {

@@ -1,126 +1,151 @@
 // hooks/useProduct.js
 import {useState} from "react";
 import {
-    getProduitByCodeBarre,
-    getProduitByMotCle,
-    getProduitDyn,
-    createProduit,
-    updateProduit,
-    deleteProduit, getProduitsById
-} from "../services/ProductService";
+    getVenteByMotCle,
+    getVenteDyn,
+    createVente,
+    updateVente,
+    deleteVente,
+    getVenteById,
+    getVentes, getVenteLines
+} from "../services/VenteService";
 import {number} from "sockjs-client/lib/utils/random";
+import {DEFAULT_PAGINATION_SIZE} from "../utils/constants";
 
-export default function useProduct() {
-    const [produits, setProduits] = useState([]);
+export default function useVente() {
+    const [ventes, setVentes] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [totalElements, setTotalElements] = useState(number);
     const [totalPages, setTotalPages] = useState(number);
 
-    // Récupérer tous les produits par code-barre
-    const fetchByCodeBarre = async (code) => {
-        setLoading(true);
-        setError(null);
-        console.log("Enter fetchByCodeBarre", code);
-        try {
-            const response = await getProduitByCodeBarre(code);
-            setProduits(response.data);
-        } catch (err) {
-            setError(err.response?.data?.message || "Erreur lors de la récupération des produits");
-        } finally {
-            setLoading(false);
-        }
-    };
-    // Récupérer tous les produits par id
+
+    // Récupérer tous les ventes par id
     const fetchById = async (id) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await getProduitsById(id);
-            setProduits(response.data);
+            const response = await getVenteById(id);
+            setVentes(response.data);
         } catch (err) {
-            setError(err.response?.data?.message || "Erreur lors de la récupération de produit");
+            setError(err.response?.data?.message || "Erreur lors de la récupération de vente");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Récupérer tous les ventes par id
+    const fetchVenteLines = async (id) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await getVenteLines(id);
+            setVentes(response.data.content);
+            setTotalPages(response.data.totalPages);
+            setTotalElements(response.data.totalElements);
+        } catch (err) {
+            setError(err.response?.data?.message || "Erreur lors de la récupération des lignes de l'vente");
         } finally {
             setLoading(false);
         }
     };
 
     // Recherche par mot clé avec pagination
-    const fetchByMotCle = async (motCle, page = 0, size = 10) => {
+    const fetchByMotCle = async (motCle, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await getProduitByMotCle(motCle, page, size);
-            setProduits(response.data.content);
+            const response = await getVenteByMotCle(motCle, page, size);
+            setVentes(response.data.content);
             setTotalPages(response.data.totalPages);
             setTotalElements(response.data.totalElements);
         } catch (err) {
-            setError(err.response?.data?.message || "Erreur lors de la recherche des produits");
+            setError(err.response?.data?.message || "Erreur lors de la recherche des ventes");
         } finally {
             setLoading(false);
         }
     };
 
-    // Recherche dynamique de produits
-    const fetchByParams = async (params, page = 0, size = 10) => {
+    // Recherche dynamique des ventes
+    const fetchByParams = async (params, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await getProduitDyn(params, page, size);
-            setProduits(response.data.content);
+            const response = await getVenteDyn(params, page, size);
+            setVentes(response.data.content);
             setTotalPages(response.data.totalPages);
             setTotalElements(response.data.totalElements);
         } catch (err) {
-            setError(err.response?.data?.message || "Erreur lors de la recherche dynamique des produits");
+            setError(err.response?.data?.message || "Erreur lors de la recherche dynamique des ventes");
         } finally {
             setLoading(false);
         }
     };
 
-    // Créer un produit
-    const create = async (produitData) => {
+    const fetchAllVentes = async ( page = 0, size = DEFAULT_PAGINATION_SIZE) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await createProduit(produitData);
-            setProduits([...produits, response.data]); // Ajoute le produit créé à la liste
+            const response = await getVentes( page, size);
+            setVentes(response.data.content);
+            setTotalPages(response.data.totalPages);
+            setTotalElements(response.data.totalElements);
         } catch (err) {
-            setError(err.response?.data?.message || "Erreur lors de la création du produit");
+            setError(err.response?.data?.message || "Erreur lors de la recherche dynamique des ventes");
         } finally {
             setLoading(false);
         }
     };
 
-    // Mettre à jour un produit
-    const update = async (id, produitData) => {
+    // Créer un vente
+    const create = async (venteData) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await updateProduit(id, produitData);
-            setProduits(produits.map(produit => (produit.id === id ? response.data : produit))); // Mise à jour du produit dans la liste
+            const response = await createVente(venteData);
+            setVentes([...ventes, response.data]); // Ajoute l'employé créé à la liste
         } catch (err) {
-            setError(err.response?.data?.message || "Erreur lors de la mise à jour du produit");
+            setError(err.response?.data?.message || "Erreur lors de la création du vente");
         } finally {
             setLoading(false);
         }
     };
 
-    // Supprimer un produit
+    // Mettre à jour un vente
+    const update = async (id, venteData) => {
+        setLoading(true);
+        setError(null);
+        try {
+            await updateVente(id, venteData);
+
+            if (Array.isArray(ventes)) {
+                await fetchAllVentes();
+            } else if (ventes && ventes.id === Number(id)) {
+                await fetchById(id)
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || "Erreur lors de la mise à jour du vente");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Supprimer un vente
     const remove = async (id) => {
         setLoading(true);
         setError(null);
         try {
-            await deleteProduit(id);
-            setProduits(produits.filter(produit => produit.id !== id)); // Retirer le produit supprimé de la liste
+            await deleteVente(id);
+            await fetchAllVentes()
         } catch (err) {
-            setError(err.response?.data?.message || "Erreur lors de la suppression du produit");
+            setError(err.response?.data?.message || "Erreur lors de la suppression du vente");
         } finally {
             setLoading(false);
         }
     };
 
     return {
-        produits, loading, error, fetchByCodeBarre, fetchById, fetchByMotCle, fetchByParams, create, update, remove, totalElements,
+        ventes, loading, error, fetchAllVentes,fetchVenteLines, fetchById, fetchByMotCle, fetchByParams, create, update, remove, totalElements,
         totalPages
     };
 }

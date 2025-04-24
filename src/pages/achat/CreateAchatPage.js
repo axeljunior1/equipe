@@ -1,11 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
-import AchatService from "../../services/AchatService";
-import {useJwt} from "../../context/JwtContext";
+import useAchat from "../../hooks/useAchat";
 
 const CreateAchatPage = () => {
-    const {loggedEmployee} = useJwt();
 
     let formInitialState = {
         montantTotal: 0,
@@ -13,9 +11,8 @@ const CreateAchatPage = () => {
     };
     const [formData, setFormData] = useState(formInitialState);
 
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const {achats, error, loading, create} = useAchat();
 
     // Gestion des modifications du formulaire
     const handleChange = (e) => {
@@ -29,20 +26,17 @@ const CreateAchatPage = () => {
     // Fonction pour soumettre les données à l'API
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        try {
-            let data = await AchatService.createAchat(formData);
-            setFormData(formInitialState);
-            navigate(`/achats/${data.id}`);
-        }catch(error) {
-            setError(error);
-        }
+
+        create(formData);
+        setFormData(formInitialState);
+        navigate(`/achats/${achats.id}`);
 
     };
 
     useEffect(() => {
-        console.log(loggedEmployee)
-    },[])
+
+    },[achats])
+
     return (
         <div className="container mt-5">
             <h3>Entrée en stock</h3>

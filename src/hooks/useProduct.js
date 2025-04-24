@@ -27,6 +27,7 @@ export default function useProduct() {
             const response = await getProduitByCodeBarre(code);
             setProduits(response.data);
         } catch (err) {
+            console.log(err)
             setError(err.response?.data?.message || "Erreur lors de la récupération des produits");
         } finally {
             setLoading(false);
@@ -34,6 +35,7 @@ export default function useProduct() {
     };
     // Récupérer tous les produits par id
     const fetchById = async (id) => {
+        if (!id) throw new Error("No product id");
         setLoading(true);
         setError(null);
         try {
@@ -94,6 +96,8 @@ export default function useProduct() {
 
     // Mettre à jour un produit
     const update = async (id, produitData) => {
+        if (!id || !produitData) throw new Error("No product id or data");
+
         setLoading(true);
         setError(null);
         try {
@@ -113,6 +117,7 @@ export default function useProduct() {
 
     // Supprimer un produit
     const remove = async (id) => {
+        if (!id) throw new Error("No product id");
         setLoading(true);
         setError(null);
         try {

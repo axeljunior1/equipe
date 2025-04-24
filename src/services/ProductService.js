@@ -21,7 +21,7 @@ export const getProduitByMotCle = async (motCle, page = 0, size = DEFAULT_PAGINA
 
 
 export const getProduitDyn = async (params, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
-    // Générer proprement la query string
+
     const queryString = new URLSearchParams(params).toString();
 
     return await axiosInstance.get(`${BASE_URL}/recherche-dynamique?${queryString}`, {

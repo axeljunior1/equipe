@@ -26,7 +26,6 @@ const LoginForm = () => {
             const res = await axiosInstance.post("/login", formLoging); // Utilisation de l'instance Axios
             const token = res.data.token;
 
-            // console.log("Réponse réussie -> Token :", token);
             setJwt(token);
 
             setLoggedEmployee(JSON.stringify(res.data.employeGetDto));

@@ -24,7 +24,6 @@ const ListRole = () => {
     const fetchRoles = async () => {
         setLoading(true);
         try {
-            // let data = await RoleService.getRole(currentPage, pageSize); // on peut ajouter des critères de filtre (nom : desc, description : asc)
             let data = await apiCrudService.get('roles', currentPage, pageSize);
             setRoles(data.content);  // Assuming 'content' is the array of products
             setTotalPages(data.totalPages); // Assuming 'totalPages' is the total page count

@@ -1,26 +1,19 @@
 import React, {useEffect, useState} from "react";
 import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
-import VenteService from "../../services/VenteService";
 import Table from "react-bootstrap/Table";
-import LigneVenteService from "../../services/LigneVenteService";
-import {Alert, Button, Col, Form, Modal, Row} from "react-bootstrap";
-import InputGroup from "react-bootstrap/InputGroup";
+import {Alert, Button, Col, Modal, Row} from "react-bootstrap";
 import {formatDate} from "../../utils/dateUtils";
 import apiCrudService from "../../services/ApiCrudService";
 import ProduitListe from "../produit/ProduitsListe";
 import AlertComp from "../../components/AlertComp";
+import useVente from "../../hooks/useVentes";
 
 const VenteDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
-    const [vente, setVente] = useState(null);
-    const [lignesVentes, setLignesVentes] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [formAddLinesError, setFormAddLinesError] = useState("");
-    const [isEditing, setIsEditing] = useState(false); // État pour le mode édition
-    const [formData, setFormData] = useState({}); // État pour stocker les données du formulaire
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
+    const {ventes: vente, error, loading, fetchById} = useVente()
+    const {ventes: lignesVentes, error: errorVL, loading: loadingVL, fetchVenteLines, remove} = useVente()
 
 
     const location = useLocation();
@@ -39,82 +32,44 @@ const VenteDetail = () => {
 
 
     // Fonction pour récupérer les données de l'employé
-    const fetchVente = async () => {
-        setLoading(true);
-        try {
-            let data = await VenteService.getVenteById(id)
-            setVente(data)
-            await fetchLigneVente(data)
-            // setFormData(data) // Pré-remplit le formulaire
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
-
-            setIsEditing(false);
-        }
-    };
-
-    // Fonction pour mettre à jour les données de l'employé
-    const updateVente = async () => {
-        VenteService.updateVente(id, formData).then(data => {
-            setVente(data)
-            setFormData(data);
-            setIsEditing(false);
-        }).catch(err => setError('Une erreur est survenue lors de la mise à jour de l\'employé' + err));
-
+    const fetchVente = async (ide = id) => {
+        fetchById(ide)
+        await fetchLigneVente()
     };
 
 
     const fetchLigneVente = async () => {
 
-        setLoading(true);
-        try {
-            let data = await apiCrudService.get(`ventes/${id}/lignes`);
-            setLignesVentes(data.content); // Mise à jour de l'état après que toutes les données sont récupérées
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
+        fetchVenteLines(id)
+
     };
 
 
-    const handleDeleteVente = async () => {
-        await VenteService.deleteVente(id);
-        navigate('/ventes')
-
-    }
     const payerVente = async () => {
-        // await apiCrudService.get(`ventes/${vente.id}/payer`);
         navigate(`/paiement/vente/${vente.id}`)
 
     }
-    const anulerVente = async () => {
-        await apiCrudService.get(`ventes/${vente.id}/annuler`);
-        navigate('/ventes')
 
-    }
-    const rembourserVente = async () => {
-        await apiCrudService.get(`ventes/${vente.id}/rembourser`);
+    const anulerVente = async () => {
+        // await apiCrudService.get(`ventes/${vente.id}/annuler`);
         navigate('/ventes')
 
     }
 
 
     useEffect(() => {
-        fetchVente();
+        fetchVente(id).then();
     }, [id]);
 
+    useEffect(() => {
+        if (vente && vente.length>0){
+            fetchLigneVente().then()
+        }
+    }, [vente]);
 
-    // Gestion des modifications du formulaire
-    const handleChange = (e) => {
-        const {name, value} = e.target;
-        setFormData({...formData, [name]: value});
-    };
 
     // Gestion des états
-    if (loading) {
+    if (loading || loadingVL) {
         return (
             <div className="text-center">
                 <h1>Chargement en cours...</h1>
@@ -129,41 +84,20 @@ const VenteDetail = () => {
         return <h1 className="text-danger">{error}</h1>;
     }
 
-    if (!vente) {
+
+    if (errorVL) {
+        return <h1 className="text-danger">{errorVL}</h1>;
+    }
+
+    if (!vente || vente.length === 0 ) {
         return <h1 className="text-warning">Vente introuvable</h1>;
     }
 
-    const handleInputChange = (e) => {
-        const {name, value} = e.target;
-        setFormAddLigne({...formAddLigne, [name]: value});
-    };
 
-    async function createVenteLine() {
-        setLoading(true)
-        try {
-            await LigneVenteService.createLigneVente(formAddLigne);
-            setFormAddLigne({...formAddLigne, 'produitId': 0, "produitNom": ""});
-            fetchVente().then();
-        } catch (error) {
-            console.log(error)
-            if (error.response?.data?.message) {
-                setFormAddLinesError(error.response.data.message);
-            }
-        } finally {
-            setIsEditing(false);
-            setLoading(false)
-
-        }
-    }
-
-    const handleSubmitFormAAddLine = async (e) => {
-        e.preventDefault();
-        await createVenteLine();
-    }
 
     const handleDeleteLigne = async (e, id) => {
         e.preventDefault();
-        await LigneVenteService.deleteLigneVente(id)
+        remove(id)
 
         await fetchVente();
     }

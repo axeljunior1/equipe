@@ -1,40 +1,39 @@
 import React, {useEffect, useState} from "react";
-import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
-import AchatService from "../../services/AchatService";
-import achatService from "../../services/AchatService";
-import LigneAchatService from "../../services/LigneAchatService";
-import {Button, Col, Form, Modal, Row} from "react-bootstrap";
-import InputGroup from "react-bootstrap/InputGroup";
-import AlertComp from "../../components/AlertComp";
+import {Link, useNavigate, useParams} from "react-router-dom";
+import {Button, Col, Modal, Row} from "react-bootstrap";
 import DataTableComp from "../../components/DataTableComp";
 import PaginationComp from "../../components/PaginationComp";
 import {formatDate} from "../../utils/dateUtils";
 import DetailsComp from "../../components/DetailsComp";
 import ErrorAlert from "../../exceptions/ErrorAlert";
-import apiCrudService from "../../services/ApiCrudService";
 import ProduitListe from "../produit/ProduitsListe";
+import useAchat from "../../hooks/useAchat";
+import useLigneAchat from "../../hooks/useLigneAchat";
+import AchatAddLineForm from "./AchatAddLineForm";
+
 
 const AchatDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search); // Utilise URLSearchParams pour obtenir les paramètres de requête
-    const pShowAlert = queryParams.get("showAlert"); // Récupère la valeur de param1
 
-    const [achat, setAchat] = useState(null);
-    const [lignesAchats, setLignesAchats] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [isEditing, setIsEditing] = useState(false); // État pour le mode édition
-    const [formData, setFormData] = useState({}); // État pour stocker les données du formulaire
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
-    const [showAlert, setShowAlert] = useState(pShowAlert ? pShowAlert : false);
-    const [nombreTotalDeLigne, setNombreTotalDeLigne] = useState(0); // Nombre total de pages
 
     //Pagination
     const [currentPage, setCurrentPage] = useState(0); // Page actuelle
     const [pageSize, setPageSize] = useState(15); // Taille de la page
-    const [totalPages, setTotalPages] = useState(0); // Nombre total de pages
+    const {achats: achat, error, loading, fetchById} = useAchat()
+    const {
+        achats: lignesAchats,
+        errorAL,
+        loadingAL,
+        fetchAchatLines,
+        remove,
+        totalPages: totalPagesAL,
+        totalElements: totalElementsAL
+    } = useAchat()
+    const {error: errorLA, loading: loadingLA, create: createLA, remove: removeLA} = useLigneAchat()
+    const [formErrors, setFormErrors] = useState({});
+
 
     let initFormAddLigne = {
         "prixAchat": 0,
@@ -47,72 +46,34 @@ const AchatDetail = () => {
     const [formAddLigne, setFormAddLigne] = useState(initFormAddLigne);
 
 
-    useEffect(() => {
-        fetchAchat().then(r => null);
-
-    }, [currentPage, pageSize]);
 
     // Fonction pour récupérer les données de l'employé
     const fetchAchat = async () => {
-        setLoading(true);
-        try {
-            let data = await AchatService.getAchatById(Number(id))
-            setAchat(data)
-            await fetchLigneAchat(data)
-            // setFormData(data) // Pré-remplit le formulaire
-        } catch (err) {
-            setError(err);
-        } finally {
-            setIsEditing(false);
-        }
-    };
-
-    // Fonction pour mettre à jour les données de l'employé
-    const updateAchat = async () => {
-        AchatService.updateAchat(id, formData).then(data => {
-            setAchat(data)
-            setFormData(data);
-            setIsEditing(false);
-        }).catch(err => setError('Une erreur est survenue lors de la mise à jour de l\'employé' + err));
-
+        fetchById(id)
     };
 
 
     const fetchLigneAchat = async () => {
-        setError(null)
-        setLoading(true);
-        try {
-            let data = await achatService.getAchatLines(id);
-            setLignesAchats(data.content); // Mise à jour de l'état après que toutes les données sont récupérées
-            setTotalPages(data.totalPages); // Assuming 'totalPages' is the total page count
-            setNombreTotalDeLigne(data.totalElements)
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
+        fetchAchatLines(id)
     };
 
 
     const handleDeleteAchat = async () => {
-        await AchatService.deleteAchat(id);
+        remove(id);
         navigate('/achats')
 
     }
 
+    useEffect(() => {
+        fetchAchat().then();
+    }, [currentPage, pageSize, id]);
+
+
 
     useEffect(() => {
-            fetchAchat();
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [id]);
+        fetchLigneAchat().then()
+    }, [achat]);
 
-
-    // Gestion des modifications du formulaire
-    const handleChange = (e) => {
-        const {name, value} = e.target;
-        setFormData({...formData, [name]: value});
-    };
 
     // Gestion des états
     if (loading) {
@@ -133,23 +94,13 @@ const AchatDetail = () => {
     };
 
     async function createAchatLine() {
-        setLoading(true)
-        setError(null)
-        try {
-            if (formAddLigne.quantite <= 0) throw new Error("Quantité doit être positive et > 0");
-            console.log(formAddLigne);
 
-            await apiCrudService.post('ligneAchats', formAddLigne);
-            setFormAddLigne({...formAddLigne, 'produitId': 0, "produitNom": "", "prixAchatF": ""});
-            fetchAchat();
-        } catch (error) {
-            console.log(error.message);
-            setError(error.message);
-        } finally {
-            setIsEditing(false);
-            setLoading(false)
+        if (formAddLigne.quantite <= 0) throw new Error("Quantité doit être positive et > 0");
+        console.log(formAddLigne);
 
-        }
+        createLA(formAddLigne);
+        await fetchAchat()
+        setFormAddLigne({...formAddLigne, 'produitId': 0, "produitNom": "", "prixAchatF": ""});
     }
 
     const removeColumns = (baseColumns, excludedAccessors) => {
@@ -163,7 +114,7 @@ const AchatDetail = () => {
             accessor: "produit",
             render: (value, ligne) => (
                 <Link to={`/produits/${ligne.produitId}`} className="text-decoration-none">
-                    {ligne.produit?.id} - {ligne.produit?.nom}
+                    {ligne['produit']?.id} - {ligne['produit']?.nom}
                 </Link>
             )
         },
@@ -192,26 +143,24 @@ const AchatDetail = () => {
     let columns = removeColumns(baseColumns, []);
 
 
-    const handleSubmitFormAAddLine = async (e) => {
-        e.preventDefault();
-        if (formAddLigne.quantite <= 0) {
-            setError("La quantité doit etre positive et > 0");
-            return;
-        }
-        await createAchatLine();
-    }
-
     const handleDeleteLigne = async (e, id) => {
         e.preventDefault();
-        await LigneAchatService.deleteLigneAchat(id)
 
-        await fetchAchat();
+        removeLA(id)
+
+        await fetchAchat()
+
     }
 
     // Fonction pour gérer la sélection d'un employé
     const handleProduitSelect = (produit) => {
         console.log(produit)
-        setFormAddLigne({...formAddLigne, 'produitId': produit.id, "produitNom": produit.nom, "prixAchat": produit.prixAchat});
+        setFormAddLigne({
+            ...formAddLigne,
+            'produitId': produit.id,
+            "produitNom": produit.nom,
+            "prixAchat": produit.prixAchat
+        });
         setShowModal(false); // Ferme le modal
     };
 
@@ -224,19 +173,48 @@ const AchatDetail = () => {
         setCurrentPage(0); // Reset to first page whenever page size changes
     };
     const lines = [
-        <p><strong>Employé :</strong> <Link to={`/employes/${achat.employe.id}`}
-                                            className='text-decoration-none'> {achat.employe.id} - {achat.employe.nom}</Link>
+        <p key={1}><strong>Employé :</strong> <Link to={`/employes/${achat['employe']?.id}`}
+                                                    className='text-decoration-none'> {achat['employe']?.id} - {achat['employe']?.nom}</Link>
         </p>,
-        <p><strong>Montant :</strong> {achat.montantTotal}</p>,
-        <p><strong>Date de Création :</strong> {formatDate(achat.dateCreation)}</p>
+        <p key={2}><strong>Montant :</strong> <span className="text-danger"> {achat.montantTotal} </span></p>,
+        <p key={3}><strong>Date de Création :</strong> {formatDate(achat['dateCreation'])}</p>
     ]
 
 
     const entetes = [
-        {title: "Nombre de ligne", value: nombreTotalDeLigne},
+        {title: "Nombre de ligne", value: totalElementsAL},
     ];
 
 
+    const handleSubmitFormAAddLine = async (e) => {
+        e.preventDefault();
+
+        const errors = {};
+
+        if (!formAddLigne.produitId || formAddLigne.produitId <= 0) {
+            errors.produitId = "ID produit invalide";
+        }
+        if (!formAddLigne.quantite || formAddLigne.quantite <= 0) {
+            errors.quantite = "Quantité requise";
+        }
+        if (formAddLigne.prixAchatF && formAddLigne.prixAchatF < 0) {
+            errors.prixAchatF = "Prix forcé invalide";
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setFormErrors(errors);
+            return;
+        }
+
+        setFormErrors({});
+
+        await createAchatLine();
+    };
+
+
+    if (loading || loadingAL || loadingLA) {
+        return <div>Loading...</div>
+    }
 
 
     if (!achat) {
@@ -244,218 +222,64 @@ const AchatDetail = () => {
     }
 
 
+    if (error || errorAL || errorLA) {
+        return <h1 className="text-danger"> {error || errorAL || errorLA} </h1>;
+    }
+
+
     return (
         <div className="">
 
             {error &&
-                <ErrorAlert error={error} />
+                <ErrorAlert error={error}/>
             }
 
 
-            {showAlert && (
-                <AlertComp
-                    message="Opération réussie l'achat a été crée !"
-                    type="success"
-                    timeout={9500} // L'alerte disparaît après 5 secondes
-                    onClose={() => setShowAlert(false)}
-                />
-            )}
-
             <h1><strong>Détail de l'achat</strong></h1>
-            {!isEditing ? (
-
-                <div className="">
+            <div className="">
 
 
-                    <DetailsComp horizontal={true}
-                                 lines={lines}
-                                 footerList={[]}
-                    />
+                <DetailsComp horizontal={true}
+                             lines={lines}
+                             footerList={[]}
+                />
 
 
-                    <h3 className="my-3"> Lignes de l'achat</h3>
+                <h3 className="my-3"> Lignes de l'achat</h3>
 
-                    {lignesAchats.length > 0 ? (
+                {lignesAchats.length > 0 ? (
 
-                        <DataTableComp data={lignesAchats} columns={columns} entetes={entetes}/>
-                    ) : (
-                        <div className="text-center text-muted">Aucun element trouvé.</div>
-                    )}
-                    {/* Pagination controls */}
+                    <DataTableComp data={lignesAchats} columns={columns} entetes={entetes}/>
+                ) : (
+                    <div className="text-center text-muted">Aucun element trouvé.</div>
+                )}
+                {/* Pagination controls */}
 
-                    <PaginationComp className={"mb-5"}
-                                    currentPage={currentPage}
-                                    handlePageChange={handlePageChange}
-                                    totalPages={totalPages}
-                                    pageSize={pageSize}
-                                    handlePageSizeChange={handlePageSizeChange}
-                                    nombreElt={nombreTotalDeLigne}
+                <PaginationComp className={"mb-5"}
+                                currentPage={currentPage}
+                                handlePageChange={handlePageChange}
+                                totalPages={totalPagesAL}
+                                pageSize={pageSize}
+                                handlePageSizeChange={handlePageSizeChange}
+                                nombreElt={totalElementsAL}
 
-                    />
+                />
 
-                    {/*Todo : passer le form sour formik*/}
 
-                    <Form onSubmit={handleSubmitFormAAddLine} className={"mt-5"}>
-                        {error &&
-                            <Row>
-                                <Col xs={12} className="text-danger my-1">
-                                    Erreur : {error}
-                                </Col>
-                            </Row>}
-                        <Row className="">
-                            <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label className={'fw-bold'}> {formAddLigne.produitNom ? (<span
-                                        className="text-danger"> {formAddLigne.produitNom} </span>) : "Produit ID"}</Form.Label>
-                                    <InputGroup className="mb-3">
-                                        <Form.Control
-                                            type="number"
-                                            value={formAddLigne.produitId}
-                                            onChange={handleInputChange}
-                                            name='produitId'
-                                            className="my-1"
-                                        />
-                                        <Button variant={"outline-info"} onClick={() => {
-                                            setShowModal(true);
-                                        }
-                                        }>
-                                            🔍Search
-                                        </Button>
-                                    </InputGroup>
-                                </Form.Group>
-                            </Col>
-                            <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
+                <AchatAddLineForm onSubmit={handleSubmitFormAAddLine} formAddLigne={formAddLigne}
+                                  onChange={handleInputChange} formErrors={formErrors}
+                                  onClick={() => setShowModal(true)}/>
+                <hr/>
 
-                                <Form.Label className={'fw-bold'}>Nom</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={formAddLigne.produitNom}
-                                    onChange={handleInputChange}
-                                    placeholder="Nom du produit"
-                                    name='produitNom' readOnly
-                                    className="my-1"
-                                />
-                            </Col>
-                            <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                                <Form.Label className={'fw-bold'}>Quantité</Form.Label>
-                                <Form.Control
-                                    type="number"
-                                    value={formAddLigne.quantite}
-                                    onChange={handleInputChange}
-                                    placeholder="Quantité"
-                                    name='quantite'
-                                    className="my-1"
-                                />
-                            </Col>
-                            <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                                <Form.Label className={'fw-bold'}>Prix Achat</Form.Label>
-                                <Form.Control
-                                    type="number"
-                                    value={formAddLigne.prixAchat}
-                                    onChange={handleInputChange}
-                                    placeholder="Prix unitaire d'achat"
-                                    name='prixAchat'
-                                    className="my-1" disabled
-                                />
-                            </Col>
-                            <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                                <Form.Label className={'fw-bold'}>Prix Achat Forcé</Form.Label>
-                                <Form.Control
-                                    type="number"
-                                    value={formAddLigne.prixAchatF}
-                                    onChange={handleInputChange}
-                                    placeholder="Forcer le prix d'achat"
-                                    name='prixAchatF'
-                                    className="my-1"
-                                />
-                            </Col>
-                        </Row>
-                        <Row className={'justify-content-end mt-3 '}>
-                            <Col xs={"3"}>
-                                <Button variant={"outline-primary"} type={'submit'} className='w-100'>Ajouter
-                                    la ligne ligne</Button>
-                            </Col>
-                        </Row>
-                    </Form>
-                    <hr/>
 
-                    <Row className={'justify-content-end mt-3 '}>
-                        <Col xs={"3"}>
-                            <Button variant={"danger"} className='w-100' onClick={handleDeleteAchat}>Supprimmer
-                                l'achat</Button>
-                        </Col>
-                    </Row>
-                </div>
-            ) : (
-                /*
-                * Ce n'est plus utile car pour l'instant il n'y a pas d'information à modifier
-                * */
-                <div className="card p-4 shadow bg-light">
-                    <h3 className="text-center mb-4">Modifier l'Achat</h3>
-                    <form
-                        onSubmit={(e) => {
-                            e.preventDefault(); // Empêche le rechargement de la page
-                            updateAchat(); // Appelle la fonction de mise à jour
-                        }}
-                    >
-                        {/* Nom */}
-                        <div className="mb-3">
-                            <label htmlFor="nom" className="form-label">Montant Total :</label>
-                            <input
-                                type="text"
-                                id=""
-                                name="nom"
-                                className="form-control"
-                                value={formData.montantTotal}
-                                onChange={handleChange}
-                                placeholder="Entrez le montant total"
-                            />
-                        </div>
+                <Row className={'justify-content-end mt-3 '}>
+                    <Col xs={"3"}>
+                        <Button variant={"danger"} className='w-100' onClick={handleDeleteAchat}>Supprimer
+                            l'achat</Button>
+                    </Col>
+                </Row>
+            </div>
 
-                        {/* Prénom */}
-                        <div className="mb-3">
-                            <label htmlFor="prenom" className="form-label">Prénom :</label>
-                            <input
-                                type="text"
-                                id="prenom"
-                                name="prenom"
-                                className="form-control"
-                                value={formData.employe.prenom}
-                                onChange={handleChange}
-                                placeholder="Entrez le prénom"
-                            />
-                        </div>
-
-                        {/* Date de Création */}
-                        <div className="mb-3">
-                            <label htmlFor="dateCreation" className="form-label">Date de Création :</label>
-                            <input
-                                type="date"
-                                id="dateCreation"
-                                name="dateCreation"
-                                className="form-control"
-                                value={formData.dateCreation ? formData.dateCreation.split("T")[0] : ""}
-                                onChange={handleChange}
-                                placeholder="Entrez la date de création"
-                            />
-                        </div>
-
-                        {/* Boutons */}
-                        <div className="d-flex justify-content-between">
-                            <button type="submit" className="btn btn-success">
-                                Enregistrer
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-secondary"
-                                onClick={() => setIsEditing(false)}
-                            >
-                                Annuler
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            )}
 
             {/* Modal de recherche d'employé */}
             <Modal show={showModal} onHide={() => setShowModal(false)} size="xl" centered>

@@ -2,38 +2,26 @@ import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
 import {Button, FormControl} from "react-bootstrap";
 import ErrorAlert from "../../exceptions/ErrorAlert";
-import apiCrudService from "../../services/ApiCrudService";
 import AlertComp from "../../components/AlertComp";
+import useTarifAchat from "../../hooks/useTarifAchat";
+import PaginationComp from "../../components/PaginationComp";
+import {DEFAULT_PAGINATION_SIZE} from "../../utils/constants";
 
 function TarifAchat() {
-    const [tarifAchat, setTarifAchat] = useState([]);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [showAlertUpdateTA, setShowAlertUpdateTA] = useState(false);
-
+    const {tarifAchats :tarifAchat, error, loading, fetchAllTarifAchats, update, totalPages, totalElements} = useTarifAchat()
     const [prixAchatValues, setPrixAchatValues] = useState({});
+
+    const [currentPage, setCurrentPage] = useState(0); // Page actuelle
+
+    const [pageSize, setPageSize] = useState(DEFAULT_PAGINATION_SIZE); // Taille de la page
 
     const handleChange = (id, value) => {
         setPrixAchatValues((prev) => ({...prev, [id]: value}));
     };
 
-    async function fetchTarifAchat() {
-        setLoading(true);
-        setError(null);
-
-        try {
-            let data = await apiCrudService.get("tarif-achats")
-            setTarifAchat(data.content)
-            let obj = {}
-            data.content.forEach(element => {
-                obj[element.id] = element.prixAchat;
-            })
-            setPrixAchatValues(obj)
-        } catch (e) {
-            setError(e.response.data);
-        } finally {
-            setLoading(false);
-        }
+    async function fetchTarifAchat(page = 0, size = pageSize) {
+        fetchAllTarifAchats(page, size)
     }
 
 
@@ -41,9 +29,39 @@ function TarifAchat() {
         fetchTarifAchat().then();
     }, []);
 
+    useEffect(() => {
+        fetchTarifAchat(currentPage, pageSize ).then();
+
+    }, [currentPage, pageSize]);
+
+
+    useEffect(() => {
+        if (tarifAchat?.length > 0) {
+            let obj = {}
+            tarifAchat.forEach(element => {
+                obj[element.id] = element.prixAchat;
+            })
+            setPrixAchatValues(obj)
+        }
+    }, [tarifAchat]);
+
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const handlePageSizeChange = (e) => {
+        setPageSize(Number(e.target.value));
+        setCurrentPage(0); // Reset to first page whenever page size changes
+    };
+
 
     if (loading) {
         return <p>Loading...</p>;
+    }
+
+    if (!tarifAchat) {
+        return <p>Aucun tarif</p>;
     }
 
     if (error) {
@@ -57,19 +75,7 @@ function TarifAchat() {
 
 
     const handleEditTarif = async (id, value) => {
-        console.log(id, value);
-        setLoading(true);
-        setError(null);
-
-        try {
-            await apiCrudService.patch("tarif-achats", id, {prixAchat: value});
-            await fetchTarifAchat();
-            setShowAlertUpdateTA(true)
-        } catch (e) {
-            setError(e.response.data);
-        } finally {
-            setLoading(false);
-        }
+        update(id, {prixAchat: value});
 
 
     }
@@ -102,7 +108,7 @@ function TarifAchat() {
                     <tr key={tarif.id}>
                         <td>{tarif.id}</td>
                         <td>
-                            {tarif["produit"].id} - {tarif["produit"].nom}
+                            {tarif["produit"]?.id} - {tarif["produit"]?.nom}
                         </td>
                         <td>
                             <FormControl
@@ -128,6 +134,18 @@ function TarifAchat() {
             <Button variant="success" onClick={handleIncreaseAllPrices} disabled>
                 Augmenter tous les prix
             </Button>
+            <br/>
+            <br/>
+
+            <PaginationComp className={"mb-5"}
+                            currentPage={currentPage}
+                            handlePageChange={handlePageChange}
+                            totalPages={totalPages}
+                            pageSize={pageSize}
+                            handlePageSizeChange={handlePageSizeChange}
+                            nombreElt={totalElements}
+
+            />
 
         </div>
     );

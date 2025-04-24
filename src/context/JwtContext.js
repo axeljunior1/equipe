@@ -1,4 +1,5 @@
-import {createContext, useContext, useEffect, useState} from "react";
+import {createContext, useContext, useEffect, useMemo, useState} from "react";
+import PropTypes from "prop-types";
 
 const JwtContext = createContext();
 export const JwtProvider = ({ children }) => {
@@ -8,7 +9,6 @@ export const JwtProvider = ({ children }) => {
         return storedUser ? JSON.parse(storedUser) : null; // Convertir en objet ou null si absent
     });
     const [panierId, setPanierId] = useState(() => localStorage.getItem("panierId")  || undefined);
-    const [resetApp, setResetApp] = useState("initial");
 
     useEffect(() => {
         console.log('initial state: panier id ', panierId);
@@ -40,13 +40,16 @@ export const JwtProvider = ({ children }) => {
         console.log('changed panierId ', panierId);
     }, [panierId]);
 
+
     return (
-        <JwtContext.Provider value={{ jwt, setJwt, setResetApp, loggedEmployee, setLoggedEmployee, panierId, setPanierId }}>
+        <JwtContext.Provider value={{ jwt, setJwt, loggedEmployee, setLoggedEmployee, panierId, setPanierId }}>
             {children}
         </JwtContext.Provider>
     );
 };
 
-
+JwtProvider.propTypes = {
+    children: PropTypes.node,
+};
 
 export const useJwt = () => useContext(JwtContext);

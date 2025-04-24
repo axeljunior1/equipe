@@ -13,15 +13,15 @@ export const getClientById = async (id) => {
     return await axiosInstance.get(`${BASE_URL}/${id}`);
 }
 
-export const getClientByMotCle = async (motCle, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
+export const getClientsByMotCle = async (motCle, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
 
     return await axiosInstance.get(`${BASE_URL}/recherche?motCle=${motCle}`, {params: {page: page, size: size}});
 
 }
 
 
-export const getClientDyn = async (params, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
-    // Générer proprement la query string
+export const getClientsDyn = async (params, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
+
     const queryString = new URLSearchParams(params).toString();
 
     return await axiosInstance.get(`${BASE_URL}/recherche-dynamique?${queryString}`, {

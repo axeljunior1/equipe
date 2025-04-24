@@ -1,26 +1,24 @@
-import React, { useState, useEffect } from "react";
-import apiCrudService from "../services/ApiCrudService";
-import { usePanier } from "../context/PanierContext";
+import React, {useEffect, useState} from "react";
+import {usePanier} from "../context/PanierContext";
 import AlertComp from "./AlertComp";
+import useProduct from "../hooks/useProduct";
+import {Alert} from "react-bootstrap";
 
 const BarcodeScanner = () => {
-    const { ajouterAuPanier, nombreProduitDansPanier } = usePanier();
+    const {ajouterAuPanier, nombreProduitDansPanier} = usePanier();
 
     const [scannedCode, setScannedCode] = useState("");
     const [showAlertAdd, setShowAlertAdd] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const {produits, error, loading, fetchByCodeBarre} = useProduct()
 
     useEffect(() => {
         const handleKeyD = async (e) => {
             if (e.key === "Enter" && scannedCode.length > 0) {
                 await fetchProduit(scannedCode);
                 setScannedCode(""); // Réinitialiser après scan
-            } else {
-                if (e.key !== "Alt" && e.key !== "Shift") {
-                    console.log(scannedCode);
-                    setScannedCode((prev) => prev + e.key); // Accumuler les caractères scannés
-                }
+            } else if (e.key !== "Alt" && e.key !== "Shift") {
+                console.log(scannedCode);
+                setScannedCode((prev) => prev + e.key); // Accumuler les caractères scannés
             }
         };
 
@@ -31,23 +29,31 @@ const BarcodeScanner = () => {
     }, [scannedCode]); // Dépendance pour suivre les changements de scannedCode
 
     const fetchProduit = async (code) => {
-        setLoading(true);
-        try {
-            const data = await apiCrudService.get(`produits/code-barre/${code}`);
+        fetchByCodeBarre(code);
+    };
+
+
+    useEffect(() => {
+        if (produits) {
 
             let pro = {
-                prixVente: data.prixVente,
-                produitId: data.id,
-                quantite: nombreProduitDansPanier(data.id) + 1,
+                prixVente: produits.prixVente,
+                produitId: produits.id,
+                quantite: nombreProduitDansPanier(produits.id) + 1,
             };
             ajouterAuPanier(pro);
             setShowAlertAdd(true);
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
         }
-    };
+    }, [produits])
+
+    if (loading) {
+        return "Loading...";
+    }
+    if (typeof error === "string") {
+        return <Alert key="danger" variant="danger">
+            {error}
+        </Alert>;
+    }
 
     return (
         <>
