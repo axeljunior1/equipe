@@ -7,7 +7,7 @@ import {
     updateVente,
     deleteVente,
     getVenteById,
-    getVentes, getVenteLines
+    getVentes, getVenteLines, fermerVenteById
 } from "../services/VenteService";
 import {number} from "sockjs-client/lib/utils/random";
 import {DEFAULT_PAGINATION_SIZE} from "../utils/constants";
@@ -27,6 +27,20 @@ export default function useVente() {
         try {
             const response = await getVenteById(id);
             setVentes(response.data);
+        } catch (err) {
+            setError(err.response?.data?.message || "Erreur lors de la récupération de vente");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    const fermerVente = async (id) => {
+        setLoading(true);
+        setError(null);
+        try {
+            await fermerVenteById(id);
+            await fetchById(id)
         } catch (err) {
             setError(err.response?.data?.message || "Erreur lors de la récupération de vente");
         } finally {
@@ -146,6 +160,6 @@ export default function useVente() {
 
     return {
         ventes, loading, error, fetchAllVentes,fetchVenteLines, fetchById, fetchByMotCle, fetchByParams, create, update, remove, totalElements,
-        totalPages
+        totalPages,fermerVente
     };
 }

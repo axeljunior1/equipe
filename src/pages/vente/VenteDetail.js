@@ -8,6 +8,7 @@ import AlertComp from "../../components/AlertComp";
 import useVente from "../../hooks/useVentes";
 import * as PropTypes from "prop-types";
 import Paiement from "../../components/Paiement";
+import apiCrudService from "../../services/ApiCrudService";
 
 
 Paiement.propTypes = {data: PropTypes.any};
@@ -15,7 +16,7 @@ const VenteDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
-    const {ventes: vente, error, loading, fetchById} = useVente()
+    const {ventes: vente, error, loading, fetchById, fermerVente : closeVente} = useVente()
     const {ventes: lignesVentes, error: errorVL, loading: loadingVL, fetchVenteLines, remove} = useVente()
 
 
@@ -32,6 +33,7 @@ const VenteDetail = () => {
         "produitNom": ""
     }
     const [formAddLigne, setFormAddLigne] = useState(initFormAddLigne);
+    const [showConfirm, setShowConfirm] = useState(false);
 
 
     // Fonction pour récupérer les données de l'employé
@@ -54,8 +56,13 @@ const VenteDetail = () => {
     }
 
     const anulerVente = async () => {
-        // await apiCrudService.get(`ventes/${vente.id}/annuler`);
+        await apiCrudService.get(`ventes/${vente.id}/annuler`);
         navigate('/ventes')
+
+    }
+
+    const fermerVente = async () => {
+        await closeVente(id);
 
     }
 
@@ -83,14 +90,7 @@ const VenteDetail = () => {
         );
     }
 
-    if (error) {
-        return <h1 className="text-danger">{error}</h1>;
-    }
 
-
-    if (errorVL) {
-        return <h1 className="text-danger">{errorVL}</h1>;
-    }
 
     if (!vente || vente.length === 0 ) {
         return <h1 className="text-warning">Vente introuvable</h1>;
@@ -116,6 +116,12 @@ const VenteDetail = () => {
 
         setShowModal(false); // Ferme le modal
     };
+    const handleCloseNo = () => setShowConfirm(false);
+    const handleCloseYes = async () => {
+        setShowConfirm(false);
+        await fermerVente();
+
+    }
 
     return (
         <div className="">
@@ -129,6 +135,9 @@ const VenteDetail = () => {
                 />
             )}
 
+            {error && <Alert className={'mt-3'} variant="danger" dismissible>{error}</Alert> }
+            {errorVL && <Alert className={'mt-3'} variant="danger" dismissible>{errorVL}</Alert> }
+
             <h1><strong>Détail de la vente</strong></h1>
             <div className="card p-4 shadow">
                 <h3 className="card-title text-center">Vente : {vente.id}</h3>
@@ -140,7 +149,7 @@ const VenteDetail = () => {
                     <p><strong>Montant :</strong> {vente.montantTotal}</p>
                     <p><strong>Date de Création :</strong> {formatDate(vente.createdAt)}</p>
                     <p><strong>Date de mise à jour :</strong> {formatDate(vente.updatedAt)}</p>
-                    <p><strong>Etat :</strong> {vente.etat.libelle}</p>
+                    <p className="text-success"><strong>Etat :</strong> {vente.etat.libelle}</p>
                     <p><strong>Reste à payer :</strong> {vente.resteAPayer}</p>
                 </div>
                 <br/>
@@ -165,12 +174,16 @@ const VenteDetail = () => {
                                 </td>
                                 <td>{ligne.prixVente}</td>
                                 <td>{ligne.quantite}</td>
-                                <td className={'justify-content-center align-items-center'}>
-                                    <Button variant={"outline-danger"} className={'w-100'} onClick={(e) => {
-                                        handleDeleteLigne(e, ligne.id)
-                                    }}> Supprimer 🚮</Button>
-
+                                <td className="text-center align-middle">
+                                    <Button
+                                        variant="outline-danger"
+                                        className={`w-100 ${vente.etat.libelle === 'EN_ATTENTE_PAIEMENT' ? '' : 'disabled'}`}
+                                        onClick={(e) => handleDeleteLigne(e, ligne.id)}
+                                    >
+                                        Supprimer 🚮
+                                    </Button>
                                 </td>
+
                             </tr>
                         ))}
                         </tbody>
@@ -182,18 +195,25 @@ const VenteDetail = () => {
                 )}
 
 
-                <hr/>
 
                 <Row className={'justify-content-end mt-3 '}>
-                    {vente.etat?.libelle !== 'CONFIRME' &&
+                    {vente.etat?.libelle !== 'PAYEE' && vente.etat?.libelle !== 'FERMEE' &&
                         <Col xs={"3"}>
-                            <Button variant={"primary"} className='w-100' onClick={payerVente}>Valider et Imprimer la
-                                facture </Button>
+                            <Button variant={"primary"} className='w-100' onClick={payerVente}>Payer </Button>
                         </Col>
                     }
+                    {vente.etat.libelle === 'PAYEE' && (
+
+                        <Col xs={"3"}>
+                            <Button variant={"secondary"} className='w-100' onClick={() => setShowConfirm(true)}>Fermer</Button>
+                        </Col>
+
+                    )}
+                    {vente.etat.libelle === 'EN_ATTENTE_PAIEMENT' && (
                     <Col xs={"3"}>
                         <Button variant={"secondary"} className='w-100' onClick={anulerVente}>Annuler</Button>
                     </Col>
+                    )}
                 </Row>
             </div>
 
@@ -210,6 +230,21 @@ const VenteDetail = () => {
                 <Modal.Body>
                     <ProduitListe onSelect={handleEmployeeSelect}/>
                 </Modal.Body>
+            </Modal>
+
+            <Modal show={showConfirm} onHide={()=>setShowConfirm(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Fermeture de la vente</Modal.Title>
+                </Modal.Header>
+                <Modal.Body> Voulez vous vraiment fermer la vente ? c'est une action irreversible </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseNo}>
+                        Non
+                    </Button>
+                    <Button variant="primary" onClick={handleCloseYes}>
+                        Oui
+                    </Button>
+                </Modal.Footer>
             </Modal>
         </div>
     );

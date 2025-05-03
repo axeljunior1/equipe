@@ -18,7 +18,6 @@ const POSPaymentScreen = (props) => {
         try {
             let res = await apiCrudService.get(`ventes/${id}`)
 
-            console.log(res.resteAPayer)
             setMontantPaiement(res.resteAPayer);
 
         } catch (err) {
@@ -54,8 +53,35 @@ const POSPaymentScreen = (props) => {
         }
     };
 
+    const prisACredit = async () => {
+        setError("");
+        setLoading(true);
+        try {
+            await apiCrudService.get(`ventes/credit/${id}`)
+
+            navigate(`/ventes/${id}`)
+
+        } catch (err) {
+            setError(err)
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return <h1>Chargement en cours...</h1>;
+    }
+
+
     return (
         <div className="container mt-4">
+            {error && (
+                <p className="text-danger">
+                    Erreur : {error}
+                </p>
+            )}
+
+
             <h2 className="mb-3">POS - Paiement : {montantPaiement} </h2>
 
             <div className="mb-3">
@@ -85,10 +111,10 @@ const POSPaymentScreen = (props) => {
             <div className="d-flex gap-2">
 
                 <button className="btn btn-success" onClick={confirmPaiement}>
-                    Confirmer Paiement
+                    Payer
                 </button>
-                <button className="btn btn-warning disabled" onClick={() => null}>
-                    Paiement Partiel
+                <button className="btn btn-warning " onClick={prisACredit}>
+                    Pris à crédit
                 </button>
                 <button className="btn btn-danger disabled" onClick={() => null}>
                     Refuser

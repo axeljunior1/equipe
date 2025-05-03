@@ -20,7 +20,7 @@ const Panier = () => {
         retirerDuPanier,
         calculerTotal,
         ajouterAuPanier,
-        updatePanier
+        updatePanier, nombreProduitDansPanier,
     } = usePanier();
 
     const [produitIdModal, setProduitIdModal] = useState("");
@@ -45,7 +45,7 @@ const Panier = () => {
     }
     const [formClient, setFormClient] = useState(initFormClient);
 
-    const handleUpdatePanier = item => {
+    const handleUpdatePanier =async (item) => {
         let data =
             {
                 "prixVente": item.prixVente,
@@ -64,20 +64,6 @@ const Panier = () => {
             setQtes(obj)
         }
     }, [panier]); //
-
-    const handleIncrease = (itemPanier) => {
-        itemPanier.quantite++;
-        handleUpdatePanier(itemPanier)
-    }
-
-    const handleDecrease = (itemPanier) => {
-        if (itemPanier.quantite === 1) {
-            retirerDuPanier(itemPanier.id);
-        } else {
-            itemPanier.quantite--;
-            handleUpdatePanier(itemPanier)
-        }
-    }
 
     const handleInputChange = (e) => {
         const {name, value} = e.target;
@@ -167,6 +153,25 @@ const Panier = () => {
         ajouterAuPanier(item)
     }
 
+    const increaseCart = async (item) => {
+       await ajouterAuPanier({
+            prixVente: item.produit.prixVente,
+            produitId: item.produit.id,
+            quantite: nombreProduitDansPanier(item.produit.id) + 1
+        })
+    }
+    const decreaseCart = async (item) => {
+        if (nombreProduitDansPanier(item.produit.id) === 1) {
+            retirerDuPanier(item.id);
+        }else{
+            await ajouterAuPanier({
+                prixVente: item.produit.prixVente,
+                produitId: item.produit.id,
+                quantite: nombreProduitDansPanier(item.produit.id) - 1
+            })
+        }
+    }
+
 
     if (loading) {
         return <div>Loading...</div>
@@ -232,7 +237,7 @@ const Panier = () => {
                                             <Col xs={4}>
                                                 <Button
                                                     variant="outline-primary" className='fw-bold me-3'
-                                                    onClick={() => handleIncrease(item)}
+                                                    onClick={() => increaseCart(item)}
                                                 >
                                                     +
                                                 </Button>
@@ -257,7 +262,7 @@ const Panier = () => {
                                             <Col xs={4}>
                                                 <Button
                                                     variant="outline-info" className=' fw-bold ms-3'
-                                                    onClick={() => handleDecrease(item)}
+                                                    onClick={() => decreaseCart(item)}
                                                 >
                                                     -
                                                 </Button>

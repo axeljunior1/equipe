@@ -86,6 +86,25 @@ const ProduitListe = (props) => {
 
     };
 
+    const increaseCart = async (produit) => {
+        await ajouterAuPanier({
+            prixVente: produit.prixVente,
+            produitId: produit.id,
+            quantite: nombreProduitDansPanier(produit.id) + 1
+        })
+    }
+    const decreaseCart = async (produit) => {
+        if (nombreProduitDansPanier(produit.id) === 1) {
+            // nothing
+        }else{
+            await ajouterAuPanier({
+                prixVente: produit.prixVente,
+                produitId: produit.id,
+                quantite: nombreProduitDansPanier(produit.id) - 1
+            })
+        }
+    }
+
 
     const removeColumns = (baseColumns, excludedAccessors) => {
         return baseColumns.filter(col => !excludedAccessors.includes(col.accessor));
@@ -129,12 +148,7 @@ const ProduitListe = (props) => {
                 <Col sm={12}>
                     <Button
                         variant="outline-primary" className='fw-bold me-3'
-                        onClick={() => ajouterAuPanier({
-
-                            prixVente: produit.prixVente,
-                            produitId: produit.id,
-                            quantite: nombreProduitDansPanier(produit.id) + 1
-                        })}
+                        onClick={() => increaseCart(produit)}
                     >
                         +
                     </Button>
@@ -155,11 +169,7 @@ const ProduitListe = (props) => {
 
                     <Button
                         variant="outline-info" className=' fw-bold ms-3'
-                        onClick={() => ajouterAuPanier({
-                            prixVente: produit.prixVente,
-                            produitId: produit.id,
-                            quantite: nombreProduitDansPanier(produit.id) - 1
-                        })}
+                        onClick={() => decreaseCart(produit)}
                     >
                         -
                     </Button>

@@ -10,6 +10,18 @@ export const getVenteById = async (id) => {
     return await axiosInstance.get(`${BASE_URL}/${id}`);
 }
 
+export const payerVenteById = async (id) => {
+    return await axiosInstance.get(`${BASE_URL}/${id}/payer`);
+}
+
+export const fermerVenteById = async (id) => {
+    return await axiosInstance.get(`${BASE_URL}/${id}/fermer`);
+}
+
+export const annulerVente = async (id) => {
+    return await axiosInstance.get(`${BASE_URL}/${id}/annuler`);
+}
+
 export const getVenteLines = async (id, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
     return await axiosInstance.get(`${BASE_URL}/${id}/lignes`);
 }
