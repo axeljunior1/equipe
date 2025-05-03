@@ -49,6 +49,7 @@ function Ventes() {
                     <th>Numéro</th>
                     <th>Nom</th>
                     <th>Montant</th>
+                    <th className="text-danger">Reste à payer</th>
                     <th>Client</th>
                     <th>Etat</th>
                     <th>Employé</th>
@@ -66,6 +67,7 @@ function Ventes() {
                                   className='text-decoration-none'>{'Vente'} - {vente.id}</Link>
                         </td>
                         <td>{vente.montantTotal}</td>
+                        <td className="text-danger">{vente.resteAPayer}</td>
                         <td>
                             <Link to={`/clients/${vente.client.id}`}
                                   className='text-decoration-none'>{vente.client.id} - {vente.client.nom}</Link>

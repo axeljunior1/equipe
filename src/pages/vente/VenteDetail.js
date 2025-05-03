@@ -3,11 +3,14 @@ import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import Table from "react-bootstrap/Table";
 import {Alert, Button, Col, Modal, Row} from "react-bootstrap";
 import {formatDate} from "../../utils/dateUtils";
-import apiCrudService from "../../services/ApiCrudService";
 import ProduitListe from "../produit/ProduitsListe";
 import AlertComp from "../../components/AlertComp";
 import useVente from "../../hooks/useVentes";
+import * as PropTypes from "prop-types";
+import Paiement from "../../components/Paiement";
 
+
+Paiement.propTypes = {data: PropTypes.any};
 const VenteDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
     const navigate = useNavigate();
@@ -138,6 +141,7 @@ const VenteDetail = () => {
                     <p><strong>Date de Création :</strong> {formatDate(vente.createdAt)}</p>
                     <p><strong>Date de mise à jour :</strong> {formatDate(vente.updatedAt)}</p>
                     <p><strong>Etat :</strong> {vente.etat.libelle}</p>
+                    <p><strong>Reste à payer :</strong> {vente.resteAPayer}</p>
                 </div>
                 <br/>
                 <h3> Lignes de la vente</h3>
@@ -193,6 +197,11 @@ const VenteDetail = () => {
                 </Row>
             </div>
 
+            <div className="card p-4 shadow mt-3">
+                <h3> Paiements de la vente </h3>
+                <Paiement paiements={vente.paiements}/>
+            </div>
+
             {/* Modal de recherche d'employé */}
             <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
                 <Modal.Header closeButton>
@@ -208,93 +217,3 @@ const VenteDetail = () => {
 
 export default VenteDetail;
 
-
-/*
-
-{
-    "id": 42,
-    "montantTotal": 259.99,
-    "createdAt": "2025-02-12T18:55:49.738605",
-    "updatedAt": "2025-02-12T08:38:16.367019",
-    "clientId": null,
-    "clientNom": null,
-    "client": {
-        "id": 1,
-        "nom": "cli 1 ",
-        "prenom": "pre cli 1",
-        "email": "string@cli1.com",
-        "telephone": "0749482336",
-        "dateCreation": null
-    },
-    "actif": true,
-    "employeId": 12,
-    "employeNom": null,
-    "employe": {
-        "id": 12,
-        "nom": "junior",
-        "prenom": "junior",
-        "actif": true,
-        "rolesIds": [
-            1,
-            2,
-            3,
-            4
-        ],
-        "rolesNoms": [
-            "GESTIONNAIRE_STOCK",
-            "COMPTABLE",
-            "ADMIN",
-            "VENDEUR"
-        ],
-        "role": [
-            {
-                "id": 1,
-                "nom": "ADMIN",
-                "description": "Administrateur ayant tous les droits",
-                "authorities": [
-                    {
-                        "id": 2,
-                        "nom": "SUPPRIMER_PRODUIT"
-                    },
-                    {
-                        "id": 4,
-                        "nom": "GERER_STOCK"
-                    }
-                ]
-            },
-            {
-                "id": 4,
-                "nom": "COMPTABLE",
-                "description": "Responsable des finances",
-                "authorities": []
-            },
-            {
-                "id": 3,
-                "nom": "VENDEUR",
-                "description": "Employé chargé des vente",
-                "authorities": []
-            },
-            {
-                "id": 2,
-                "nom": "GESTIONNAIRE_STOCK",
-                "description": "Responsable de la gestion des stocks",
-                "authorities": []
-            }
-        ],
-        "dateCreation": "2025-02-10T22:39:42.907528"
-    },
-    "lignesVenteId": null,
-    "ligneVentes": [
-        {
-            "id": 57,
-            "prixUnitaire": null,
-            "quantite": 1,
-            "venteId": 42,
-            "actif": true,
-            "produitId": 51,
-            "produitNom": null
-        }
-    ]
-}
-
-*/

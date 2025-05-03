@@ -8,7 +8,7 @@ const POSPaymentScreen = (props) => {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState("cash");
-    const [vente, setVente] = useState({});
+    const [montantPaiement, setMontantPaiement] = useState("");
     const {id} = useParams();
     const navigate = useNavigate();
 
@@ -18,7 +18,8 @@ const POSPaymentScreen = (props) => {
         try {
             let res = await apiCrudService.get(`ventes/${id}`)
 
-            setVente(res);
+            console.log(res.resteAPayer)
+            setMontantPaiement(res.resteAPayer);
 
         } catch (err) {
             setError(err)
@@ -32,17 +33,20 @@ const POSPaymentScreen = (props) => {
         fetch(id);
     }, []);
 
+
     // Envoyer un événement à la state machine backend
-    const confirmPaiement = (action) => {
+    const confirmPaiement = async (action) => {
         setError("");
         setLoading(true);
         try {
-            let res = apiCrudService.get(`ventes/payer/${id}`)
+            await apiCrudService.post(`ventes/payer/${id}`, {
+                id: id,
+                montantPaiement: montantPaiement,
+                modePaiement: paymentMethod
+            })
 
 
-            setTimeout(() => {
-                navigate(`/ventes/${id}?pShowAlertPaiement=true`)
-            }, 100)
+            navigate(`/ventes/${id}?pShowAlertPaiement=true`)
         } catch (err) {
             setError(err)
         } finally {
@@ -52,7 +56,7 @@ const POSPaymentScreen = (props) => {
 
     return (
         <div className="container mt-4">
-            <h2 className="mb-3">POS - Paiement </h2>
+            <h2 className="mb-3">POS - Paiement : {montantPaiement} </h2>
 
             <div className="mb-3">
                 <label className="form-label">Moyen de paiement</label>
@@ -72,7 +76,8 @@ const POSPaymentScreen = (props) => {
                 <input
                     type="number"
                     className="form-control"
-                    defaultValue={vente.montantTotal}
+                    value={montantPaiement}
+                    onChange={(e) => setMontantPaiement( e.target.value)}
                 />
             </div>
 
