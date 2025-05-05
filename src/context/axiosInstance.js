@@ -7,13 +7,13 @@ const loadConfig = async () => {
         return config.BACK_URL;
     } catch (error) {
         console.error("Erreur de chargement de la config:", error);
-        return "http://localhost:8080"; // Valeur par défaut
+        return ""; // Valeur par défaut
     }
 };
 
 // On initialise directement l'instance Axios avec une URL temporaire
 const axiosInstance = axios.create({
-    baseURL: "http://localhost:8080", // Temporaire le temps de charger la config
+    baseURL: "", // Temporaire le temps de charger la config
 });
 
 // Charge la config et met à jour l'instance
