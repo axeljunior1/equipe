@@ -35,6 +35,8 @@ import ClientCreer from "./client/ClientCreer";
 import POSPaymentScreen from "./paiement/POSPaymentScreen";
 import TarifAchat from "./tarifAchat/TarifAchat";
 import RapportVente from "./rapportVente/RapportVente";
+import CategorieCreer from "./categorie/CategorieCreer";
+import CreerRole from "./role/CreerRole";
 
 const AppRoutes = () => {
 
@@ -62,10 +64,12 @@ const AppRoutes = () => {
                     <Route path="/panier" element={<Panier/>}/>
                     <Route path="/categories" element={<ListCategories/>}/>
                     <Route path="/categories/:id" element={<CategorieDetail/>}/>
+                    <Route path="/creer-categorie" element={<CategorieCreer/>}/>
                     <Route path="/mouvements-stock" element={<MouvementStock/>}/>
                     <Route path="/mouvements-stock/produit/:id" element={<MouvementStock/>}/>
                     <Route path="/roles" element={<Roles/>}/>
                     <Route path="/roles/:id" element={<RoleDetail/>}/>
+                    <Route path="/creer-role" element={<CreerRole/>}/>
                     <Route path="/factures" element={<FactureList/>}/>
                     <Route path="/factures/:id" element={<FactureDetail/>}/>
                     <Route path="/factures/edit/:id" element={<FactureEdit/>}/>

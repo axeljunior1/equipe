@@ -21,13 +21,19 @@ const SelectMultiple = (props) => {
         props.setSelectedOptions(selectedItems);
     }, [selectedItems])
 
+    useEffect(() => {
+        console.log()
+        console.log(props.selectedOptions)
+        console.log(props.options)
+    })
+
     return (
         <>
             {/* Affichage des badges pour les éléments sélectionnés */}
             <Stack direction="horizontal" gap={3} className="bg-body-secondary">
                 {selectedItems.map((item, index) => (
                     <Badge key={index} bg="secondary" className=" my-2">
-                        {item.nom}
+                        {item?.nom}
                         <Button variant="outline-danger" className=" px-2 text-white py-0 ms-2"
                                 onClick={() => handleSelect(item)}>X</Button>
                     </Badge>
@@ -46,7 +52,7 @@ const SelectMultiple = (props) => {
                             <Form.Check
                                 type="checkbox"
                                 label={option.nom}
-                                checked={selectedItems.some(item => item.id === option.id)}
+                                checked={selectedItems.some(item => item?.id === option.id)}
                                 onChange={() => handleSelect(option)}
                                 className="me-2"
                                 style={{pointerEvents: "none"}} // Empêche le checkbox d'intercepter le clic

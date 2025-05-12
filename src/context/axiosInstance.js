@@ -1,28 +1,11 @@
 import axios from "axios";
 
-const loadConfig = async () => {
-    try {
-        const response = await fetch("/config.json");
-        const config = await response.json();
-        return config.BACK_URL;
-    } catch (error) {
-        console.error("Erreur de chargement de la config:", error);
-        return ""; // Valeur par défaut
-    }
-};
-
-// On initialise directement l'instance Axios avec une URL temporaire
+// Créer l'instance axios avec baseURL venant du .env
 const axiosInstance = axios.create({
-    baseURL: "", // Temporaire le temps de charger la config
+    baseURL: `${process.env.REACT_APP_BACK_URL}/`,
 });
 
-// Charge la config et met à jour l'instance
-loadConfig().then((baseUrl) => {
-    axiosInstance.defaults.baseURL = `${baseUrl}/`;
-    console.log("🚀 Axios configuré sur :", baseUrl);
-});
-
-// Intercepteurs
+// Intercepteur de requête pour ajouter le token
 axiosInstance.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem("jwt");
@@ -31,9 +14,10 @@ axiosInstance.interceptors.request.use(
         }
         return config;
     },
-    (error) => new Error(error),
+    (error) => Promise.reject(error)
 );
 
+// Intercepteur de réponse pour gérer les erreurs 401
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {

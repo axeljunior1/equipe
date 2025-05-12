@@ -37,9 +37,6 @@ const App = () => {
         }
     }, [location])
 
-    useEffect(() => {
-        console.log('jwt change a change : ', jwt)
-    }, [jwt])
 
     return (
         <div>

@@ -88,10 +88,8 @@ const ListCategories = () => {
             <h1><strong>Categorie</strong></h1>
 
 
-            <HeaderBtnElementComp titreFil='' variant='outline-primary' onClick={() => navigate('/creer-categorie')}
-                                  valueBtn='Créer categorie' />
-
-
+            <HeaderBtnElementComp titreFil='creer-categorie' variant='outline-primary'
+                                  valueBtn='Créer Catégorie'/>
 
             <SearchCategorieCritere
                 handleSubmitSearch={handleSubmitSearch}

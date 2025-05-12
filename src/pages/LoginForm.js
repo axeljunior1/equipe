@@ -9,6 +9,7 @@ const LoginForm = () => {
     const initialFormLogin = {
         username: "",
         password: "",
+        tenantId: "",
     };
 
     const [formLoging, setFormLoging] = useState(initialFormLogin);
@@ -23,7 +24,11 @@ const LoginForm = () => {
         setErrors([]);
 
         try {
-            const res = await axiosInstance.post("/login", formLoging); // Utilisation de l'instance Axios
+            const res = await axiosInstance.post("/login", formLoging, {
+                headers: {
+                    'X-Tenant-ID': formLoging.tenantId,  // Ajouter dynamiquement le header
+                }
+            }); // Utilisation de l'instance Axios
             const token = res.data.token;
 
             setJwt(token);
@@ -112,6 +117,18 @@ const LoginForm = () => {
                                         required
                                         name="password"
                                         value={formLoging.password}
+                                        onChange={handleChangeField}
+                                    />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3" controlId="formBasicPassword">
+                                    <Form.Label>Entreprise</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Entreprise"
+                                        required
+                                        name="tenantId"
+                                        value={formLoging.tenantId}
                                         onChange={handleChangeField}
                                     />
                                 </Form.Group>

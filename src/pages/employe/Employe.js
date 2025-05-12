@@ -26,6 +26,9 @@ function Achats() {
     if (error) {
         return <ErrorAlert error={error}/>;
     }
+    if (!employes) {
+        return <p>Aucun employe</p>;
+    }
 
     return (
         <div>
@@ -53,9 +56,9 @@ function Achats() {
                         </td>
                         <td>{employe.prenom}</td>
                         <td className="fw-bold">
-                            {employe["roles"].length > 3
-                                ? employe["roles"].slice(0, 3).map(r => r.nom).join(', ') + '...'
-                                : employe["roles"].map(r => r.nom).join(', ')}
+                            {employe["employeRoles"].length > 3
+                                ? employe["employeRoles"].slice(0, 3).map(r => r.role.nom).join(', ') + '...'
+                                : employe["employeRoles"].map(r => r.role.nom).join(', ')}
                         </td>
                         <td>{formatDate(employe["dateCreation"])}
                         </td>

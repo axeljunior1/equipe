@@ -11,11 +11,6 @@ export const JwtProvider = ({ children }) => {
     const [panierId, setPanierId] = useState(() => localStorage.getItem("panierId")  || undefined);
 
     useEffect(() => {
-        console.log('initial state: panier id ', panierId);
-    }, []);
-
-
-    useEffect(() => {
         if (jwt) {
             localStorage.setItem("jwt", jwt);
         } else {
@@ -37,7 +32,6 @@ export const JwtProvider = ({ children }) => {
         } else {
             localStorage.removeItem("panierId");
         }
-        console.log('changed panierId ', panierId);
     }, [panierId]);
 
 

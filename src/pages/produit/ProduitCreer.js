@@ -89,7 +89,6 @@ const ProduitCreer = () => {
                 console.log('Produit : ' + produit.nom);
                 await apiCrudService.post('produits', produit);
 
-                alert('tout est ok ! ')
             } catch (e) {
                 setError(e)
             } finally {

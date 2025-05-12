@@ -67,9 +67,8 @@ const ListRole = () => {
             <h1><strong>Role</strong></h1>
 
 
-            <HeaderBtnElementComp titreFil='' variant='outline-primary' onClick={() => navigate('/creer-role')}
-                                  valueBtn='Créer role'/>
-
+            <HeaderBtnElementComp titreFil='creer-role' variant='outline-primary'
+                                  valueBtn='Créer Role'/>
 
 
             <h5> Nombre total de ligne : <strong className={"text-danger"}>{nombreTotalDeLigne}</strong> </h5>

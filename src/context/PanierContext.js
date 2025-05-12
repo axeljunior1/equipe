@@ -30,10 +30,7 @@ export const PanierProvider = ({children}) => {
         fetchById(panierId);
     };
 
-    useEffect(() => {
-        console.log('fetch panier', panierId, panier);
 
-    }, [panier])
 
 
     const ajouterAuPanier = async (lignePanier) => {

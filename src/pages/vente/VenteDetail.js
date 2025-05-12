@@ -9,6 +9,7 @@ import useVente from "../../hooks/useVentes";
 import * as PropTypes from "prop-types";
 import Paiement from "../../components/Paiement";
 import apiCrudService from "../../services/ApiCrudService";
+import useLigneVente from "../../hooks/useLigneVente";
 
 
 Paiement.propTypes = {data: PropTypes.any};
@@ -18,6 +19,7 @@ const VenteDetail = () => {
     const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
     const {ventes: vente, error, loading, fetchById, fermerVente : closeVente} = useVente()
     const {ventes: lignesVentes, error: errorVL, loading: loadingVL, fetchVenteLines, remove} = useVente()
+    const {error: errorLV, loading: loadingLV, remove: removeLV} = useLigneVente()
 
 
     const location = useLocation();
@@ -100,7 +102,7 @@ const VenteDetail = () => {
 
     const handleDeleteLigne = async (e, id) => {
         e.preventDefault();
-        remove(id)
+        removeLV(id)
 
         await fetchVente();
     }
@@ -137,6 +139,7 @@ const VenteDetail = () => {
 
             {error && <Alert className={'mt-3'} variant="danger" dismissible>{error}</Alert> }
             {errorVL && <Alert className={'mt-3'} variant="danger" dismissible>{errorVL}</Alert> }
+            {errorLV && <Alert className={'mt-3'} variant="danger" dismissible>{errorLV}</Alert> }
 
             <h1><strong>Détail de la vente</strong></h1>
             <div className="card p-4 shadow">
