@@ -20,7 +20,7 @@ const FilterSelect = ({ name, value, onChange, options, placeholder }) => (
         onChange={onChange}
         className="mb-3"
     >
-        <option value="">{placeholder}</option>
+        <option value="" disabled >{placeholder}</option>
         {options.map((opt, idx) => (
             <option key={idx} value={opt.value}>
                 {opt.label}
@@ -33,23 +33,12 @@ const SearchCritereComp = ({
                                searchInput,
                                handleSearchInput,
                                handleSubmitSearch,
-                               handleSubmitFilter,
-                               cols,
+                               handleSubmitFilter, filters, setFilters,
+                               cols, handleInputChange
                            }) => {
-    const [filters, setFilters] = useState({});
 
-    useEffect(() => {
-        const initialFilters = {};
-        cols.forEach(col => {
-            initialFilters[col.name] = '';
-        });
-        setFilters(initialFilters);
-    }, [cols]);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFilters({ ...filters, [name]: value });
-    };
+
 
     return (
         <div>

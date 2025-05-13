@@ -197,81 +197,50 @@ const ProduitListe = (props) => {
         columns = removeColumns(baseColumns, ['onSelect']);
     }
 
+
+
     let cols = [
-        <Form.Select className="mb-3" key={"actif"}
-                     name="actif"
-                     value={filters.actif}
-                     onChange={handleInputChange}
-                     placeholder="Actif">
-            <option>Produits actifs uniquement ?</option>
-            <option value={"true"}>Oui</option>
-            <option value={"false"}>Non</option>
+        {
+            type: "select",
+            name: "actif",
+            placeholder: "Produits actifs uniquement ?",
+            options: [
+                { value: "true", label: "Oui" },
+                { value: "false", label: "Non" }
+            ]
+        },
+        {
+            type: "text",
+            name: "nom",
+            placeholder: "Nom"
+        },
+        {
+            type: "text",
+            name: "description",
+            placeholder: "Description"
+        },
+        {
+            type: "text",
+            name: "prixUnitaireMin",
+            placeholder: "Prix Unitaire Min"
+        },
+        {
+            type: "text",
+            name: "prixUnitaireMax",
+            placeholder: "Prix Unitaire Max"
+        },
+        {
+            type: "text",
+            name: "stockInitialMin",
+            placeholder: "Stock Initial Min"
+        },
+        {
+            type: "text",
+            name: "stockInitialMax",
+            placeholder: "Stock Initial Max"
+        }
+    ];
 
-        </Form.Select>
-    ]
-
-
-    /*let cols = [
-        <Form.Select className="mb-3" key={"actif"}
-                     name="actif"
-                     value={filters.actif}
-                     onChange={handleInputChange}
-                     placeholder="Actif">
-            <option>Produits actifs uniquement ?</option>
-            <option value={"true"}>Oui</option>
-            <option value={"false"}>Non</option>
-
-        </Form.Select>,
-        <Form.Control
-            type="text" key={"nom"}
-            value={filters.nom}
-            onChange={handleInputChange}
-            placeholder="Nom"
-            name='nom'
-            className="my-1"
-        />
-        ,
-        <Form.Control key={"description"}
-            type="text"
-            value={filters.description}
-            onChange={handleInputChange}
-            placeholder="Description"
-            name='description'
-            className="my-1 "
-        />,
-        <Form.Control key={"prixUnitaireMin"}
-            type="text"
-            value={filters.prixUnitaireMin}
-            onChange={handleInputChange}
-            placeholder="Prix Unitaire Min"
-            name='prixUnitaireMin'
-            className="my-1 "
-        />,
-        <Form.Control key={"prixUnitaireMax"}
-            type="text"
-            value={filters.prixUnitaireMax}
-            onChange={handleInputChange}
-            placeholder="Prix Unitaire Max"
-            name='prixUnitaireMax'
-            className="my-1 "
-        />,
-        <Form.Control key={"stockInitialMin"}
-            type="text"
-            value={filters.stockInitialMin}
-            onChange={handleInputChange}
-            placeholder="Stock Initial Min"
-            name='stockInitialMin'
-            className="my-1 "
-        />,
-        <Form.Control key={"stockInitialMax"}
-            type="text"
-            value={filters.stockInitialMax}
-            onChange={handleInputChange}
-            placeholder="Stock Initial Max"
-            name='stockInitialMax'
-            className="my-1 "
-        />
-    ]*/
 
 
     const handleSubmitSearch = async (e) => {
@@ -329,6 +298,7 @@ const ProduitListe = (props) => {
                                searchInput={searchInput}
                                handleSearchInput={handleSearchInput}
                                handleSubmitFilter={handleSubmitFilter}
+                               filters={filters} setFilters={setFilters} handleInputChange={handleInputChange}
             />
 
             {produits.length > 0 ? (
