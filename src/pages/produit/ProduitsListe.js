@@ -197,8 +197,21 @@ const ProduitListe = (props) => {
         columns = removeColumns(baseColumns, ['onSelect']);
     }
 
-
     let cols = [
+        <Form.Select className="mb-3" key={"actif"}
+                     name="actif"
+                     value={filters.actif}
+                     onChange={handleInputChange}
+                     placeholder="Actif">
+            <option>Produits actifs uniquement ?</option>
+            <option value={"true"}>Oui</option>
+            <option value={"false"}>Non</option>
+
+        </Form.Select>
+    ]
+
+
+    /*let cols = [
         <Form.Select className="mb-3" key={"actif"}
                      name="actif"
                      value={filters.actif}
@@ -258,7 +271,7 @@ const ProduitListe = (props) => {
             name='stockInitialMax'
             className="my-1 "
         />
-    ]
+    ]*/
 
 
     const handleSubmitSearch = async (e) => {

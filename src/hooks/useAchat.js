@@ -18,7 +18,6 @@ export default function useAchat() {
     const [error, setError] = useState(null);
     const [totalElements, setTotalElements] = useState(number);
     const [totalPages, setTotalPages] = useState(number);
-    const [achatSave, setAchatSave] = useState({});
 
 
     // Récupérer tous les achats par id
@@ -35,19 +34,6 @@ export default function useAchat() {
         }
     };
 
-    // Récupérer tous les achats par id
-    const fetchByIdSaved = async (id) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await getAchatById(id);
-            setAchatSave(response.data);
-        } catch (err) {
-            setError(err.response?.data?.message || "Erreur lors de la récupération de achat");
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // Récupérer tous les achats par id
     const fetchAchatLines = async (id) => {
@@ -118,10 +104,12 @@ export default function useAchat() {
         setError(null);
         try {
             const response = await createAchat(achatData);
-            setAchats([...achats, response.data]); // Ajoute l'employé créé à la liste
-            await fetchByIdSaved(response.data.id);
+            return { success: true, data: response.data };
         } catch (err) {
-            setError(err.response?.data?.message || "Erreur lors de la création du achat");
+            const message = err.response?.data?.message || "Erreur lors de la création du achat";
+            setError(message);
+            return { success: false, error: message };
+
         } finally {
             setLoading(false);
         }
@@ -161,7 +149,7 @@ export default function useAchat() {
     };
 
     return {
-        achats, loading, error, fetchAllAchats,fetchAchatLines, fetchById, achatSave, fetchByMotCle, fetchByParams, create, update, remove, totalElements,
+        achats, loading, error, fetchAllAchats,fetchAchatLines, fetchById, fetchByMotCle, fetchByParams, create, update, remove, totalElements,
         totalPages
     };
 }

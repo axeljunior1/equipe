@@ -86,15 +86,14 @@ export default function useProduct() {
         setError(null);
         try {
             const response = await createProduit(produitData);
-            setProduits([...produits, response.data]); // Ajoute le produit créé à la liste
-            return response.data
+            return { success: true, data: response.data };
         } catch (err) {
-            setError(err.response?.data?.message || "Erreur lors de la création du produit");
-            return false
+            const message = err.response?.data?.message || "Erreur lors de la création du achat";
+            setError(message);
+            return { success: false, error: message };
         } finally {
             setLoading(false);
         }
-        return false;
     };
 
     // Mettre à jour un produit

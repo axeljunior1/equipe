@@ -11,7 +11,7 @@ import useAchat from "../../hooks/useAchat";
 function Achats() {
     const navigate = useNavigate();
     const {loggedEmployee} = useJwt();
-    const {achats, achatSave, error, loading, fetchAllAchats, create, remove} = useAchat()
+    const {achats, error, loading, fetchAllAchats, create, remove} = useAchat()
 
     async function fetchAchats() {
         await fetchAllAchats()
@@ -21,12 +21,6 @@ function Achats() {
          fetchAchats();
     }, []);
 
-
-    // useEffect(() => {
-    //     if (achatSave && achatSave.id) {
-    //         navigate(`/achats/${achatSave.id}?showAlert=true`);
-    //     }
-    // }, [achatSave]);
 
 
     const handleDeleteAchat =async (id) => {
@@ -49,7 +43,10 @@ function Achats() {
                 montantTotal: 0,
                 employeId: parsed.id,
             };
-            await create(achat);
+            let res = await create(achat);
+            if (res.success ) {
+                navigate(`/achats/${res.data.id}`);
+            }
         }
     }
 

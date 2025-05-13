@@ -37,10 +37,8 @@ const ProduitCreer = () => {
         let res = await create(formData);
 
 
-        if (res) {
-
-            navigate(`/produits/${res.id}`);
-
+        if (res.success) {
+            navigate(`/produits/${res.data.id}`);
         }
 
     };
@@ -79,7 +77,7 @@ const ProduitCreer = () => {
     const initProduct = async () => {
 
         initPro.map(async produit => {
-           let succes = await create(produit);
+           await create(produit);
         })
     }
 
@@ -167,7 +165,7 @@ const ProduitCreer = () => {
                              value={formData.categorieId} required
                              onChange={handleChange}
                              placeholder="Entrez la catégorie">
-                    <option>Catégorie</option>
+                    <option value="" disabled hidden>Entrez la catégorie</option>
                     <>
                     {categories.map((item) => (
                         <option key={item.id} value={item.id}>{item.nom}</option>
