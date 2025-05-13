@@ -3,6 +3,7 @@ import {useNavigate} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import apiCrudService from "../../services/ApiCrudService";
 import useCategory from "../../hooks/useCategory";
+import useProduct from "../../hooks/useProduct";
 
 const ProduitCreer = () => {
     const [formData, setFormData] = useState({
@@ -16,9 +17,8 @@ const ProduitCreer = () => {
         stockInitial: 0
 
     });
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { loading, error, create} = useProduct();
     const {categories, fetchCategories, loading: loadingCat, error: errorCat} = useCategory();
 
     // Gestion des modifications du formulaire
@@ -31,25 +31,20 @@ const ProduitCreer = () => {
     };
 
 
-
-
     // Fonction pour soumettre les données à l'API
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        try {
-            let response = await apiCrudService.post('produits',formData);
-            debugger;
-            navigate(`/produits/${response.id}?showAlertCreation=true`);
+        let res = await create(formData);
 
-        }catch (error) {
-            setError(error);
-        }finally {
-            setLoading(false);
+
+        if (res) {
+
+            navigate(`/produits/${res.id}`);
+
         }
 
-
     };
+
     const initPro = [
         { nom: "Coque de téléphone transparente", description: "Coque légère et résistante.", ean13: "1234567890001", image: "coque_transparente.jpg", prixVente: 9.99, prixAchat: 4.5, categorieId: 1, seuilProduit: 10, stockInitial: 50 },
         { nom: "Chargeur sans fil rapide", description: "Chargeur induction 15W.", ean13: "1234567890002", image: "chargeur_sans_fil.jpg", prixVente: 24.99, prixAchat: 12.5, categorieId: 1, seuilProduit: 8, stockInitial: 30 },
@@ -84,16 +79,7 @@ const ProduitCreer = () => {
     const initProduct = async () => {
 
         initPro.map(async produit => {
-            setLoading(true);
-            try {
-                console.log('Produit : ' + produit.nom);
-                await apiCrudService.post('produits', produit);
-
-            } catch (e) {
-                setError(e)
-            } finally {
-                setLoading(false);
-            }
+           let succes = await create(produit);
         })
     }
 
@@ -108,15 +94,15 @@ const ProduitCreer = () => {
         fetchCategories();
     },[])
 
-    if (loadingCat) {
+    if (loadingCat || loading) {
         return <div>Loading...</div>
     }
 
     return (
         <div className="container mt-5">
             <h3>Créer un nouveau produit</h3>
-            {error && <div className="alert alert-danger">{error.message}</div>}
-            {errorCat && <div className="alert alert-danger">{errorCat.message}</div>}
+            {error && <div className="alert alert-danger">{error}</div>}
+            {errorCat && <div className="alert alert-danger">{errorCat}</div>}
             <Button variant={"outline-warning"} onClick={initProduct} >Initialiser</Button>
             <Form className=" mt-3 mb-4" onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">

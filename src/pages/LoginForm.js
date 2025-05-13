@@ -24,19 +24,19 @@ const LoginForm = () => {
         setErrors([]);
 
         try {
-            const res = await axiosInstance.post("/login", formLoging, {
+            let res = await axiosInstance.post("/login", formLoging, {
                 headers: {
                     'X-Tenant-ID': formLoging.tenantId,  // Ajouter dynamiquement le header
                 }
             }); // Utilisation de l'instance Axios
-            const token = res.data.token;
+            let token = res.data.token;
 
             setJwt(token);
 
             setLoggedEmployee(JSON.stringify(res.data.employeGetDto));
 
             let panierId = null;
-            res.data.panier?.forEach(panier => {
+            res.data.panier.forEach(panier => {
                 if (panier.etat?.libelle === 'EN_COURS') {
                     panierId = panier.id;
                 }

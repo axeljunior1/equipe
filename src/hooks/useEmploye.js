@@ -88,11 +88,13 @@ export default function useEmploye() {
         try {
             const response = await createEmploye(employeData);
             setEmployes([...employes, response.data]); // Ajoute l'employé créé à la liste
+            return response.data;
         } catch (err) {
             setError(err.response?.data?.message || "Erreur lors de la création du employe");
         } finally {
             setLoading(false);
         }
+        return null;
     };
 
     // Mettre à jour un employe

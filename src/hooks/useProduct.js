@@ -87,11 +87,14 @@ export default function useProduct() {
         try {
             const response = await createProduit(produitData);
             setProduits([...produits, response.data]); // Ajoute le produit créé à la liste
+            return response.data
         } catch (err) {
             setError(err.response?.data?.message || "Erreur lors de la création du produit");
+            return false
         } finally {
             setLoading(false);
         }
+        return false;
     };
 
     // Mettre à jour un produit

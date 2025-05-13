@@ -30,9 +30,11 @@ const CreateEmployePage = () => {
     // Fonction pour soumettre les données à l'API
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await create(formData)
-        setFormData(formInitialState);
-        navigate(`/employes/${employe['id']}`);
+        const res = await create(formData)
+        if (res!=null){
+            setFormData(formInitialState);
+            navigate(`/employes/${res['id']}`);
+        }
 
     };
 
