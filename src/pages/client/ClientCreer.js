@@ -2,6 +2,8 @@ import React, {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import apiCrudService from "../../services/ApiCrudService";
+import useCategory from "../../hooks/useCategory";
+import useClient from "../../hooks/useClients";
 
 const ClientCreer = () => {
     const [formData, setFormData] = useState({
@@ -11,9 +13,9 @@ const ClientCreer = () => {
         telephone: ''
 
     });
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const {clients, loading, error, create} = useClient();
     const navigate = useNavigate();
+
     // Gestion des modifications du formulaire
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -24,23 +26,14 @@ const ClientCreer = () => {
     };
 
 
-
     // Fonction pour soumettre les données à l'API
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setError(null);
-        try {
-            let response = await apiCrudService.post('clients',formData);
-            debugger;
-            navigate(`/clients/${response.id}?showAlertCreation=true`);
+        let response = await create(formData);
 
-        }catch (error) {
-            setError(error);
-        }finally {
-            setLoading(false);
+        if (response.success) {
+            navigate(`/clients/${response.data.id}`);
         }
-
 
     };
 
@@ -49,7 +42,7 @@ const ClientCreer = () => {
     return (
         <div className="container mt-5">
             <h3>Créer un nouveau client</h3>
-            {error && <div className="alert alert-danger">{error.message}</div>}
+            {error && <div className="alert alert-danger">{error}</div>}
             <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
                     <Form.Label>Nom</Form.Label>
@@ -58,7 +51,7 @@ const ClientCreer = () => {
                         name="nom"
                         value={formData.nom}
                         onChange={handleChange}
-                        placeholder="Entrez le nom du client"
+                        placeholder="Entrez le nom du client" required
                     />
                 </Form.Group>
 
@@ -69,7 +62,7 @@ const ClientCreer = () => {
                         name="prenom"
                         value={formData.prenom}
                         onChange={handleChange}
-                        placeholder="Entrez la prenom"
+                        placeholder="Entrez la prenom" required
                     />
                 </Form.Group>
 
@@ -92,6 +85,7 @@ const ClientCreer = () => {
                         value={formData.telephone}
                         onChange={handleChange}
                         placeholder="Entrez le telephone"
+                        required
                     />
                 </Form.Group>
 

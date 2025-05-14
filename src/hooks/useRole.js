@@ -47,9 +47,11 @@ export default function useRole() {
         setError(null);
         try {
             const response = await createRole(roleData);
-            setRoles([...roles, response.data]); // Ajoute l'employé créé à la liste
+            return {success : true, data : response.data}
         } catch (err) {
-            setError(err.response?.data?.message || "Erreur lors de la création du role");
+            let message = err.response?.data?.message || "Erreur lors de la création du role";
+            setError(message);
+            return {success : false, error : message};
         } finally {
             setLoading(false);
         }

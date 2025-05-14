@@ -28,6 +28,11 @@ const LoginForm = () => {
                 headers: {
                     'X-Tenant-ID': formLoging.tenantId,  // Ajouter dynamiquement le header
                 }
+            });
+             res = await axiosInstance.post("/login", formLoging, {
+                headers: {
+                    'X-Tenant-ID': formLoging.tenantId,  // Ajouter dynamiquement le header
+                }
             }); // Utilisation de l'instance Axios
             let token = res.data.token;
 

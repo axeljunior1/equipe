@@ -88,9 +88,11 @@ export default function useClient() {
         setError(null);
         try {
             const response = await createClient(clientData);
-            setClients([...clients, response.data]); // Ajoute le client créé à la liste
+            return {success : true, data : response.data}
         } catch (err) {
-            setError(err.response?.data?.message || "Erreur lors de la création du client");
+            let message = err.response?.data?.message || "Erreur lors de la création du client";
+            setError(message);
+            return {success : false, error : message};
         } finally {
             setLoading(false);
         }

@@ -27,9 +27,11 @@ const CreerRole = () => {
     // Fonction pour soumettre les données à l'API
     const handleSubmit = async (e) => {
 
-        await create(formData)
+        let res = await create(formData)
 
-        navigate(`/roles`);
+        if (res.success) {
+            navigate(`/roles/${res.data.id}`);
+        }
 
     };
 

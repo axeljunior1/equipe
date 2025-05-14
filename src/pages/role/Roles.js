@@ -5,34 +5,22 @@ import apiCrudService from "../../services/ApiCrudService";
 import ErrorAlert from "../../exceptions/ErrorAlert";
 import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
 import {Pagination} from "react-bootstrap";
+import useRole from "../../hooks/useRole";
 
 
 const ListRole = () => {
-    const [roles, setRoles] = useState([]);
 
-
-
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(0); // Page actuelle
     const [pageSize, setPageSize] = useState(15); // Taille de la page
     const [totalPages, setTotalPages] = useState(0); // Nombre total de pages
     const [nombreTotalDeLigne, setNombreTotalDeLigne] = useState(0); // Nombre total de pages
+    const {roles, fetchAllRoles, loading, error} = useRole()
     const navigate = useNavigate();
 
     // Fonction pour récupérer les role avec pagination
     const fetchRoles = async () => {
-        setLoading(true);
-        try {
-            let data = await apiCrudService.get('roles', currentPage, pageSize);
-            setRoles(data.content);  // Assuming 'content' is the array of products
-            setTotalPages(data.totalPages); // Assuming 'totalPages' is the total page count
-            setNombreTotalDeLigne(data.totalElements)
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
+
+        await fetchAllRoles(currentPage, pageSize)
 
     };
 
@@ -57,14 +45,14 @@ const ListRole = () => {
     };
 
 
-    if (error) {
-        return <ErrorAlert error={error}/>;
-    }
+
 
     return (
         <div>
 
             <h1><strong>Role</strong></h1>
+
+            {error && <p className={"text-danger"}> {error} </p>}
 
 
             <HeaderBtnElementComp titreFil='creer-role' variant='outline-primary'

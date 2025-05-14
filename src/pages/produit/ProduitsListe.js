@@ -268,9 +268,6 @@ const ProduitListe = (props) => {
     ];
 
 
-    if (error) {
-        return <ErrorAlert error={error}/>;
-    }
     return (
         <div>
 
@@ -285,6 +282,8 @@ const ProduitListe = (props) => {
             )}
 
             <h1><strong>Produits</strong></h1>
+
+            {error && (<p className={"text-danger"}> {error} </p>)}
 
             <ToastContainer />
 
