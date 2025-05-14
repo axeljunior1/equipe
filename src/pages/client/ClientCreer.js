@@ -76,7 +76,6 @@ const ClientCreer = () => {
                         placeholder="Entrez l'email"
                     />
                 </Form.Group>
-
                 <Form.Group className="mb-3">
                     <Form.Label>Telephone</Form.Label>
                     <Form.Control
