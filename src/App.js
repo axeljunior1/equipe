@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import AppRoutes from "./pages/AppRoutes";
-import {Button, Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
+import {Button, Col, Container, Nav, Navbar, NavDropdown, Row} from "react-bootstrap";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {useJwt} from "./context/JwtContext";
 import useMobile from "./context/useMobile";
@@ -37,6 +37,9 @@ const App = () => {
         }
     }, [location])
 
+    useEffect(() => {
+        console.log(JSON.parse(loggedEmployee))
+    },[loggedEmployee])
 
     return (
         <div>
@@ -96,16 +99,24 @@ const App = () => {
                                 </Nav>
                                 <Nav>
 
-                                        <span className={'text-white'}>
-                                            Bonjour : {JSON.parse(loggedEmployee).nom.toUpperCase()}
-                                        </span>
-                                    <Button
-                                        variant="outline-light"
-                                        onClick={handleLogout}
-                                        className="ms-2"
-                                    >
-                                        Déconnexion
-                                    </Button>
+                                        <Row className={'text-white'}>
+                                            <Col xs={12} sm={12} md={4} >
+                                                Bonjour : {JSON.parse(loggedEmployee).nom.toUpperCase()}
+                                            </Col>
+                                            <Col xs={12} sm={12} md={4} >
+                                                Entreprise : { JSON.parse(loggedEmployee).tenantId?.toUpperCase()}
+                                            </Col>
+                                            <Col xs={12} sm={12} md={4} >
+                                                <Button
+                                                    variant="outline-light"
+                                                    onClick={handleLogout}
+                                                    className="ms-2"
+                                                >
+                                                    Déconnexion
+                                                </Button>
+                                            </Col>
+                                        </Row>
+
                                 </Nav>
                             </Navbar.Collapse>
                         </Container>
