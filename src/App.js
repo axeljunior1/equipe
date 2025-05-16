@@ -5,7 +5,6 @@ import {Link, useLocation, useNavigate} from "react-router-dom";
 import {useJwt} from "./context/JwtContext";
 import useMobile from "./context/useMobile";
 import Footer from "./pages/footer/Footer";
-import usePanierProduit from "./hooks/usePanierProduit";
 import LoginForm from "./pages/LoginForm";
 import {usePanier} from "./context/PanierContext";
 

@@ -271,7 +271,6 @@ const ProduitListe = (props) => {
     return (
         <div>
 
-
             {showAlertSupprProduit && (
                 <AlertComp
                     message="Opération réussie le produit a été suprimé !"
