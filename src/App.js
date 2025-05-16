@@ -14,7 +14,7 @@ const App = () => {
     const {jwt, setJwt, setPanierId, setLoggedEmployee, loggedEmployee} = useJwt();
     const navigate = useNavigate();
     const location = useLocation();
-    const isMobile = useMobile(); // Utilisation du hook
+    const isMobile = useMobile(); // Utilisation du hook seeeeeeeqssjkoqjdhlksqd
     const [logout, setLogout] = useState(false);
 
     const handleLogout = () => {
