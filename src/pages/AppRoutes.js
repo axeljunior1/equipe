@@ -37,6 +37,9 @@ import TarifAchat from "./tarifAchat/TarifAchat";
 import RapportVente from "./rapportVente/RapportVente";
 import CategorieCreer from "./categorie/CategorieCreer";
 import CreerRole from "./role/CreerRole";
+import ListAuthority from "./authority/ListAuthority";
+import DetailsAuthority from "./authority/DetailsAuthority";
+import AutorityCreer from "./authority/AutorityCreer";
 
 const AppRoutes = () => {
 
@@ -67,6 +70,9 @@ const AppRoutes = () => {
                     <Route path="/creer-categorie" element={<CategorieCreer/>}/>
                     <Route path="/mouvements-stock" element={<MouvementStock/>}/>
                     <Route path="/mouvements-stock/produit/:id" element={<MouvementStock/>}/>
+                    <Route path="/autorisations" element={<ListAuthority/>}/>
+                    <Route path="/autorisations/:id" element={<DetailsAuthority/>}/>
+                    <Route path="/creer-autorisation" element={<AutorityCreer/>}/>
                     <Route path="/roles" element={<Roles/>}/>
                     <Route path="/roles/:id" element={<RoleDetail/>}/>
                     <Route path="/creer-role" element={<CreerRole/>}/>

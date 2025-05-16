@@ -91,6 +91,7 @@ const App = () => {
                                         <NavDropdown title="Employés" id="nav-dropdown-employes">
                                             <NavDropdown.Item as={Link} to="/employes">Employés</NavDropdown.Item>
                                             <NavDropdown.Item as={Link} to="/roles">Rôles</NavDropdown.Item>
+                                            <NavDropdown.Item as={Link} to="/autorisations">Autorisations</NavDropdown.Item>
                                         </NavDropdown>
                                     </>}
 

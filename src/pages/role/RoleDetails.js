@@ -16,7 +16,7 @@ const RoleDetail = (props) => {
     let initialFormDetailRole = {
         nom : "",
         description : "",
-        authoritiesNoms : [],
+        authoritiesIds : [],
     };
     const [isEditing, setIsEditing] = useState(false); // État pour basculer en mode édition
     const [formData, setFormData] = useState(initialFormDetailRole); // État pour stocker les modifications
@@ -30,14 +30,15 @@ const RoleDetail = (props) => {
     };
 
     useEffect(() => {
-       if (role && role.length > 0) {
-           let preFormData = formData;
-           preFormData.nom = role.nom;
-           preFormData.description = role.description;
-           preFormData.authoritiesNoms = role.authorityNoms ;
-           setFormData(preFormData);
-       }
+        if (role) {
+            setFormData({
+                nom: role.nom,
+                description: role.description,
+                authoritiesIds: role.authoritiesIds
+            })
+        }
     }, [role]);
+
 
     // Fonction pour récupérer les données d'un role
     const fetchAuthorities = async () => {
@@ -88,8 +89,17 @@ const RoleDetail = (props) => {
         return <ErrorAlert error={errorA} />
     }
 
+
+
     const setSelectedOptions = (selectedItems) => {
-        setFormData({...formData, authoritiesNoms : selectedItems});
+        let newFormData = {
+            ...formData,
+            authoritiesIds: selectedItems.map(item => item.id)
+        };
+        console.log(newFormData.rolesNoms);
+
+        setFormData(newFormData);
+
     }
 
 
