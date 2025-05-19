@@ -43,10 +43,9 @@ const App = () => {
     return (
         <div>
 
-
             {jwt && jwt !== "" && (
                 <div className="d-flex flex-column  min-vh-100">
-                    <Navbar expand="lg" className="bg-body-tertiary" bg="dark" data-bs-theme="dark">
+                    <Navbar expand="lg" className="bg-body-tertiary" bg="dark" data-bs-theme="dark" fixed="top">
                         <Container>
 
 

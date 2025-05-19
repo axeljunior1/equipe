@@ -1,3 +1,7 @@
+body {
+  padding-top: 56px; /* hauteur approximative de la navbar Bootstrap */
+}
+
 .App {
   text-align: center;
 }
