@@ -32,12 +32,6 @@ const ProduitCreer = () => {
         });
     };
 
-    useEffect(() => {
-        console.log("devises")
-        if (devises && devises.length !== 0) {
-            console.log(devises)
-        }
-    }, [devises])
 
 
     // Fonction pour soumettre les données à l'API
@@ -98,11 +92,11 @@ const ProduitCreer = () => {
     }
 
     useEffect(() => {
-        fetchCategories();
+        fetchCategories(0,200);
     },[])
 
     useEffect(() => {
-        fetchAll();
+        fetchAll(0,200);
     },[])
 
     if (loadingCat || loading) {

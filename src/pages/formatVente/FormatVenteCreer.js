@@ -52,7 +52,7 @@ const FormatVenteCreer = () => {
     }
 
     useEffect(() => {
-        fetchCategories();
+        fetchCategories(0,200);
     },[])
 
     if (loadingCat || loading) {

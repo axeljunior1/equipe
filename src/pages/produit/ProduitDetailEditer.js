@@ -44,7 +44,7 @@ const ProduitDetailEditer = (props) => {
     } = useCategory();
 
     useEffect(() => {
-        fetchCategories(0, DEFAULT_PAGINATION_SIZE);
+        fetchCategories(0, 200);
         fetchById(id);
     }, [id]);
 
