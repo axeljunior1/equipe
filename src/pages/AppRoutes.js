@@ -40,6 +40,7 @@ import CreerRole from "./role/CreerRole";
 import ListAuthority from "./authority/ListAuthority";
 import DetailsAuthority from "./authority/DetailsAuthority";
 import AutorityCreer from "./authority/AutorityCreer";
+import FormatVente from "./formatVente/FormatVente";
 
 const AppRoutes = () => {
 
@@ -57,6 +58,8 @@ const AppRoutes = () => {
                     <Route path="/creer-achat" element={<CreateAchatPage/>}/>
                     <Route path="/achats" element={<Achats/>}/>
                     <Route path="/achats/:id" element={<AchatDetail/>}/>
+                    <Route path="/format-vente" element={<FormatVente/>}/>
+                    <Route path="/creer-format-vente" element={<FormatVenteCreer/>}/>
                     <Route path="/ventes" element={<Ventes/>}/>
                     <Route path="/ventes/:id" element={<VenteDetail/>}/>
                     <Route path="/rapport-ventes" element={<RapportVente/>}/>

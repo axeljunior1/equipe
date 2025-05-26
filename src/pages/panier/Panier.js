@@ -11,6 +11,7 @@ import {usePanier} from "../../context/PanierContext";
 import ListClients from "../client/ClientList";
 import BarcodeReader from "../../components/BarcodeReader";
 import ProduitListe from "../produit/ProduitsListe";
+import BarcodeScanner from "../../components/BarcodeScanner";
 
 const Panier = () => {
     const [showModalClient, setShowModalClient] = useState(false); // Contrôle d'affichage du modal
@@ -398,6 +399,11 @@ const Panier = () => {
                 <br/>
                 <br/>
             </span>
+
+            <div className="m-5">
+                <BarcodeScanner/>
+            </div>
+
             <div className="my-3">
                 <ProduitListe panierList={true}/>
             </div>

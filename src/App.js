@@ -69,6 +69,7 @@ const App = () => {
                                             <NavDropdown.Item as={Link} to="/ventes">Ventes</NavDropdown.Item>
                                             <NavDropdown.Item as={Link} to="/rapport-ventes">Rapport de
                                                 Ventes</NavDropdown.Item>
+                                            <NavDropdown.Item as={Link} to="/format-vente">Format Vente</NavDropdown.Item>
                                             <NavDropdown.Item as={Link} to="/factures">Factures</NavDropdown.Item>
                                         </NavDropdown>
 
