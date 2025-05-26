@@ -193,7 +193,7 @@ const Panier = () => {
                 <div className="alert alert-danger" role="alert"> {error.message} </div>
             }
 
-            <h3 className="my-4 text-danger">Total: {calculerTotal()}€</h3>
+            <h3 className="my-4 text-danger">Total: {calculerTotal()}</h3>
 
             <BarcodeReader/>
 
@@ -228,7 +228,7 @@ const Panier = () => {
                                 <Button variant={"outline-primary"} className={"w-100"}
                                         onClick={() => handleShowModalDetailProduit(item["produit"].id)}>{item["produit"].nom}</Button>
                             </td>
-                            <td>{item["produit"].prixVente}€</td>
+                            <td>{item["produit"].prixVente} {item.produit.deviseSymbole}</td>
                             <td>
                                 <Row>
                                     <Col>
@@ -274,7 +274,7 @@ const Panier = () => {
                                     </Col>
                                 </Row>
                             </td>
-                            <td>{(item["produit"].prixVente * item.quantite).toFixed(2)}€</td>
+                            <td>{(item["produit"].prixVente * item.quantite).toFixed(2)} {item.produit?.deviseSymbole} ({item.produit?.deviseCode})</td>
                             <td>
                                 <Button
                                     variant="danger"

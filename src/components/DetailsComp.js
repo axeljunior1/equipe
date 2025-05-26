@@ -4,33 +4,6 @@ import {Col, ListGroup, Row, Stack} from "react-bootstrap";
 const DetailsComp = (props) => {
 
 
-        // // Fonction pour récupérer les données d'un produit
-        // const fetchProduitByCodeBarre = async (codeBarre) => {
-        //     try {
-        //         const data = await produitService.getProduitsByCodeBarre(codeBarre)
-        //         setProduit(data);
-        //         ajouterAuPanier({
-        //             "prixVente": data.prixVente,
-        //             "produitId": data.id,
-        //             "quantite": nombreProduitDansPanier(data.id) + 1
-        //         });
-        //         props.setTexte('')
-        //
-        //     } catch (error) {
-        //         setError(error);
-        //     }
-        // };
-        //
-        //
-        //
-        //
-        // useEffect(() => {
-        //     console.log('relance panier ', props.panier)
-        //     if (props.scanAndAdd) {
-        //         fetchProduitByCodeBarre(props.codeBarre).then(r => r);
-        //
-        //     }
-        // }, [ props.codeBarre]);
 
 
         return (

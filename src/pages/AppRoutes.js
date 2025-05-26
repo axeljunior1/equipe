@@ -41,6 +41,7 @@ import ListAuthority from "./authority/ListAuthority";
 import DetailsAuthority from "./authority/DetailsAuthority";
 import AutorityCreer from "./authority/AutorityCreer";
 import FormatVente from "./formatVente/FormatVente";
+import FormatVenteCreer from "./formatVente/FormatVenteCreer";
 
 const AppRoutes = () => {
 

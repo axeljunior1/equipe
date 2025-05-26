@@ -55,8 +55,8 @@ const ProduitDetail = (props) => {
     }
 
     const lines = [
-        <p key={produits.id}><strong>Prix Vente :</strong> {produits.prixVente} €</p>,
-        <p key={produits.id}><strong>Prix Achat:</strong> {produits.prixAchat} €</p>,
+        <p key={produits.id}><strong>Prix Vente :</strong> {produits.prixVente} {produits.deviseSymbole} ({produits.deviseCode})</p>,
+        <p key={produits.id}><strong>Prix Achat:</strong> {produits.prixAchat} {produits.deviseSymbole} ({produits.deviseCode})</p>,
         <p key={produits.id}><strong>Description :</strong> {produits.description}</p>,
         <p key={produits.id}><strong>Catégorie :</strong> {produits.categorieNom}</p>,
         <p key={produits.id}><strong>Stock initial :</strong> {produits.stockInitial}</p>,

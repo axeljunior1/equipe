@@ -175,7 +175,7 @@ const VenteDetail = () => {
                                 <td><Link to={`/produits/${ligne.id}`}
                                           className='text-decoration-none'>{ligne.produit.id} - {ligne.produit.nom}</Link>
                                 </td>
-                                <td>{ligne.prixVente}</td>
+                                <td>{ligne.prixVente} {ligne.produit?.deviseSymbole} ({ligne.produit?.deviseCode})</td>
                                 <td>{ligne.quantite}</td>
                                 <td className="text-center align-middle">
                                     <Button

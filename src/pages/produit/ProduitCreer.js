@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {Button, Form} from 'react-bootstrap';
+import {Button, Col, Form, Row} from 'react-bootstrap';
 import apiCrudService from "../../services/ApiCrudService";
 import useCategory from "../../hooks/useCategory";
 import useProduct from "../../hooks/useProduct";
+import useDevise from "../../hooks/useDevise";
 
 const ProduitCreer = () => {
     const [formData, setFormData] = useState({
@@ -20,6 +21,7 @@ const ProduitCreer = () => {
     const navigate = useNavigate();
     const { loading, error, create} = useProduct();
     const {categories, fetchCategories, loading: loadingCat, error: errorCat} = useCategory();
+    const {devises, fetchAll} = useDevise();
 
     // Gestion des modifications du formulaire
     const handleChange = (e) => {
@@ -29,6 +31,13 @@ const ProduitCreer = () => {
             [name]: value
         });
     };
+
+    useEffect(() => {
+        console.log("devises")
+        if (devises && devises.length !== 0) {
+            console.log(devises)
+        }
+    }, [devises])
 
 
     // Fonction pour soumettre les données à l'API
@@ -92,6 +101,10 @@ const ProduitCreer = () => {
         fetchCategories();
     },[])
 
+    useEffect(() => {
+        fetchAll();
+    },[])
+
     if (loadingCat || loading) {
         return <div>Loading...</div>
     }
@@ -102,88 +115,107 @@ const ProduitCreer = () => {
             {error && <div className="alert alert-danger">{error}</div>}
             {errorCat && <div className="alert alert-danger">{errorCat}</div>}
             <Button variant={"outline-warning"} onClick={initProduct} >Initialiser</Button>
+
+
+
             <Form className=" mt-3 mb-4" onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                    <Form.Label>Nom</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="nom"
-                        value={formData.nom}
-                        onChange={handleChange}
-                        placeholder="Entrez le nom du produit" required
-                    />
-                </Form.Group>
+                <Row className="mt-3">
+                    <Col sm={12} md={4} > <Form.Group className="mb-3">
+                        <Form.Label>Nom</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="nom"
+                            value={formData.nom}
+                            onChange={handleChange}
+                            placeholder="Entrez le nom du produit" required
+                        />
+                    </Form.Group></Col>
+                    <Col sm={12} md={4} ><Form.Group className="mb-3">
+                        <Form.Label>Description</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="description"
+                            value={formData.description}
+                            onChange={handleChange}
+                            placeholder="Entrez la description" required
+                        />
+                    </Form.Group></Col>
+                    <Col sm={12} md={4} > <Form.Group className="mb-3">
+                        <Form.Label>Ean13</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="ean13"
+                            value={formData.ean13}
+                            onChange={handleChange}
+                            onKeyDown={handleKeydown}
+                            placeholder="Ean13"
+                        />
+                    </Form.Group></Col>
+                    <Col sm={12} md={4} ><Form.Group className="mb-3">
+                        <Form.Label>Prix Vente</Form.Label>
+                        <Form.Control
+                            type="number"
+                            name="prixVente"
+                            value={formData.prixVente}
+                            onChange={handleChange}
+                            placeholder="Entrez le prix Vente" required
+                        />
+                    </Form.Group></Col>
+                    <Col sm={12} md={4} ><Form.Group className="mb-3">
+                        <Form.Label>Prix Achat</Form.Label>
+                        <Form.Control
+                            type="number"
+                            name="prixAchat"
+                            value={formData.prixAchat}
+                            onChange={handleChange}
+                            maxLength={13}
+                            minLength={13}
+                            placeholder="Entrez le prix Achat" required
+                        />
+                    </Form.Group></Col>
+                    <Col sm={12} md={4} ><Form.Group className="mb-3">
+                        <Form.Label>Catégorie</Form.Label>
+                        <Form.Select className="mb-3"
+                                     name="categorieId"
+                                     value={formData.categorieId} required
+                                     onChange={handleChange}
+                                     placeholder="Entrez la catégorie">
+                            <option value="" disabled hidden>Entrez la catégorie</option>
+                            <>
+                                {categories.map((item) => (
+                                    <option key={item.id} value={item.id}>{item.nom}</option>
+                                ))}</>
+                        </Form.Select>
+                    </Form.Group></Col>
+                    <Col sm={12} md={4} >  <Form.Group className="mb-3">
+                        <Form.Label>Dévise</Form.Label>
+                        <Form.Select className="mb-3"
+                                     name="deviseCode"
+                                     value={formData.deviseCode} required
+                                     onChange={handleChange}
+                                     placeholder="Entrez la dévise">
+                            <option value="" disabled hidden>Entrez la dévise</option>
+                            <>
+                                {devises.map((item) => (
+                                    <option key={item.id} value={item.code}>{item.code} - {item.nom}</option>
+                                ))}</>
+                        </Form.Select>
+                    </Form.Group></Col>
+                    <Col sm={12} md={4} > <Form.Group className="mb-3">
+                        <Form.Label>Stock Initial</Form.Label>
+                        <Form.Control
+                            type="number"
+                            name="stockInitial"
+                            value={formData.stockInitial}
+                            onChange={handleChange}
+                            placeholder="Entrez le stock initial"
+                        />
+                    </Form.Group></Col>
+                </Row>
 
-                <Form.Group className="mb-3">
-                    <Form.Label>Description</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        placeholder="Entrez la description" required
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>Ean13</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="ean13"
-                        value={formData.ean13}
-                        onChange={handleChange}
-                        onKeyDown={handleKeydown}
-                        placeholder="Ean13"
-                    />
-                </Form.Group>
 
-                <Form.Group className="mb-3">
-                    <Form.Label>Prix Vente</Form.Label>
-                    <Form.Control
-                        type="number"
-                        name="prixVente"
-                        value={formData.prixVente}
-                        onChange={handleChange}
-                        placeholder="Entrez le prix Vente" required
-                    />
-                </Form.Group>
 
-                <Form.Group className="mb-3">
-                    <Form.Label>Prix Achat</Form.Label>
-                    <Form.Control
-                        type="number"
-                        name="prixAchat"
-                        value={formData.prixAchat}
-                        onChange={handleChange}
-                        maxLength={13}
-                        minLength={13}
-                        placeholder="Entrez le prix Achat" required
-                    />
-                </Form.Group>
-
-                <Form.Select className="mb-3"
-                             name="categorieId"
-                             value={formData.categorieId} required
-                             onChange={handleChange}
-                             placeholder="Entrez la catégorie">
-                    <option value="" disabled hidden>Entrez la catégorie</option>
-                    <>
-                    {categories.map((item) => (
-                        <option key={item.id} value={item.id}>{item.nom}</option>
-                    ))}</>
-                </Form.Select>
-
-                <Form.Group className="mb-3">
-                    <Form.Label>Stock Initial</Form.Label>
-                    <Form.Control
-                        type="number"
-                        name="stockInitial"
-                        value={formData.stockInitial}
-                        onChange={handleChange}
-                        placeholder="Entrez le stock initial"
-                    />
-                </Form.Group>
-
-                <Button variant="primary" type="submit" disabled={loading}>
+                <Button variant="primary" type="submit" disabled={loading} className="mt-3">
                     {loading ? 'Chargement...' : 'Créer le produit'}
                 </Button>
             </Form>
