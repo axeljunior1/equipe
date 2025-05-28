@@ -11,24 +11,25 @@ import {usePanier} from "./context/PanierContext";
 
 const App = () => {
     const {panier} = usePanier()
-    const {jwt, setJwt, setPanierId, setLoggedEmployee, loggedEmployee} = useJwt();
+    const {jwt, loggedEmployee, tenantId, employeName,
+        employePrenom, restore} = useJwt();
     const navigate = useNavigate();
     const location = useLocation();
-    const isMobile = useMobile(); // Utilisation du hook seeeeeeeqssjkoqjdhlksqd
+    const isMobile = useMobile();
     const [logout, setLogout] = useState(false);
 
-    const handleLogout = () => {
-        localStorage.removeItem("jwt"); // Supprimer le JWT
-        localStorage.removeItem("loggedEmployee"); // Supprimer le JWT
-        localStorage.removeItem("requestedUrl"); // Supprimer le JWT
-        localStorage.removeItem("panierId");
-        setJwt("")// Supprimer le JWT
-        setLoggedEmployee(null); // Réinitialiser l'utilisateur
-        setPanierId(null);  // Réinitialiser le panier
+    const handleLogout = async () => {
+
+        localStorage.clear()
+
 
         setLogout(!logout)
-        navigate("/login"); // Rediriger vers la page de connexion
+
+        restore();
+
+        navigate("/home")
     };
+
     useEffect(() => {
         // Mettre à jour localStorage avec l'URL courante
         if (location.pathname !== "/login") {
@@ -102,10 +103,10 @@ const App = () => {
 
                                         <Row className={'text-white'}>
                                             <Col xs={12} sm={12} md={4} >
-                                                Bonjour : {JSON.parse(loggedEmployee).nom.toUpperCase()}
+                                                Bonjour : {employeName.toUpperCase()} {employePrenom}
                                             </Col>
                                             <Col xs={12} sm={12} md={4} >
-                                                Entreprise : { JSON.parse(loggedEmployee).tenantId?.toUpperCase()}
+                                                Entreprise : {tenantId}
                                             </Col>
                                             <Col xs={12} sm={12} md={4} >
                                                 <Button

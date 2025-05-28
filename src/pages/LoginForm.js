@@ -15,7 +15,10 @@ const LoginForm = () => {
     const [formLoging, setFormLoging] = useState(initialFormLogin);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState([]);
-    const { setJwt, setLoggedEmployee, setPanierId } = useJwt();
+    const { setJwt, setLoggedEmployee, setPanierId, setTenantId,
+        setEmployeName,
+        setEmployeId,
+        setEmployePrenom } = useJwt();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -36,7 +39,11 @@ const LoginForm = () => {
             }); // Utilisation de l'instance Axios
             let token = res.data.token;
 
-            setJwt(token);
+            setJwt(token)
+            setTenantId(res.data.tenantId);
+            setEmployeName(res.data.employeName);
+            setEmployeId(res.data.employeId);
+            setEmployePrenom(res.data.employePrenom);
 
             setLoggedEmployee(JSON.stringify(res.data.employeGetDto));
 
@@ -57,7 +64,7 @@ const LoginForm = () => {
                 localStorage.removeItem("requestedUrl"); // Nettoyez après redirection
                 navigate(requestedUrl); // Redirigez vers l'URL mémorisée
             } else {
-                navigate("/"); // Par défaut, redirigez vers la page d'accueil
+                navigate("/home"); // Par défaut, redirigez vers la page d'accueil
             }
 
         } catch (err) {
