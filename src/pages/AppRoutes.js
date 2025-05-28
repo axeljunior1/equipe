@@ -42,6 +42,8 @@ import DetailsAuthority from "./authority/DetailsAuthority";
 import AutorityCreer from "./authority/AutorityCreer";
 import FormatVente from "./formatVente/FormatVente";
 import FormatVenteCreer from "./formatVente/FormatVenteCreer";
+import UniteVente from "./uniteVente/UniteVente";
+import UniteVenteCreer from "./uniteVente/UniteVenteCreer";
 
 const AppRoutes = () => {
 
@@ -62,6 +64,8 @@ const AppRoutes = () => {
                     <Route path="/format-vente" element={<FormatVente/>}/>
                     <Route path="/creer-format-vente" element={<FormatVenteCreer/>}/>
                     <Route path="/ventes" element={<Ventes/>}/>
+                    <Route path="/unite-vente" element={<UniteVente/>}/>
+                    <Route path="/creer-unite-vente" element={<UniteVenteCreer/>}/>
                     <Route path="/ventes/:id" element={<VenteDetail/>}/>
                     <Route path="/rapport-ventes" element={<RapportVente/>}/>
                     <Route path="/paiement/vente/:id" element={<POSPaymentScreen/>}/>

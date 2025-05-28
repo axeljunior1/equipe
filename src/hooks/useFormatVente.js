@@ -7,7 +7,8 @@ import {
     updateFormatVente,
     deleteFormatVente,
     getFormatVentes,
-    getFormatVenteById
+    getFormatVenteById,
+    getFormatVenteByProduitId
 } from "../services/FormatVenteService";
 import {DEFAULT_PAGINATION_SIZE} from "../utils/constants";
 import {number} from "sockjs-client/lib/utils/random";
@@ -65,6 +66,19 @@ export default function useFormatVente() {
             setLoading(false);
         }
     };
+
+    const fetchByProduitId = async (id, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await getFormatVenteByProduitId(id, page, size);
+            setFormatVentes(response.data.content);
+            setTotalPages(response.data.totalPages);
+            setTotalElements(response.data.totalElements);
+        } catch (err) {
+            setError(err.response?.data?.message || "Erreur lors de la recherche des formatVentes");
+        }
+    }
 
     // Recherche dynamique de formatVentes
     const fetchByParams = async (params, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
@@ -132,7 +146,7 @@ export default function useFormatVente() {
     };
 
     return {
-        formatVentes, loading, error, fetchAll, fetchById, fetchByMotCle, fetchByParams, create, update, remove, totalElements,
+        formatVentes, loading, error, fetchAll, fetchById, fetchByMotCle, fetchByProduitId, fetchByParams, create, update, remove, totalElements,
         totalPages
     };
 }

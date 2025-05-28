@@ -14,8 +14,11 @@ export const getFormatVenteById = async (id) => {
     return await axiosInstance.get(`${BASE_URL}/${id}`);
 }
 
-export const getFormatVenteByMotCle = async (motCle, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
+export const getFormatVenteByProduitId = async (id, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
+    return await axiosInstance.get(`${BASE_URL}/produit/${id}`, {params: {page: page, size: size}});
+}
 
+export const getFormatVenteByMotCle = async (motCle, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
     return await axiosInstance.get(`${BASE_URL}/recherche?motCle=${motCle}`, {params: {page: page, size: size}});
 
 }

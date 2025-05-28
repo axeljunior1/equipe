@@ -167,6 +167,7 @@ const ProduitCreer = () => {
                             placeholder="Entrez le prix Achat" required
                         />
                     </Form.Group></Col>
+
                     <Col sm={12} md={4} ><Form.Group className="mb-3">
                         <Form.Label>Catégorie</Form.Label>
                         <Form.Select className="mb-3"

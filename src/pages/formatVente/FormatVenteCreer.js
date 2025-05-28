@@ -20,6 +20,7 @@ const FormatVenteCreer = () => {
     const navigate = useNavigate();
     const { loading, error, create} = useProduct();
     const {categories, fetchCategories, loading: loadingCat, error: errorCat} = useCategory();
+    // const {unite } =  useUn
 
     // Gestion des modifications du formulaire
     const handleChange = (e) => {

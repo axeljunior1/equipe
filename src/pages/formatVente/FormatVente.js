@@ -1,6 +1,5 @@
 import React, {useEffect} from 'react';
 import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
-import DataTableComp from "../../components/DataTableComp";
 import useFormatVente from "../../hooks/useFormatVente";
 import Table from "react-bootstrap/Table";
 import {Link} from "react-router-dom";
@@ -29,12 +28,12 @@ const FormatVente = () => {
 
     return (
         <div>
-             <h1><strong>Achats</strong></h1>
+             <h1><strong>Formats ventes</strong></h1>
 
 
 
 
-                <HeaderBtnElementComp titreFil='creer-format-vente' variant='outline-primary' onClick={handleCreateAchat}
+                <HeaderBtnElementComp titreFil='creer-format-vente' variant='outline-primary'
                                       valueBtn='Créer Format de vente' />
 
 
