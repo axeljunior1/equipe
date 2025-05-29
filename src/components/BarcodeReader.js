@@ -12,20 +12,22 @@ const BarcodeScanner = () => {
     const {produits, error, loading, fetchByCodeBarre} = useProduct()
 
     useEffect(() => {
-        const handleKeyD = async (e) => {
-            if (e.key === "Enter" && scannedCode.length > 0) {
-                await fetchProduit(scannedCode);
-                setScannedCode(""); // Réinitialiser après scan
-            } else if (e.key !== "Alt" && e.key !== "Shift") {
-                console.log(scannedCode);
-                setScannedCode((prev) => prev + e.key); // Accumuler les caractères scannés
-            }
-        };
+        if (scannedCode.length > 0) {
+            const handleKeyD = async (e) => {
+                if (e.key === "Enter" && scannedCode.length > 0) {
+                    await fetchProduit(scannedCode);
+                    setScannedCode(""); // Réinitialiser après scan
+                } else if (e.key !== "Alt" && e.key !== "Shift") {
+                    console.log(scannedCode);
+                    setScannedCode((prev) => prev + e.key); // Accumuler les caractères scannés
+                }
+            };
 
-        document.addEventListener("keydown", handleKeyD);
-        return () => {
-            document.removeEventListener("keydown", handleKeyD);
-        };
+            document.addEventListener("keydown", handleKeyD);
+            return () => {
+                document.removeEventListener("keydown", handleKeyD);
+            };
+        }
     }, [scannedCode]); // Dépendance pour suivre les changements de scannedCode
 
     const fetchProduit = async (code) => {
@@ -34,8 +36,8 @@ const BarcodeScanner = () => {
 
 
     useEffect(() => {
-        if (produits) {
-
+        if (produits && produits.length > 0) {
+debugger;
             let pro = {
                 prixVente: produits.prixVente,
                 produitId: produits.id,

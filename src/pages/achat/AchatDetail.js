@@ -36,11 +36,11 @@ const AchatDetail = () => {
 
 
     let initFormAddLigne = {
-        "prixAchat": 0,
+        "prixAchat": "",
         "prixAchatF": "",
-        "quantite": 0,
+        "quantite": "",
         "achatId": id,
-        "produitId": 0,
+        "produitId": "",
         "produitNom": ""
     }
     const [formAddLigne, setFormAddLigne] = useState(initFormAddLigne);
@@ -98,9 +98,11 @@ const AchatDetail = () => {
         if (formAddLigne.quantite <= 0) throw new Error("Quantité doit être positive et > 0");
         console.log(formAddLigne);
 
-        createLA(formAddLigne);
-        await fetchAchat()
-        setFormAddLigne({...formAddLigne, 'produitId': 0, "produitNom": "", "prixAchatF": ""});
+       let res =  await createLA(formAddLigne);
+       if (res.success){
+           await fetchAchat()
+           setFormAddLigne(initFormAddLigne);
+       }
     }
 
     const removeColumns = (baseColumns, excludedAccessors) => {
@@ -281,7 +283,7 @@ const AchatDetail = () => {
             </div>
 
 
-            {/* Modal de recherche d'employé */}
+            {/* Modal de recherche d'un produit */}
             <Modal show={showModal} onHide={() => setShowModal(false)} size="xl" centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Rechercher un Produit</Modal.Title>

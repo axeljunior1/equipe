@@ -1,10 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
-import ClientService from "../../services/ClientService";
 import AlertComp from "../../components/AlertComp";
 import ErrorAlert from "../../exceptions/ErrorAlert";
 import apiCrudService from "../../services/ApiCrudService";
-import {Form} from "react-bootstrap";
 import {updateObject} from "../../utils/objectMapping";
 
 const ClientEdit = (props) => {

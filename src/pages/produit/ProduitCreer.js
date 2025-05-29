@@ -154,7 +154,8 @@ const ProduitCreer = () => {
                             onChange={handleChange}
                             placeholder="Entrez le prix Vente" required
                         />
-                    </Form.Group></Col>
+                    </Form.Group>
+                    </Col>
                     <Col sm={12} md={4} ><Form.Group className="mb-3">
                         <Form.Label>Prix Achat</Form.Label>
                         <Form.Control

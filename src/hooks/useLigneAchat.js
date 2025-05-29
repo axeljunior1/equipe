@@ -89,8 +89,12 @@ export default function useLigneAchat() {
         try {
             const response = await createLigneAchat(ligneAchatData);
             setLigneAchats([...ligneAchats, response.data]); // Ajoute l'employé créé à la liste
+            return {success : true, data : response.data}
         } catch (err) {
-            setError(err.response?.data?.message || "Erreur lors de la création du ligneAchat");
+
+            let message = err.response?.data?.message || "Erreur lors de la création du ligneAchat";
+            setError(message);
+            return {success : false, error : message};
         } finally {
             setLoading(false);
         }

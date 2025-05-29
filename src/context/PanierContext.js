@@ -34,12 +34,14 @@ export const PanierProvider = ({children}) => {
 
 
     const ajouterAuPanier = async (lignePanier) => {
+        console.log(lignePanier, 'lignePanier')
 
         const postData = {
             prixVente: lignePanier.prixVente,
             panierId: panierId,
             produitId: lignePanier.produitId,
-            quantite: lignePanier.quantite
+            quantite: lignePanier.quantite,
+            formatVenteId : lignePanier.formatVenteId
         };
         await create(postData);
         await fetchCart();
@@ -52,7 +54,8 @@ export const PanierProvider = ({children}) => {
 
         const updateData = {
             "prixVente": param.prixVente,
-            "quantite": param.quantite
+            "quantite": param.quantite,
+            "formatVenteId" : param.formatVenteId
         };
         update(param.id, updateData);
 

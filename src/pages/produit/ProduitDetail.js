@@ -9,6 +9,7 @@ import DetailsComp from "../../components/DetailsComp";
 import BarcodeDisplayComponent from "../../components/BarcodeDisplayComponent";
 import useProduct from "../../hooks/useProduct";
 import PropTypes from "prop-types";
+import FormatVente from "../formatVente/FormatVente";
 
 
 const ProduitDetail = (props) => {
@@ -103,7 +104,8 @@ const ProduitDetail = (props) => {
 
                         prixVente: produits.prixVente,
                         produitId: produits.id,
-                        quantite: nombreProduitDansPanier(produits.id) + 1
+                        quantite: nombreProduitDansPanier(produits.id) + 1,
+                        formatVenteId : produits.formatVenteId,
                     })}
                 >
                     +
@@ -116,7 +118,8 @@ const ProduitDetail = (props) => {
                     onClick={() => ajouterAuPanier({
                         prixVente: produits.prixVente,
                         produitId: produits.id,
-                        quantite: nombreProduitDansPanier(produits.id) - 1
+                        quantite: nombreProduitDansPanier(produits.id) - 1,
+                        formatVenteId : produits.formatVenteId,
                     })}
                 >
                     -
@@ -156,6 +159,11 @@ const ProduitDetail = (props) => {
                 title={<span
                     className={produits.actif ? 'text-success' : 'text-danger'}> {produits.id} - {produits.nom} </span>}
             />
+            
+            <hr className="my-4" />
+            
+
+            <FormatVente produitId={id} />
 
         </div>
 

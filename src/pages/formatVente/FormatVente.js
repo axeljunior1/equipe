@@ -2,14 +2,20 @@ import React, {useEffect} from 'react';
 import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
 import useFormatVente from "../../hooks/useFormatVente";
 import Table from "react-bootstrap/Table";
-import {Link} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 
-const FormatVente = () => {
+const FormatVente = (props) => {
 
-    const {error, loading, formatVentes, fetchAll} = useFormatVente()
+    const {error, loading, formatVentes, fetchAll, fetchByProduitId} = useFormatVente()
 
     const getFormatsventes = async () => {
-        await fetchAll();
+        if (props.produitId) {
+
+            await fetchByProduitId(props.produitId, 0, 200);
+
+        }else {
+            await fetchAll(0, 200);
+        }
     }
 
     useEffect(() => {
@@ -26,6 +32,8 @@ const FormatVente = () => {
     }
 
 
+
+
     return (
         <div>
              <h1><strong>Formats ventes</strong></h1>
@@ -33,7 +41,7 @@ const FormatVente = () => {
 
 
 
-                <HeaderBtnElementComp titreFil='creer-format-vente' variant='outline-primary'
+                <HeaderBtnElementComp titreFil={`creer-format-vente?id=${props?.produitId}`} variant='outline-primary'
                                       valueBtn='Créer Format de vente' />
 
 
@@ -44,7 +52,8 @@ const FormatVente = () => {
                         <tr className="text-center align-middle">
                             <th className="text-center align-middle">Nom Produit</th>
                             <th className="text-center align-middle">Unité</th>
-                            <th className="text-center align-middle">Quantité</th>
+                            <th className="text-center align-middle">Libellé du format</th>
+                            <th className="text-center align-middle">Quantité par format</th>
                             <th className="text-center align-middle">Prix de Vente</th>
                         </tr>
                         </thead>
@@ -57,6 +66,7 @@ const FormatVente = () => {
                                     </Link>
                                 </td>
                                 <td className="text-center align-middle ">{formatVente.uniteVenteNom}</td>
+                                <td className="text-center align-middle ">{formatVente.libelleFormat}</td>
                                 <td className="text-center align-middle ">{formatVente.quantiteParFormat}</td>
                                 <td className="text-center align-middle ">{formatVente.prixVente}</td>
                             </tr>

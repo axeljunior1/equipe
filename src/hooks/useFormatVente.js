@@ -77,6 +77,8 @@ export default function useFormatVente() {
             setTotalElements(response.data.totalElements);
         } catch (err) {
             setError(err.response?.data?.message || "Erreur lors de la recherche des formatVentes");
+        }finally {
+            setLoading(false);
         }
     }
 

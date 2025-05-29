@@ -90,7 +90,8 @@ const ProduitListe = (props) => {
         await ajouterAuPanier({
             prixVente: produit.prixVente,
             produitId: produit.id,
-            quantite: nombreProduitDansPanier(produit.id) + 1
+            quantite: nombreProduitDansPanier(produit.id) + 1,
+            formatVenteId : produit.formatVenteId,
         })
     }
     const decreaseCart = async (produit) => {
@@ -100,7 +101,8 @@ const ProduitListe = (props) => {
             await ajouterAuPanier({
                 prixVente: produit.prixVente,
                 produitId: produit.id,
-                quantite: nombreProduitDansPanier(produit.id) - 1
+                quantite: nombreProduitDansPanier(produit.id) - 1,
+                formatVenteId : produit.formatVenteId,
             })
         }
     }
@@ -126,7 +128,8 @@ const ProduitListe = (props) => {
                         let pro = {
                             id: produit.id,
                             nom: produit.nom,
-                            prixAchat: produit.prixAchat
+                            prixAchat: produit.prixAchat,
+                            prixVente: produit.prixVente
                         };
                         props.onSelect(pro);
                     }}
@@ -161,7 +164,8 @@ const ProduitListe = (props) => {
 
                             prixVente: produit.prixVente,
                             produitId: produit.id,
-                            quantite: quantites[produit.id]
+                            quantite: quantites[produit.id],
+                            formatVenteId : produit.formatVenteId,
                         })}
                         className="d-inline-block text-center"
                         style={{width: "80px"}}

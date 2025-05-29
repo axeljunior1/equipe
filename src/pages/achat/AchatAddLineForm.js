@@ -1,103 +1,131 @@
 import React from 'react';
-import {Button, Col, Form, Row} from "react-bootstrap";
+import {Button, Col, FloatingLabel, Form, Row} from "react-bootstrap";
 import InputGroup from "react-bootstrap/InputGroup";
 import PropTypes from "prop-types";
 
-const AchatAddLineForm =(props)=> {
+const AchatAddLineForm = (props) => {
     return <Form onSubmit={props.onSubmit} className="mt-5">
         <Row>
             {/* Produit ID */}
-            <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                <Form.Group className="mb-3">
-                    <Form.Label className="fw-bold">
-                        {props.formAddLigne.produitNom ? (
-                            <span className="text-danger">{props.formAddLigne.produitNom}</span>
-                        ) : (
-                            "Produit ID"
-                        )}
-                    </Form.Label>
-                    <InputGroup className="mb-1">
+            <Col xs={12} sm={12} md={6} lg={4} xxl={3} className=" ">
+
+                <div className="position-relative">
+                    <Form.Floating>
                         <Form.Control
                             type="number"
                             value={props.formAddLigne.produitId}
                             onChange={props.onChange}
                             name="produitId"
-                            className={`my-1 ${props.formErrors.produitId ? "is-invalid" : ""}`}
+                            id="produitId"
+                            className={`pe-5 ${props.formErrors.produitId ? "is-invalid" : ""}`}
+                            placeholder="Produit ID"
                         />
-                        <Button variant="outline-info" onClick={props.onClick}>
-                            🔍Search
-                        </Button>
+
+                        {props.formErrors.produitId && (
+                            <div className="invalid-feedback d-block">
+                                {props.formErrors.produitId}
+                            </div>
+                        )}
+                        <label htmlFor="produitId" className="fw-bold">
+                            {props.formAddLigne.produitNom ? (
+                                <span className="text-success">{props.formAddLigne.produitNom}</span>
+                            ) : (
+                                "Produit ID"
+                            )}
+                        </label>
+                    </Form.Floating>
+                    <Button
+                        variant="outline-info"
+                        size="sm"
+                        onClick={props.onClick}
+                        className="position-absolute top-50 end-0 translate-middle-y me-2"
+                        style={{ zIndex: 2 }}
+                    >
+                        🔍
+                    </Button>
+                </div>
+
+
+
+                {/*<Form.Floating className="mb-3">
+                    <label className="fw-bold">
+                        {props.formAddLigne.produitNom ? (
+                            <span className="text-danger">{props.formAddLigne.produitNom}</span>
+                        ) : (
+                            "Produit ID"
+                        )}
+                    </label>
+                    <InputGroup className="mb-1">
+
                     </InputGroup>
                     {props.formErrors.produitId && (
                         <div className="invalid-feedback d-block">
                             {props.formErrors.produitId}
                         </div>
                     )}
-                </Form.Group>
+                </Form.Floating>*/}
             </Col>
 
-            {/* Nom */}
-            <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                <Form.Label className="fw-bold">Nom</Form.Label>
-                <Form.Control
-                    type="text"
-                    value={props.formAddLigne.produitNom}
-                    onChange={props.onChange}
-                    placeholder="Nom du produit"
-                    name="produitNom"
-                    readOnly
-                    className="my-1"
-                />
-            </Col>
 
             {/* Quantité */}
             <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                <Form.Label className="fw-bold">Quantité</Form.Label>
-                <Form.Control
-                    type="number"
-                    value={props.formAddLigne.quantite}
-                    onChange={props.onChange}
-                    placeholder="Quantité"
-                    name="quantite"
-                    className={`my-1 ${props.formErrors.quantite ? "is-invalid" : ""}`}
-                />
-                {props.formErrors.quantite && (
-                    <div className="invalid-feedback d-block">
-                        {props.formErrors.quantite}
-                    </div>
-                )}
+
+                <Form.Floating className="mb-3">
+
+                    <Form.Control
+                        type="number"
+                        value={props.formAddLigne.quantite}
+                        onChange={props.onChange}
+                        placeholder="Quantité"
+                        name="quantite"
+                        className={`my-1 ${props.formErrors.quantite ? "is-invalid" : ""}`}
+                    />
+                    {props.formErrors.quantite && (
+                        <div className="invalid-feedback d-block">
+                            {props.formErrors.quantite}
+                        </div>
+                    )}
+                    <label htmlFor="quantite" className="fw-bold">Quantité </label>
+                </Form.Floating>
+
+
             </Col>
 
             {/* Prix Achat */}
             <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                <Form.Label className="fw-bold">Prix Achat</Form.Label>
-                <Form.Control
-                    type="number"
-                    value={props.formAddLigne.prixAchat}
-                    onChange={props.onChange}
-                    placeholder="Prix unitaire d'achat"
-                    name="prixAchat"
-                    className="my-1"
-                    disabled
-                />
+                <FloatingLabel
+                    controlId="prixAchat"
+                    label="Prix Achat"
+                    className="my-1 fw-bold"
+                >
+                    <Form.Control
+                        type="number"
+                        value={props.formAddLigne.prixAchat}
+                        onChange={props.onChange}
+                        placeholder="Prix unitaire d'achat"
+                        name="prixAchat"
+                        disabled
+                    />
+                </FloatingLabel>
             </Col>
 
             {/* Prix Achat Forcé */}
             <Col xs={12} sm={12} md={6} lg={4} xxl={3}>
-                <Form.Label className="fw-bold">Prix Achat Forcé</Form.Label>
-                <Form.Control
-                    type="number"
-                    value={props.formAddLigne.prixAchatF}
-                    onChange={props.onChange}
-                    placeholder="Forcer le prix d'achat"
-                    name="prixAchatF"
-                    className={`my-1 ${props.formErrors.prixAchatF ? "is-invalid" : ""}`}
-                />
-                {props.formErrors.prixAchatF && (
-                    <div className="invalid-feedback d-block">
-                        {props.formErrors.prixAchatF}
-                    </div>
-                )}
+                <FloatingLabel label="Prix Achat Forcé" controlId="" className="my-1 fw-bold">
+                    <Form.Control
+                        type="number"
+                        value={props.formAddLigne.prixAchatF}
+                        onChange={props.onChange}
+                        placeholder="Forcer le prix d'achat"
+                        name="prixAchatF"
+                        className={`my-1 ${props.formErrors.prixAchatF ? "is-invalid" : ""}`}
+                    />
+                    {props.formErrors.prixAchatF && (
+                        <div className="invalid-feedback d-block">
+                            {props.formErrors.prixAchatF}
+                        </div>
+                    )}
+                </FloatingLabel>
             </Col>
         </Row>
 

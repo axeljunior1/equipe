@@ -62,6 +62,7 @@ const AppRoutes = () => {
                     <Route path="/achats" element={<Achats/>}/>
                     <Route path="/achats/:id" element={<AchatDetail/>}/>
                     <Route path="/format-vente" element={<FormatVente/>}/>
+                    <Route path="/format-vente/produit/:id" element={<FormatVente/>}/>
                     <Route path="/creer-format-vente" element={<FormatVenteCreer/>}/>
                     <Route path="/ventes" element={<Ventes/>}/>
                     <Route path="/unite-vente" element={<UniteVente/>}/>

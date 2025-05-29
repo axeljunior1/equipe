@@ -1,35 +1,48 @@
 import React, {useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {Button, Form} from 'react-bootstrap';
-import apiCrudService from "../../services/ApiCrudService";
-import useCategory from "../../hooks/useCategory";
-import useProduct from "../../hooks/useProduct";
+import {useLocation, useNavigate} from 'react-router-dom';
+import {Button, Form, Modal} from 'react-bootstrap';
+import useFormatVente from "../../hooks/useFormatVente";
+import useUniteVente from "../../hooks/useUniteVente";
+import ProduitListe from "../produit/ProduitsListe";
 
 const FormatVenteCreer = () => {
-    const [formData, setFormData] = useState({
-        nom: '',
-        description: '',
-        image: '',
-        quantity: 0,
-        prixUnitaire: 0,
-        categorieId: '',
-        ean13: '',
-        stockInitial: 0
 
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const id = params.get("id");
+
+    const [formData, setFormData] = useState({
+        produitId: id ?? "",
+        uniteVenteId: "",
+        libelleFormat: '',
+        quantiteParFormat: "",
+        prixVente: ""
     });
     const navigate = useNavigate();
-    const { loading, error, create} = useProduct();
-    const {categories, fetchCategories, loading: loadingCat, error: errorCat} = useCategory();
+    const {error, loading, uniteVentes, fetchAll} = useUniteVente()
+    const [formErrors, setFormErrors] = useState({});
+    const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
+    const {loading: loadingFormatVente, error: errFormatVente, create} = useFormatVente();
+
+
     // const {unite } =  useUn
 
     // Gestion des modifications du formulaire
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData({
             ...formData,
             [name]: value
         });
     };
+
+    const fetchAllUniteventes = async () => {
+        fetchAll()
+    }
+
+    useEffect(() => {
+        fetchAllUniteventes();
+    }, [])
 
 
     // Fonction pour soumettre les données à l'API
@@ -39,64 +52,94 @@ const FormatVenteCreer = () => {
 
 
         if (res.success) {
-            navigate(`/formatVentes/${res.data.id}`);
+            navigate(`/format-vente`);
         }
 
     };
 
+    const handleProduitSelect = (produit) => {
+        console.log(produit)
+        setFormData({
+            ...formData,
+            'produitId': produit.id,
+            "produitNom": produit.nom,
+            "prixAchat": produit.prixAchat,
+            "prixVente": produit.prixVente,
+        });
+        setShowModal(false); // Ferme le modal
+    };
 
-    const handleKeydown = (e) =>{
+
+    const handleKeydown = (e) => {
         if (e.key === "Enter") {
             e.preventDefault()
             e.stopPropagation()
         }
     }
 
-    useEffect(() => {
-        fetchCategories(0,200);
-    },[])
 
-    if (loadingCat || loading) {
+    if (loading || loading) {
         return <div>Loading...</div>
     }
 
     return (
         <div className="container mt-5">
-            <h3>Créer un nouveau formatVente</h3>
+            <h3 className="text-success fw-bold ">Créer un nouveau format de vente</h3>
             {error && <div className="alert alert-danger">{error}</div>}
-            {errorCat && <div className="alert alert-danger">{errorCat}</div>}
+            {/*{errorCat && <div className="alert alert-danger">{errorCat}</div>}*/}
             <Form className=" mt-3 mb-4" onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                    <Form.Label>Nom</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="nom"
-                        value={formData.nom}
-                        onChange={handleChange}
-                        placeholder="Entrez le nom du formatVente" required
-                    />
-                </Form.Group>
 
-                <Form.Group className="mb-3">
-                    <Form.Label>Description</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        placeholder="Entrez la description" required
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>Ean13</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="ean13"
-                        value={formData.ean13}
-                        onChange={handleChange}
-                        onKeyDown={handleKeydown}
-                        placeholder="Ean13"
-                    />
+                <div className="position-relative">
+                    <Form.Floating>
+                        <Form.Control
+                            type="number"
+                            value={formData.produitId}
+                            onChange={handleChange}
+                            name="produitId"
+                            id="produitId"
+                            className={`pe-5 ${formErrors.produitId ? "is-invalid" : ""}`}
+                            placeholder="Produit ID"
+                        />
+
+                        {formErrors.produitId && (
+                            <div className="invalid-feedback d-block">
+                                {formErrors.produitId}
+                            </div>
+                        )}
+                        <label htmlFor="produitId" className="fw-bold">
+                            {formData.produitNom ? (
+                                <span className="text-success">{formData.produitNom}</span>
+                            ) : (
+                                "Produit ID"
+                            )}
+                        </label>
+                    </Form.Floating>
+                    <Button
+                        variant="outline-info"
+                        size="sm"
+                        onClick={()=> setShowModal(true)}
+                        className="position-absolute top-50 end-0 translate-middle-y me-2"
+                        style={{zIndex: 2}}
+                    >
+                        🔍
+                    </Button>
+                </div>
+
+
+                <Form.Group className="my-3">
+
+                    <Form.Label htmlFor="uniteVenteId"> Unité de vente </Form.Label>
+                    <Form.Select className="mb-3"
+                                 name="uniteVenteId"
+                                 value={formData.uniteVenteId} required
+                                 onChange={handleChange}
+                                 placeholder="Unité de Vente">
+                        <option value="" disabled hidden>Entrez l'unité de Vente</option>
+                        <>
+                            {uniteVentes.map((item) => (
+                                <option key={item.id} value={item.id} >{item.code} - {item.libelle}</option>
+                            ))}</>
+                    </Form.Select>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
@@ -111,38 +154,24 @@ const FormatVenteCreer = () => {
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                    <Form.Label>Prix Achat</Form.Label>
+                    <Form.Label>Libellé du format</Form.Label>
                     <Form.Control
-                        type="number"
-                        name="prixAchat"
-                        value={formData.prixAchat}
+                        type="text"
+                        name="libelleFormat"
+                        value={formData.libelleFormat}
                         onChange={handleChange}
-                        maxLength={13}
-                        minLength={13}
-                        placeholder="Entrez le prix Achat" required
+                        placeholder="Entrez le libellé du format" required
                     />
                 </Form.Group>
 
-                <Form.Select className="mb-3"
-                             name="categorieId"
-                             value={formData.categorieId} required
-                             onChange={handleChange}
-                             placeholder="Entrez la catégorie">
-                    <option value="" disabled hidden>Entrez la catégorie</option>
-                    <>
-                    {categories.map((item) => (
-                        <option key={item.id} value={item.id}>{item.nom}</option>
-                    ))}</>
-                </Form.Select>
-
                 <Form.Group className="mb-3">
-                    <Form.Label>Stock Initial</Form.Label>
+                    <Form.Label>Quantité par format</Form.Label>
                     <Form.Control
                         type="number"
-                        name="stockInitial"
-                        value={formData.stockInitial}
+                        name="quantiteParFormat"
+                        value={formData.quantiteParFormat}
                         onChange={handleChange}
-                        placeholder="Entrez le stock initial"
+                        placeholder="Entrez la qté par format" required
                     />
                 </Form.Group>
 
@@ -151,6 +180,15 @@ const FormatVenteCreer = () => {
                 </Button>
             </Form>
 
+            {/* Modal de recherche d'un produit */}
+            <Modal show={showModal} onHide={() => setShowModal(false)} size="xl" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Rechercher un Produit</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <ProduitListe onSelect={handleProduitSelect}/>
+                </Modal.Body>
+            </Modal>
 
         </div>
     );

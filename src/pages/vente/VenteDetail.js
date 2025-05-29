@@ -165,6 +165,7 @@ const VenteDetail = () => {
                             <th>Produit</th>
                             <th>Prix unitaire</th>
                             <th>Qte</th>
+                            <th>Format de la vente</th>
                             <th>Delete</th>
                         </tr>
                         </thead>
@@ -177,6 +178,7 @@ const VenteDetail = () => {
                                 </td>
                                 <td>{ligne.prixVente} {ligne.produit?.deviseSymbole} ({ligne.produit?.deviseCode})</td>
                                 <td>{ligne.quantite}</td>
+                                <td>{ligne.formatVenteLibelle}</td>
                                 <td className="text-center align-middle">
                                     <Button
                                         variant="outline-danger"

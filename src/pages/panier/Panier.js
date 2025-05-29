@@ -29,6 +29,7 @@ const Panier = () => {
     const [validated, setValidated] = useState(false);
     const {loggedEmployee, panierId} = useJwt();
     const [qtes, setQtes] = useState({});
+    const [formatUnitIds, setFormatUnit] = useState({});
 
 
     const [loading, setLoading] = useState(false);
@@ -51,7 +52,8 @@ const Panier = () => {
             {
                 "prixVente": item.prixVente,
                 "id": item.id,
-                "quantite": item.quantite
+                "quantite": item.quantite,
+                "formatVenteId": formatUnitIds[item.id]
             }
         updatePanier(data);
     };
@@ -59,11 +61,16 @@ const Panier = () => {
 
     useEffect(() => {
         let obj = {}
+        let _formatUnit = {}
 
         for (const panierElement of panier) {
             obj[panierElement["id"]] = panierElement["quantite"];
-            setQtes(obj)
+            console.log(panierElement)
+            _formatUnit[panierElement["id"]] = panierElement["formatVenteId"]
         }
+        console.log(_formatUnit)
+        setFormatUnit(_formatUnit)
+        setQtes(obj)
     }, [panier]); //
 
     const handleInputChange = (e) => {
@@ -124,7 +131,8 @@ const Panier = () => {
         let caisse = {
             idClient: formClient.id,
             idPanier: panierId,
-            idEmploye: JSON.parse(loggedEmployee)?.id
+            idEmploye: JSON.parse(loggedEmployee)?.id,
+            idFormatVente: 1,
         }
 
         setLoading(true);
@@ -149,6 +157,10 @@ const Panier = () => {
     const handleQteChange = (id, val) => {
         setQtes({...qtes, [id]: val});
     }
+
+    const handleUnitChange = (id, val) => {
+        setFormatUnit({...formatUnitIds, [id]: val});
+    }
     const handleQteBlur = (item) => {
 
         ajouterAuPanier(item)
@@ -156,9 +168,10 @@ const Panier = () => {
 
     const increaseCart = async (item) => {
        await ajouterAuPanier({
-            prixVente: item.produit.prixVente,
+            prixVente: item.produit.formatVentes?.filter(i => i.id === formatUnitIds[item.id])[0]?.prixVente,
             produitId: item.produit.id,
-            quantite: nombreProduitDansPanier(item.produit.id) + 1
+            quantite: nombreProduitDansPanier(item.produit.id) + 1,
+           formatVenteId: formatUnitIds[item.id]
         })
     }
     const decreaseCart = async (item) => {
@@ -166,9 +179,11 @@ const Panier = () => {
             retirerDuPanier(item.id);
         }else{
             await ajouterAuPanier({
-                prixVente: item.produit.prixVente,
+                prixVente: item.produit.formatVentes?.filter(i => i.id === formatUnitIds[item.id])[0]?.prixVente,
                 produitId: item.produit.id,
-                quantite: nombreProduitDansPanier(item.produit.id) - 1
+                quantite: nombreProduitDansPanier(item.produit.id) - 1,
+                formatVenteId: formatUnitIds[item.id]
+
             })
         }
     }
@@ -217,6 +232,7 @@ const Panier = () => {
                         <th>Produit</th>
                         <th>Prix</th>
                         <th>Quantité</th>
+                        <th>Format de vente</th>
                         <th>Total</th>
                         <th>Action</th>
                     </tr>
@@ -228,7 +244,7 @@ const Panier = () => {
                                 <Button variant={"outline-primary"} className={"w-100"}
                                         onClick={() => handleShowModalDetailProduit(item["produit"].id)}>{item["produit"].nom}</Button>
                             </td>
-                            <td>{item["produit"].prixVente} {item.produit.deviseSymbole}</td>
+                            <td>{item["produit"].formatVentes?.filter(i => i.id === item.formatVenteId)[0]?.prixVente} {item.produit.deviseSymbole}</td>
                             <td>
                                 <Row>
                                     <Col>
@@ -252,9 +268,10 @@ const Panier = () => {
                                                               onChange={(e) => handleQteChange(item.id, e.target.value)}
                                                               onBlur={(e) => handleQteBlur(
                                                                   {
-                                                                      "prixVente": item["produit"].prixVente,
+                                                                      "prixVente": item["produit"].formatVentes?.filter(i => i.id === formatUnitIds[item.id])[0]?.prixVente,
                                                                       "produitId": item["produit"].id,
                                                                       "quantite": e.target.value,
+                                                                      "formatVenteId": formatUnitIds[item.id],
                                                                   }
                                                               )}
 
@@ -274,7 +291,37 @@ const Panier = () => {
                                     </Col>
                                 </Row>
                             </td>
-                            <td>{(item["produit"].prixVente * item.quantite).toFixed(2)} {item.produit?.deviseSymbole} ({item.produit?.deviseCode})</td>
+                            <td>
+                                <select className="form-select" aria-label="Default select example" value={formatUnitIds[item.id]}
+                                    onChange={(e)=>{
+                                        let elt = {}
+                                        elt[item.id] = e.target.value
+                                        setFormatUnit({...formatUnitIds, [item.id]: e.target.value})
+                                        console.log(item.id, e.target.value, 'valeurs a modifier', item)
+                                        handleQteBlur(
+                                            {
+                                                "prixVente": item["produit"].formatVentes?.filter(i => i.id === e.target.value)[0]?.prixVente,
+                                                "produitId": item["produit"].id,
+                                                "quantite": item.quantite,
+                                                "formatVenteId": e.target.value,
+                                            });
+                                    }}
+                                >
+                                    <option selected = {true} disabled hidden> </option>
+                                    {item.produit?.formatVentes?.map(format => {
+
+                                        return (
+                                            <option value={format.id} key={format.id}
+
+                                            >
+                                                {format.libelleFormat}
+                                            </option>
+                                        )
+                                    })}
+                                </select>
+
+                            </td>
+                            <td>{(item["produit"].formatVentes?.filter(i => i.id === formatUnitIds[item.id])[0]?.prixVente * item.quantite).toFixed(2)} {item.produit?.deviseSymbole} ({item.produit?.deviseCode})</td>
                             <td>
                                 <Button
                                     variant="danger"
@@ -401,7 +448,8 @@ const Panier = () => {
             </span>
 
             <div className="m-5">
-                <BarcodeScanner/>
+                {/*todo*/}
+                {/*<BarcodeScanner/>*/}
             </div>
 
             <div className="my-3">
