@@ -16,6 +16,8 @@ export const PanierProvider = ({children}) => {
 
     const {panierProduits: panier, loading, error, fetchById, create, update, remove} = usePanierProduit();
 
+    const errorPanier = error;
+    const loadingPanier = loading;
 
     useEffect(() => {
 
@@ -101,7 +103,6 @@ export const PanierProvider = ({children}) => {
         return panier && panier.reduce((total, item) => Number(total) + Number(item.prixVente) * Number(item.quantite), 0).toFixed(2);
     };
 
-    // const obj = useMemo(()=>(), [])
 
     return (
         <PanierContext.Provider value={{
@@ -111,7 +112,7 @@ export const PanierProvider = ({children}) => {
             calculerTotal,
             idPanierProduit,
             nombreProduitDansPanier,
-            presentDansPanier, loading, error,
+            presentDansPanier, loadingPanier, errorPanier,
             updatePanier
         }}>
             {children}

@@ -4,7 +4,6 @@ import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
 import {Button, Col, Form} from "react-bootstrap";
 import {usePanier} from "../../context/PanierContext";
 import PaginationComp from "../../components/PaginationComp";
-import ErrorAlert from "../../exceptions/ErrorAlert";
 import AlertComp from "../../components/AlertComp";
 import DataTableComp from "../../components/DataTableComp";
 import SearchCritereComp from "../../components/SearchCritereComp";
@@ -35,7 +34,7 @@ const ProduitListe = (props) => {
     });
     const [currentPage, setCurrentPage] = useState(0); // Page actuelle
     const [pageSize, setPageSize] = useState(DEFAULT_PAGINATION_SIZE); // Taille de la page
-    const {panier, ajouterAuPanier, nombreProduitDansPanier} = usePanier();
+    const {panier, ajouterAuPanier, nombreProduitDansPanier,loadingPanier, errorPanier } = usePanier();
     const [quantites, setQuantites] = useState({});
     const {produits, loading, error, totalElements, totalPages, fetchByMotCle, fetchByParams} = useProduct();
 
@@ -271,6 +270,10 @@ const ProduitListe = (props) => {
         {title: "Nombre de ligne", value: totalElements},
     ];
 
+    if (loadingPanier || loading) {
+        return <h1>Chargement en cours...</h1>;
+    }
+
 
     return (
         <div>
@@ -287,6 +290,7 @@ const ProduitListe = (props) => {
             <h1><strong>Produits : </strong></h1>
 
             {error && (<p className={"text-danger"}> {error} </p>)}
+            {errorPanier && (<p className={"text-danger"}> {errorPanier} </p>)}
 
             <ToastContainer />
 
