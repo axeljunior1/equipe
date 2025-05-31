@@ -1,13 +1,15 @@
 // hooks/useProduct.js
 import {useState} from "react";
 import {
+    createVente,
+    deleteVente,
+    fermerVenteById,
+    getVenteById,
     getVenteByMotCle,
     getVenteDyn,
-    createVente,
-    updateVente,
-    deleteVente,
-    getVenteById,
-    getVentes, getVenteLines, fermerVenteById
+    getVenteLines,
+    getVentes,
+    updateVente, validerVente
 } from "../services/VenteService";
 import {number} from "sockjs-client/lib/utils/random";
 import {DEFAULT_PAGINATION_SIZE} from "../utils/constants";
@@ -125,6 +127,23 @@ export default function useVente() {
         }
     };
 
+
+
+    const validerPanier = async (caisse) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await validerVente(caisse);
+            return {success : true, data : response.data}
+        } catch (err) {
+            let message = err.response?.data?.message || "Erreur lors de la validation de la vente";
+            setError(message);
+            return {success : false, error : message};
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // Mettre à jour un vente
     const update = async (id, venteData) => {
         setLoading(true);
@@ -159,7 +178,7 @@ export default function useVente() {
     };
 
     return {
-        ventes, loading, error, fetchAllVentes,fetchVenteLines, fetchById, fetchByMotCle, fetchByParams, create, update, remove, totalElements,
+        ventes, loading, error, fetchAllVentes,fetchVenteLines, fetchById, fetchByMotCle, fetchByParams, validerPanier, create, update, remove, totalElements,
         totalPages,fermerVente
     };
 }

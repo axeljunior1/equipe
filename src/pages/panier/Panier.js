@@ -12,6 +12,7 @@ import ListClients from "../client/ClientList";
 import BarcodeReader from "../../components/BarcodeReader";
 import ProduitListe from "../produit/ProduitsListe";
 import BarcodeScanner from "../../components/BarcodeScanner";
+import useVente from "../../hooks/useVentes";
 
 const Panier = () => {
     const [showModalClient, setShowModalClient] = useState(false); // Contrôle d'affichage du modal
@@ -21,8 +22,10 @@ const Panier = () => {
         retirerDuPanier,
         calculerTotal,
         ajouterAuPanier,
-        updatePanier, nombreProduitDansPanier,
+        updatePanier, nombreProduitDansPanier, errorPanier, loadingPanier
     } = usePanier();
+
+    const {error : errorVente, loading : loadVente , validerPanier} = useVente()
 
     const [produitIdModal, setProduitIdModal] = useState("");
     const [showAlert, setShowAlert] = useState(false);
@@ -65,10 +68,8 @@ const Panier = () => {
 
         for (const panierElement of panier) {
             obj[panierElement["id"]] = panierElement["quantite"];
-            console.log(panierElement)
             _formatUnit[panierElement["id"]] = panierElement["formatVenteId"]
         }
-        console.log(_formatUnit)
         setFormatUnit(_formatUnit)
         setQtes(obj)
     }, [panier]); //
@@ -92,8 +93,6 @@ const Panier = () => {
             } else {
                 setError({message: "Le panier est vide ! "})
             }
-            // Formulaire valide, procéder avec l'envoi des données
-            console.log('Données soumises:', formClient);
         }
 
         setValidated(true);
@@ -134,19 +133,12 @@ const Panier = () => {
             idEmploye: JSON.parse(loggedEmployee)?.id,
             idFormatVente: 1,
         }
+        console.log(caisse)
 
-        setLoading(true);
-        setError(null);
-        try {
-            let response = await axiosInstance.post("/ventes/valide-panier", caisse)
+        let response = await validerPanier( caisse)
 
-            console.log(response.data)
-
+        if (response.success ) {
             navigate(`/ventes/${response.data.id}`);
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
         }
     }
 
@@ -189,7 +181,7 @@ const Panier = () => {
     }
 
 
-    if (loading) {
+    if (loading || loadingPanier || loadVente) {
         return <div>Loading...</div>
     }
 
@@ -207,6 +199,7 @@ const Panier = () => {
             {error &&
                 <div className="alert alert-danger" role="alert"> {error.message} </div>
             }
+            {errorVente && <div className="alert alert-danger" role="alert"> {errorVente} </div>}
 
             <h3 className="my-4 text-danger">Total: {calculerTotal()}</h3>
 
@@ -297,7 +290,6 @@ const Panier = () => {
                                         let elt = {}
                                         elt[item.id] = e.target.value
                                         setFormatUnit({...formatUnitIds, [item.id]: e.target.value})
-                                        console.log(item.id, e.target.value, 'valeurs a modifier', item)
                                         handleQteBlur(
                                             {
                                                 "prixVente": item["produit"].formatVentes?.filter(i => i.id === e.target.value)[0]?.prixVente,

@@ -65,6 +65,10 @@ export const createVente = async (vente) => {
     return await axiosInstance.post(`${BASE_URL}`, vente);
 }
 
+export const validerVente = async (caisse) => {
+    return await axiosInstance.post(`${BASE_URL}/valide-panier`, caisse);
+}
+
 
 export const updateVente = async (id, vente) => {
     // Appel de la requête PATCH
