@@ -172,7 +172,13 @@ const RapportVente = (props) => {
         {header: "Prix Achat", accessor: "prixAchat"},
 
         {header: "Prix Vente", accessor: "prixVente"},
-        {header: "Quantité", accessor: "quantiteTotale"},
+        {header: "Quantité Totale", accessor: "quantiteTotale"},
+        {header: "Quantité \npar format", accessor: "quantiteParFormat"},
+        {header: "Libellé \ndu format", accessor: "libelleFormat", render: (value, produit) => (
+            <>
+                {produit.uniteVenteCode} - {produit.libelleFormat}
+            </>
+            )},
         {header: "Montant Vente Total", accessor: "montantVenteTotal"},
         {header: "Marge realisé", accessor: "margeTotale"},
         {header: "Nombre Ventes", accessor: "nombreVentes"}

@@ -155,6 +155,8 @@ const Panier = () => {
     }
     const handleQteBlur = (item) => {
 
+        console.log(calculerTotal())
+        console.log(item)
         ajouterAuPanier(item)
     }
 
@@ -290,9 +292,10 @@ const Panier = () => {
                                         let elt = {}
                                         elt[item.id] = e.target.value
                                         setFormatUnit({...formatUnitIds, [item.id]: e.target.value})
+                                        console.log(e.target.value)
                                         handleQteBlur(
                                             {
-                                                "prixVente": item["produit"].formatVentes?.filter(i => i.id === e.target.value)[0]?.prixVente,
+                                                "prixVente": item["produit"].formatVentes?.filter(i => i.id === Number(e.target.value))[0]?.prixVente,
                                                 "produitId": item["produit"].id,
                                                 "quantite": item.quantite,
                                                 "formatVenteId": e.target.value,
