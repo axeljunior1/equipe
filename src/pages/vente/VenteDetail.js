@@ -57,6 +57,11 @@ const VenteDetail = () => {
 
     }
 
+    const payerVenteOM = async () => {
+        navigate(`/paiement-momo/${vente.id}`)
+
+    }
+
     const anulerVente = async () => {
         await apiCrudService.get(`ventes/${vente.id}/annuler`);
         navigate('/ventes')
@@ -203,9 +208,12 @@ const VenteDetail = () => {
 
                 <Row className={'justify-content-end mt-3 '}>
                     {vente.etat?.libelle !== 'PAYEE' && vente.etat?.libelle !== 'FERMEE' &&
-                        <Col xs={"3"}>
+                        <> <Col xs={"3"}>
                             <Button variant={"primary"} className='w-100' onClick={payerVente}>Payer </Button>
                         </Col>
+                        <Col xs={"3"}>
+                            <Button variant={"success"} className='w-100' onClick={payerVenteOM}>Payer Par OM </Button>
+                        </Col> </>
                     }
                     {vente.etat.libelle === 'PAYEE' && (
 

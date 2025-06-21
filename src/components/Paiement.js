@@ -28,8 +28,8 @@ const PaiementList = ({ paiements }) => {
                             <td>{new Date(p.createdAt).toLocaleString()}</td>
                             <td>{p.montantPaye?.toFixed(2)} (DEV)</td>
                             <td>{p.etat?.libelle}</td>
-                            <td>{p.modePaiement || '-'}</td>
-                            <td>{p.reference || '-'}</td>
+                            <td>{p.modePaiement?.code || '-'}</td>
+                            <td>{p.modePaiement?.reference || '-'}</td>
                         </tr>
                     ))}
                     </tbody>

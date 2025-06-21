@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { Container, Form, Button, Card, Alert, Spinner } from "react-bootstrap";
 import axiosInstance from "../context/axiosInstance";
+import {useParams} from "react-router-dom";
+import useModePaiement from "../hooks/useModePaiement";
 
 function PaiementMoMo() {
     const [telephone, setTelephone] = useState("");
@@ -8,10 +10,23 @@ function PaiementMoMo() {
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
     const [referenceId, setReferenceId] = useState(null);
+    // id dans l'url
+    const {id} = useParams();
+    const {modePaiements, error : errorMP, loading: loadingMP, fetchAll} = useModePaiement();
 
     const genererUUID = () => crypto.randomUUID();
 
+    const fetchAllModePaiement = async() =>{
+        await fetchAll()
+    }
+
+    useEffect(() => {
+        fetchAllModePaiement();
+    }, [])
+
     const lancerPaiement = async () => {
+
+
         if (!telephone || !montant) {
             setStatus("❗ Numéro et montant requis");
             return;
@@ -32,7 +47,7 @@ function PaiementMoMo() {
 
             // Vérifier le statut toutes les 3 sec
             const interval = setInterval(async () => {
-                const resStatut = await axiosInstance.get(`momo/statut/${refId}`);
+                const resStatut = await axiosInstance.post(`momo/statut`, {refId : refId, venteId : id});
                 const data = resStatut.data;
 
                 if (data.status && data.status !== "PENDING") {
@@ -54,6 +69,9 @@ function PaiementMoMo() {
 
     return (
         <Container className="my-5">
+
+            {errorMP && <Alert variant="danger">{errorMP}</Alert>}
+
             <Card className="shadow-sm mx-auto" style={{ maxWidth: "500px" }}>
                 <Card.Body>
                     <Card.Title className="text-center mb-4">💳 Paiement MTN MoMo</Card.Title>
