@@ -1,5 +1,6 @@
 import React from 'react';
 import { Table, Card } from 'react-bootstrap';
+import {formatDate} from "../utils/dateUtils";
 
 const PaiementList = ({ paiements }) => {
     if (!paiements || paiements.length === 0) {
@@ -22,10 +23,10 @@ const PaiementList = ({ paiements }) => {
                     </tr>
                     </thead>
                     <tbody>
-                    {paiements.map((p) => (
-                        <tr key={p.idPaiement}>
-                            <td>{p.idPaiement}</td>
-                            <td>{new Date(p.createdAt).toLocaleString()}</td>
+                    {paiements?.map((p) => (
+                        <tr key={p.id}>
+                            <td>{p.id}</td>
+                            <td>{formatDate(p.createdAt)}</td>
                             <td>{p.montantPaye?.toFixed(2)} (DEV)</td>
                             <td>{p.etat?.libelle}</td>
                             <td>{p.modePaiement?.code || '-'}</td>

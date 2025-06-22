@@ -56,6 +56,7 @@ const App = () => {
                                 <Nav className="me-auto">
 
                                     <Nav.Link as={Link} to="/produits">Produits</Nav.Link>
+                                    <Nav.Link as={Link} to="/retours">Retours</Nav.Link>
                                     {!isMobile && <>
                                         {/* Achats Dropdown */}
 

@@ -7,9 +7,10 @@ import ProduitListe from "../produit/ProduitsListe";
 import AlertComp from "../../components/AlertComp";
 import useVente from "../../hooks/useVentes";
 import * as PropTypes from "prop-types";
-import Paiement from "../../components/Paiement";
+import Paiement from "../../components/PaiementList";
 import apiCrudService from "../../services/ApiCrudService";
 import useLigneVente from "../../hooks/useLigneVente";
+import RetourClientPreForm from "../retours/RetourClientPreForm";
 
 
 Paiement.propTypes = {data: PropTypes.any};
@@ -17,6 +18,7 @@ const VenteDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
+    const [showModalRetourClient, setShowModalRetourClient] = useState(false); // Contrôle d'affichage du modal
     const {ventes: vente, error, loading, fetchById, fermerVente : closeVente} = useVente()
     const {ventes: lignesVentes, error: errorVL, loading: loadingVL, fetchVenteLines, remove} = useVente()
     const {error: errorLV, loading: loadingLV, remove: removeLV} = useLigneVente()
@@ -159,6 +161,7 @@ const VenteDetail = () => {
                     <p><strong>Date de mise à jour :</strong> {formatDate(vente.updatedAt)}</p>
                     <p className="text-success"><strong>Etat :</strong> {vente.etat.libelle}</p>
                     <p><strong>Reste à payer :</strong> {vente.resteAPayer}</p>
+                    <Button variant="danger" className='col-3' onClick={() => setShowModalRetourClient(true)}>Retour Client</Button>
                 </div>
                 <br/>
                 <h3> Lignes de la vente</h3>
@@ -179,7 +182,7 @@ const VenteDetail = () => {
                             <tr key={ligne.id}>
                                 <td>{index + 1}</td>
                                 <td><Link to={`/produits/${ligne.id}`}
-                                          className='text-decoration-none'>{ligne.produit.id} - {ligne.produit.nom}</Link>
+                                          className='text-decoration-none'>{ligne.produitId} - {ligne.produitNom}</Link>
                                 </td>
                                 <td>{ligne.prixVente} {ligne.produit?.deviseSymbole} ({ligne.produit?.deviseCode})</td>
                                 <td>{ligne.quantite}</td>
@@ -235,6 +238,8 @@ const VenteDetail = () => {
                 <Paiement paiements={vente.paiements}/>
             </div>
 
+
+
             {/* Modal de recherche d'employé */}
             <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
                 <Modal.Header closeButton>
@@ -242,6 +247,16 @@ const VenteDetail = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <ProduitListe onSelect={handleEmployeeSelect}/>
+                </Modal.Body>
+            </Modal>
+
+
+            <Modal show={showModalRetourClient} onHide={() => setShowModalRetourClient(false)} size="lg" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Retour Client</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <RetourClientPreForm />
                 </Modal.Body>
             </Modal>
 

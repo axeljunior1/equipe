@@ -45,6 +45,8 @@ import FormatVenteCreer from "./formatVente/FormatVenteCreer";
 import UniteVente from "./uniteVente/UniteVente";
 import UniteVenteCreer from "./uniteVente/UniteVenteCreer";
 import PaiementMoMo from "./PaiementMomo";
+import Retour from "./retours/Retour";
+import RetourDetail from "./retours/retourDetail";
 
 const AppRoutes = () => {
 
@@ -56,6 +58,8 @@ const AppRoutes = () => {
                     <Route path="/" element={<Navigate to="/home" />} />
                     <Route path="/home" element={<Home/>}/>
                     <Route path="/paiement-momo/:id" element={<PaiementMoMo/>}/>
+                    <Route path="/retours" element={<Retour/>}/>
+                    <Route path="/retours/:id" element={<RetourDetail/>}/>
                     <Route path="/produits" element={<ListProduits/>}/>
                     <Route path="/produits/:id" element={<ProduitDetail/>}/>
                     <Route path="/produits/edit/:id" element={<DetailsProduitEdit/>}/>
