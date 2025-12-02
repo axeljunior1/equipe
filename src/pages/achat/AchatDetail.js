@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {Button, Col, Modal, Row} from "react-bootstrap";
+import {Button, Card, Col, Modal, Row} from "react-bootstrap";
 import DataTableComp from "../../components/DataTableComp";
 import PaginationComp from "../../components/PaginationComp";
 import {formatDate} from "../../utils/dateUtils";
@@ -237,7 +237,14 @@ const AchatDetail = () => {
             }
 
 
-            <h1><strong>Détail de l'achat</strong></h1>
+            <Card className="mb-4 border-0 bg-body-secondary">
+                <Card.Body>
+                    <h3 className="fw-bold mb-1">
+                        Détail de l'achat
+                    </h3>
+                </Card.Body>
+            </Card>
+
             <div className="">
 
 
@@ -246,8 +253,13 @@ const AchatDetail = () => {
                              footerList={[]}
                 />
 
-
-                <h3 className="my-3"> Lignes de l'achat</h3>
+                <Card className="my-4 shadow-lg border-0 bg-body-secondary ">
+                    <Card.Body>
+                        <h4 className="fw-bold mb-1">
+                            Lignes de l'achat
+                        </h4>
+                    </Card.Body>
+                </Card>
 
                 {lignesAchats.length > 0 ? (
 

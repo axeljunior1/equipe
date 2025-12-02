@@ -96,6 +96,7 @@ const FormatVenteCreer = () => {
                             value={formData.produitId}
                             onChange={handleChange}
                             name="produitId"
+                            required={true}
                             id="produitId"
                             className={`pe-5 ${formErrors.produitId ? "is-invalid" : ""}`}
                             placeholder="Produit ID"

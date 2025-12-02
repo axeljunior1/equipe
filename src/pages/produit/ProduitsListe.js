@@ -138,7 +138,9 @@ const ProduitListe = (props) => {
             )
         },
 
-        {header: "Prix Unitaire", accessor: "prixVente"},
+        {header: "Prix Unitaire", accessor: "prixVente", render : (value, produit) => (
+                <span>{value} {produit.deviseSymbole } {produit.deviseCode ? '('+ produit.deviseCode +')' : null } </span>
+            )},
         {header: "Stock Initial", accessor: "stockInitial"},
         {
             header: "Stock Courant", accessor: "stockCourant", render: (value) => (

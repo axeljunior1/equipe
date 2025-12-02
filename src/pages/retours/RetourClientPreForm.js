@@ -72,7 +72,8 @@ const RetourClientPreForm = (props) => {
             navigate(`/retours/${response.id}`);
 
         }catch (err){
-            setError(err.message);
+            console.log('error test', err);
+            setError(err);
         }finally {
             setLoading(false);
         }
@@ -85,7 +86,7 @@ const RetourClientPreForm = (props) => {
     return (
         <div>
             <h1>Retour Client</h1>
-            {error && <p className={"text-danger"}> {error.message} </p>}
+            {error && <p className={"text-danger"}> {error} </p>}
 
             <Form onSubmit={submitForm} className="mt-5">
 

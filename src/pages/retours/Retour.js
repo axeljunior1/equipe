@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import Table from "react-bootstrap/Table";
 import {Link} from "react-router-dom";
-import {Button} from "react-bootstrap";
+import {Button, Card} from "react-bootstrap";
 import {formatDate} from "../../utils/dateUtils";
 import useRetour from "../../hooks/useRetour";
 import {DEFAULT_PAGINATION_SIZE} from "../../utils/constants";
@@ -40,7 +40,14 @@ function Retour() {
 
     return (
         <div>
-            <h1>Retours </h1>
+            <Card className="mb-4 shadow-sm border-0 bg-light">
+                <Card.Body>
+                    <h3 className="fw-bold mb-1">
+                        <i className="bi bi-arrow-counterclockwise text-primary me-2"></i>
+                        Retours de ventes clients
+                    </h3>
+                </Card.Body>
+            </Card>
 
 
             <Table striped bordered hover>

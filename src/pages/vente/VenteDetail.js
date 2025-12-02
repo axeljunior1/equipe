@@ -184,7 +184,7 @@ const VenteDetail = () => {
                                 <td><Link to={`/produits/${ligne.id}`}
                                           className='text-decoration-none'>{ligne.produitId} - {ligne.produitNom}</Link>
                                 </td>
-                                <td>{ligne.prixVente} {ligne.produit?.deviseSymbole} ({ligne.produit?.deviseCode})</td>
+                                <td>{ligne.prixVente} {ligne.produitDeviseVenteSymbole} ({ligne.produitDeviseVenteCode})</td>
                                 <td>{ligne.quantite}</td>
                                 <td>{ligne.formatVenteLibelle}</td>
                                 <td className="text-center align-middle">

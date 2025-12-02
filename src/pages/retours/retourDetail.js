@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
+import {Link, useLocation, useParams} from "react-router-dom";
 import Table from "react-bootstrap/Table";
 import {Alert, Button, Col, Modal, Row} from "react-bootstrap";
 import ProduitListe from "../produit/ProduitsListe";
@@ -14,7 +14,6 @@ import apiCrudService from "../../services/ApiCrudService";
 Paiement.propTypes = {data: PropTypes.any};
 const RetourDetail = () => {
     const {id} = useParams(); // Récupère l'ID depuis l'URL
-    const navigate = useNavigate();
     const {retours: retour, error: errorR, loading: loadingR, fetchById} = useRetour()
     const {error: errorLR, loading: loadingLR, createAll, remove: removeLR} = useLigneRetour()
     const [error, setError] = useState();
@@ -242,7 +241,7 @@ const RetourDetail = () => {
                                 <td><Link to={`/produits/${ligne.ligneVente.produitId}`}
                                           className='text-decoration-none'>{ligne.ligneVente.produitId} - {ligne.ligneVente.produitNom}</Link>
                                 </td>
-                                <td>{ligne.ligneVente.prixVente} </td>
+                                <td>{ligne.ligneVente.prixVente} {ligne.ligneVente?.produitDeviseVenteSymbole}   </td>
                                 <td>{ligne.quantite}</td>
                                 <td><Button variant="outline-danger" onClick={() => dellLigneRetour(ligne.id)}>Supprimer
                                     la ligne</Button></td>
@@ -311,7 +310,7 @@ const RetourDetail = () => {
                                 <td><Link to={`/produits/${ligne.produitId}`}
                                           className='text-decoration-none'>{ligne.produitId} - {ligne.produitNom}</Link>
                                 </td>
-                                <td>{ligne.prixVente} </td>
+                                <td>{ligne.prixVente} {ligne.produitDeviseVenteSymbole}  </td>
                                 <td><Link to={`/ventes/${ligne.venteId}`}
                                           className='text-decoration-none'>Vente - {ligne.venteId}</Link></td>
                                 <td>{ligne.quantite}</td>

@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import Table from "react-bootstrap/Table";
 import {Link, useNavigate} from "react-router-dom";
-import {Button} from "react-bootstrap";
+import {Button, Card} from "react-bootstrap";
 import HeaderBtnElementComp from "../../components/HeaderBtnElementComp";
 import {useJwt} from "../../context/JwtContext";
 import {formatDate} from "../../utils/dateUtils";
@@ -53,13 +53,20 @@ function Achats() {
 
     return (
         <div>
-            <h1><strong>Achats</strong></h1>
 
+            <Card className="mb-4 shadow-sm border-0 bg-light">
+                <Card.Body>
+                    <h3 className="fw-bold mb-1">
+                        <i className="bi bi-arrow-counterclockwise text-primary me-2"></i>
+                        Achats
+                    </h3>
+                </Card.Body>
+            </Card>
 
 
 
             <HeaderBtnElementComp titreFil='' variant='outline-primary' onClick={handleCreateAchat}
-                                  valueBtn='Créer Achat' />
+                                  valueBtn='Faire une entree en stock' />
 
             <Table striped bordered hover>
                 <thead>
