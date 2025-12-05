@@ -11,7 +11,7 @@ const RetourClientPreForm = (props) => {
     const [etatRetour, setEtatRetour] = useState([]);
     const [etatRetourField, setEtatRetourField] = useState("");
     const [typeRetourField, setTypeRetourField] = useState("");
-    const {navigate} = useNavigate();
+    const navigate = useNavigate();
 
 
     const fetchTypeRetour = async () => {
@@ -86,7 +86,7 @@ const RetourClientPreForm = (props) => {
     return (
         <div>
             <h1>Retour Client</h1>
-            {error && <p className={"text-danger"}> {error} </p>}
+            {error && <p className={"text-danger"}> erreur inconnu </p>}
 
             <Form onSubmit={submitForm} className="mt-5">
 

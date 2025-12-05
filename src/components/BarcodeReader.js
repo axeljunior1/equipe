@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {usePanier} from "../context/PanierContext";
 import AlertComp from "./AlertComp";
 import useProduct from "../hooks/useProduct";
@@ -12,41 +12,49 @@ const BarcodeScanner = () => {
     const {produits, error, loading, fetchByCodeBarre} = useProduct()
 
     useEffect(() => {
-        if (scannedCode.length > 0) {
-            const handleKeyD = async (e) => {
-                if (e.key === "Enter" && scannedCode.length > 0) {
-                    await fetchProduit(scannedCode);
-                    setScannedCode(""); // Réinitialiser après scan
-                } else if (e.key !== "Alt" && e.key !== "Shift") {
-                    console.log(scannedCode);
-                    setScannedCode((prev) => prev + e.key); // Accumuler les caractères scannés
-                }
-            };
+        const listener = (e) => {
+            if (e.key === "Enter" && scannedCode.length > 0) {
+                fetchProduit(scannedCode);
+                setScannedCode("");
+            } else if (e.key.length === 1) {
+                // évite Alt, Shift, etc.
+                setScannedCode(prev => prev + e.key);
+            }
+        };
 
-            document.addEventListener("keydown", handleKeyD);
-            return () => {
-                document.removeEventListener("keydown", handleKeyD);
-            };
-        }
-    }, [scannedCode]); // Dépendance pour suivre les changements de scannedCode
+        document.addEventListener("keydown", listener);
+
+        return () => {
+            document.removeEventListener("keydown", listener);
+        };
+    }, [scannedCode]);
 
     const fetchProduit = async (code) => {
         fetchByCodeBarre(code);
     };
 
 
+    const firstUpdate = useRef(true);
+
     useEffect(() => {
-        if (produits && produits.length > 0) {
-debugger;
-            let pro = {
-                prixVente: produits.prixVente,
-                produitId: produits.id,
-                quantite: nombreProduitDansPanier(produits.id) + 1,
-            };
-            ajouterAuPanier(pro);
-            setShowAlertAdd(true);
+        if (firstUpdate.current) {
+            firstUpdate.current = false;
+            return; // ⛔ ne pas exécuter au montage
         }
-    }, [produits])
+
+        if (!produits || !produits.id) return;
+
+        let pro = {
+            prixVente: produits.prixVente,
+            produitId: produits.id,
+            quantite: nombreProduitDansPanier(produits.id) + 1,
+        };
+
+        ajouterAuPanier(pro);
+        setShowAlertAdd(true);
+
+    }, [produits]);
+
 
     if (loading) {
         return "Loading...";

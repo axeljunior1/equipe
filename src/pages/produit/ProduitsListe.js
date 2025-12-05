@@ -114,7 +114,7 @@ const ProduitListe = (props) => {
     const baseColumns = [
         {
             header: "Nom", accessor: "nom", render: (value, produit) => (
-                <Link to={`/produits/${produit.id}`} className="text-decoration-none">{value}</Link>
+                <Link to={`/produits/${produit.id}`} className="text-decoration-none">{produit.id} - {value}</Link>
             )
         },
         {header: "Description", accessor: "description"},
