@@ -32,6 +32,13 @@ export const PanierProvider = ({children}) => {
         fetchById(panierId);
     };
 
+    const viderPanier = async () => {
+        for (let i = 0; i < panier; i++) {
+            debugger
+            await retirerDuPanier(panier.id)
+        }
+    }
+
 
 
 
@@ -46,7 +53,6 @@ export const PanierProvider = ({children}) => {
             formatVenteId : lignePanier.formatVenteId
         };
         await create(postData);
-        await fetchCart();
 
     };
 
@@ -61,12 +67,12 @@ export const PanierProvider = ({children}) => {
         };
         update(param.id, updateData);
 
-        await fetchCart();
     };
 
     // Supprimer un produit du panier
     const retirerDuPanier = async (id) => {
         remove(id)
+
     };
 
 
@@ -113,7 +119,8 @@ export const PanierProvider = ({children}) => {
             idPanierProduit,
             nombreProduitDansPanier,
             presentDansPanier, loadingPanier, errorPanier,
-            updatePanier
+            updatePanier,
+            viderPanier
         }}>
             {children}
         </PanierContext.Provider>

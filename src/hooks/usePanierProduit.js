@@ -6,11 +6,13 @@ import {
     getPanierProduitById,
     updatePanierProduit
 } from "../services/PanierProduitService";
+import {useJwt} from "../context/JwtContext";
 
 export default function usePanierProduit() {
     const [panierProduits, setPanierProduits] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const {panierId} = useJwt();
  
     // Récupérer tous les paniers par id
     const fetchById = async (id) => {
@@ -35,7 +37,9 @@ export default function usePanierProduit() {
         setError(null);
         try {
             const response = await createPanierProduit(panierData);
-            setPanierProduits([...panierProduits, response.data]); // Ajoute le panier créé à la liste
+            // setPanierProduits([...panierProduits, response.data]); // Ajoute le panier créé à la liste
+            await fetchById(panierId);
+
         } catch (err) {
             setError(err.response?.data?.message || "Erreur lors de la création du panier");
         } finally {
@@ -69,7 +73,8 @@ export default function usePanierProduit() {
         setError(null);
         try {
             await deletePanierProduit(id);
-            setPanierProduits(panierProduits.filter(panier => panier.id !== id)); // Retirer le panier supprimé de la liste
+            // setPanierProduits(panierProduits.filter(panier => panier.id !== id)); // Retirer le panier supprimé de la liste
+            await fetchById(panierId);
         } catch (err) {
             setError(err.response?.data?.message || "Erreur lors de la suppression du panier");
         } finally {

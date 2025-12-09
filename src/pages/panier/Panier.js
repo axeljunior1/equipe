@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
 import {Button, Col, Form, Modal, Row, Table} from 'react-bootstrap';
-import axiosInstance from "../../context/axiosInstance";
 import {useNavigate} from "react-router-dom";
 import ModalDetailProduit from "../../modales/modalDetailProduit";
 import AlertComp from "../../components/AlertComp";
@@ -11,7 +10,6 @@ import {usePanier} from "../../context/PanierContext";
 import ListClients from "../client/ClientList";
 import BarcodeReader from "../../components/BarcodeReader";
 import ProduitListe from "../produit/ProduitsListe";
-import BarcodeScanner from "../../components/BarcodeScanner";
 import useVente from "../../hooks/useVentes";
 
 const Panier = () => {
@@ -155,9 +153,13 @@ const Panier = () => {
     }
     const handleQteBlur = (item) => {
 
-        console.log(calculerTotal())
-        console.log(item)
         ajouterAuPanier(item)
+    }
+
+    const handleViderPanier = async () => {
+        for (let i = 0; i < panier.length; i++) {
+            retirerDuPanier(panier[i]?.id);
+        }
     }
 
     const increaseCart = async (item) => {
@@ -229,7 +231,11 @@ const Panier = () => {
                         <th>Quantité</th>
                         <th>Format de vente</th>
                         <th>Total</th>
-                        <th>Action</th>
+                        <th>Action
+                        <Button variant={"danger"} className="ms-2" onClick={handleViderPanier}>
+                            Vider le panier
+                        </Button>
+                        </th>
                     </tr>
                     </thead>
                     <tbody>
@@ -287,22 +293,24 @@ const Panier = () => {
                                 </Row>
                             </td>
                             <td>
-                                <select className="form-select" aria-label="Default select example" value={formatUnitIds[item.id]}
-                                    onChange={(e)=>{
-                                        let elt = {}
-                                        elt[item.id] = e.target.value
-                                        setFormatUnit({...formatUnitIds, [item.id]: e.target.value})
-                                        console.log(e.target.value)
-                                        handleQteBlur(
-                                            {
-                                                "prixVente": item["produit"].formatVentes?.filter(i => i.id === Number(e.target.value))[0]?.prixVente,
-                                                "produitId": item["produit"].id,
-                                                "quantite": item.quantite,
-                                                "formatVenteId": e.target.value,
-                                            });
-                                    }}
+                                <select key={item.id + `-formatventeSelect`} name={item.id + `-formatventeSelect`}
+                                        className="form-select" aria-label="Default select example"
+                                        value={formatUnitIds[item.id]}
+                                        onChange={(e) => {
+                                            let elt = {}
+                                            elt[item.id] = e.target.value
+                                            setFormatUnit({...formatUnitIds, [item.id]: e.target.value})
+                                            console.log(e.target.value)
+                                            handleQteBlur(
+                                                {
+                                                    "prixVente": item["produit"].formatVentes?.filter(i => i.id === Number(e.target.value))[0]?.prixVente,
+                                                    "produitId": item["produit"].id,
+                                                    "quantite": item.quantite,
+                                                    "formatVenteId": e.target.value,
+                                                });
+                                        }}
                                 >
-                                    <option selected = {true} disabled hidden> </option>
+                                    <option disabled hidden></option>
                                     {item.produit?.formatVentes?.map(format => {
 
                                         return (
@@ -319,7 +327,7 @@ const Panier = () => {
                             <td>{(item["produit"].formatVentes?.filter(i => i.id === formatUnitIds[item.id])[0]?.prixVente * item.quantite).toFixed(2)} {item.produit?.deviseSymbole} ({item.produit?.deviseCode})</td>
                             <td>
                                 <Button
-                                    variant="danger"
+                                    variant="outline-danger"
                                     onClick={() => retirerDuPanier(item.id)}
                                 >
                                     Retirer
@@ -370,15 +378,17 @@ const Panier = () => {
                                 </button>
                             </Col>
                             <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
-                                <Form.Label className={'fw-bold'}>Nom</Form.Label>
+                                <Form.Label className={'fw-bold'} htmlFor={"nom"}>Nom</Form.Label>
                                 <Form.Control
                                     type="text"
                                     value={formClient.nom}
                                     onChange={handleInputChange}
                                     placeholder="Nom"
                                     name='nom'
+                                    id='nom'
                                     className="my-1"
                                     required readOnly
+                                    autoComplete='nom'
                                     isInvalid={validated && !formClient.nom}
                                 />
                                 <Form.Control.Feedback type="invalid">
@@ -386,13 +396,15 @@ const Panier = () => {
                                 </Form.Control.Feedback>
                             </Col>
                             <Col xs={12} sm={12} md={6} lg={4} xxl={3} className="mt-2">
-                                <Form.Label className={'fw-bold'}>prenom</Form.Label>
+                                <Form.Label htmlFor={"prenom"} className={'fw-bold'}>prenom</Form.Label>
                                 <Form.Control
                                     type="text"
                                     value={formClient.prenom}
                                     onChange={handleInputChange}
                                     placeholder="Prénom"
                                     name='prenom'
+                                    id='prenom'
+                                    autoComplete="prenom"
                                     className="my-1"
                                     required readOnly
                                     isInvalid={validated && !formClient.prenom}

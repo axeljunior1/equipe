@@ -25,6 +25,8 @@ const RetourDetail = () => {
     const [showAlertPaiement, setShowAlertPaiement] = useState(!!pShowAlertPaiement);
     const [showModal, setShowModal] = useState(false);
     const [listCheck, setListCheck] = useState({});
+    const [quantitesRetour, setQuantitesRetour] = useState({});
+
 
     let initFormAddLigne = {
         "prixRetour": 0,
@@ -41,6 +43,13 @@ const RetourDetail = () => {
     const fetchRetour = async (ide = id) => {
         fetchById(ide)
         // await fetchLigneRetour()
+    };
+
+    const handleChangeQuantite = (id, value) => {
+        setQuantitesRetour(prev => ({
+            ...prev,
+            [id]: Number(value)
+        }));
     };
 
 
@@ -60,6 +69,19 @@ const RetourDetail = () => {
     useEffect(() => {
         fetchRetour(id).then();
     }, [id]);
+
+    useEffect(() => {
+        if (!retour?.ligneRetours) return;
+
+        const init = {};
+
+        for (const ligne of retour.ligneRetours) {
+            init[ligne.ligneVente.id] = ligne.quantite;   // ou ligne.quantiteRetournee si disponible
+        }
+
+        setQuantitesRetour(init);
+    }, [retour]);
+
 
     useEffect(() => {
         let elt = {};
@@ -114,9 +136,10 @@ const RetourDetail = () => {
 
     }
 
-    const validSelect = async () => {
+    const validSelect1 = async (e) => {
+        console.log(e)
         let checkOk = []
-        retour?.vente?.ligneVentes.forEach((ligne) => {
+        retour?.vente?.ligneVentes?.forEach((ligne) => {
             if (listCheck[ligne.id] === true) {
                 checkOk.push({ligneVenteId: ligne.id, retourId: id, quantite: ligne.quantite})
             }
@@ -131,6 +154,38 @@ const RetourDetail = () => {
         }
 
     }
+
+    const validSelect = async () => {
+        let checkOk = [];
+
+        retour?.vente?.ligneVentes?.forEach((ligne) => {
+            if (listCheck[ligne.id] === true) {
+
+                const qte = quantitesRetour[ligne.id];
+
+                // sécurité : quantité obligatoire
+                if (!qte || qte <= 0) return;
+
+                checkOk.push({
+                    ligneVenteId: ligne.id,
+                    retourId: id,
+                    quantite: qte
+                });
+            }
+        });
+
+        if (checkOk.length === 0) {
+            alert("Aucune ligne valide sélectionnée");
+            return;
+        }
+
+        let response = await createAll(checkOk);
+
+        if (response.success) {
+            await fetchRetour(id);
+        }
+    };
+
 
     const validerRetour = async () => {
         try {
@@ -295,7 +350,8 @@ const RetourDetail = () => {
                             <th>Produit</th>
                             <th>Vente</th>
                             <th>Prix unitaire</th>
-                            <th>Qte</th>
+                            <th>Qte vendu</th>
+                            {/*<th>Qte retourné</th>*/}
                             <th><input type="checkbox"
                                        name="selAll"
                                        id="selAll"
@@ -310,24 +366,51 @@ const RetourDetail = () => {
                                 <td><Link to={`/produits/${ligne.produitId}`}
                                           className='text-decoration-none'>{ligne.produitId} - {ligne.produitNom}</Link>
                                 </td>
-                                <td>{ligne.prixVente} {ligne.produitDeviseVenteSymbole}  </td>
                                 <td><Link to={`/ventes/${ligne.venteId}`}
                                           className='text-decoration-none'>Vente - {ligne.venteId}</Link></td>
+                                <td>{ligne.prixVente} {ligne.produitDeviseVenteSymbole}  </td>
+
                                 <td>{ligne.quantite}</td>
+                                {/*<td>*/}
+                                {/*    /!*<Button variant={"primary"} className='w-100'*/}
+                                {/*            onClick={() => navigate(`/retours/${retour.id}/ligne/${ligne.id}`)}>*/}
+                                {/*        Retourner*/}
+                                {/*    </Button>*!/*/}
+                                {/*    {ligne?.id &&*/}
+                                {/*        <input type="checkbox"*/}
+                                {/*               name="retour"*/}
+                                {/*               id={ligne.id}*/}
+                                {/*               onChange={(e) => handleChangeCheck(e, ligne.id)}*/}
+                                {/*               checked={!!listCheck[ligne.id]}*/}
+                                {/*               value={ligne.id}/>*/}
+                                {/*    }*/}
+                                {/*    */}
+                                {/*    */}
+                                {/*</td>*/}
                                 <td>
-                                    {/*<Button variant={"primary"} className='w-100'
-                                            onClick={() => navigate(`/retours/${retour.id}/ligne/${ligne.id}`)}>
-                                        Retourner
-                                    </Button>*/}
-                                    {ligne?.id &&
-                                        <input type="checkbox"
-                                               name="retour"
-                                               id={ligne.id}
-                                               onChange={(e) => handleChangeCheck(e, ligne.id)}
-                                               checked={!!listCheck[ligne.id]}
-                                               value={ligne.id}/>
-                                    }
+                                    {/* case à cocher */}
+                                    <input
+                                        type="checkbox"
+                                        onChange={(e) => handleChangeCheck(e, ligne.id)}
+                                        checked={!!listCheck[ligne.id]}
+                                    />
+
+                                    {/* quantité à retourner */}
+                                    {listCheck[ligne.id] && (
+                                        <input
+                                            type="number"
+                                            min={1}
+                                            max={ligne.quantite}
+                                            className="form-control mt-1"
+                                            value={quantitesRetour[ligne.id] || ""}
+                                            placeholder="Qté"
+                                            onChange={(e) =>
+                                                handleChangeQuantite(ligne.id, e.target.value)
+                                            }
+                                        />
+                                    )}
                                 </td>
+
 
                             </tr>
                         ))}

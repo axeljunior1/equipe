@@ -1,23 +1,39 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
 import {Link} from "react-router-dom";
 import {Button, Card} from "react-bootstrap";
 import {formatDate} from "../../utils/dateUtils";
 import useRetour from "../../hooks/useRetour";
 import {DEFAULT_PAGINATION_SIZE} from "../../utils/constants";
+import PaginationComp from "../../components/PaginationComp";
 
 function Retour() {
-    const {retours, error, loading, fetchAllRetours, remove} = useRetour()
+    const {retours, error, loading, fetchAllRetours, remove, totalElements, totalPages} = useRetour()
 
+    const [currentPage, setCurrentPage] = useState(0); // Page actuelle
+    const [pageSize, setPageSize] = useState(DEFAULT_PAGINATION_SIZE); // Taille de la page
 
     async function fetchRetours(page, size = DEFAULT_PAGINATION_SIZE) {
-        fetchAllRetours()
+        fetchAllRetours(page, size);
     }
 
     useEffect(() => {
         fetchRetours().then();
     }, []);
 
+    useEffect(() => {
+        fetchRetours(currentPage, pageSize);
+    }, [currentPage]);
+
+    const handlePageChange = (pageNumber) => {
+        console.log('pageNumber : ', pageNumber);
+        setCurrentPage(pageNumber);
+    };
+
+    const handlePageSizeChange = (e) => {
+        setPageSize(Number(e.target.value));
+        setCurrentPage(0); // Reset to first page whenever page size changes
+    };
 
     const handleDeleteRetour = async (id) => {
         remove(id)
@@ -88,6 +104,18 @@ function Retour() {
                 ))}
                 </tbody>
             </Table>
+
+            {/* Pagination controls */}
+
+            <PaginationComp className={"mb-5"}
+                            currentPage={currentPage}
+                            handlePageChange={handlePageChange}
+                            totalPages={totalPages}
+                            pageSize={pageSize}
+                            handlePageSizeChange={handlePageSizeChange}
+                            nombreElt={totalElements}
+
+            />
         </div>
     );
 }

@@ -159,7 +159,7 @@ const ProduitListe = (props) => {
 
                     <Form.Control
                         type="number"
-                        value={quantites[produit.id]}
+                        value={quantites[produit.id] ?? ""}
                         onChange={(e) => handleChangeNbProPanier(produit.id, e.target.value)}
                         onBlur={() => handleBlur({
 
@@ -314,6 +314,7 @@ const ProduitListe = (props) => {
             ) : (
                 <div className="text-center text-muted">Aucun produit trouvé.</div>
             )}
+
             {/* Pagination controls */}
 
             <PaginationComp className={"mb-5"}
@@ -326,7 +327,7 @@ const ProduitListe = (props) => {
 
             />
 
-            <span className={"mb-5"}></span>
+            {/*<span className={"mb-5"}></span>*/}
 
 
         </div>
