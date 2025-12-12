@@ -168,7 +168,7 @@ const EmployeDetail = () => {
                         <div className="mb-3">
 
                             {roles && (
-                                <SelectMultiple title="Roles : " options={roles} selectedOptions={employe.employeRoles.map(item => item.role)}
+                                <SelectMultiple title="Roles : " options={roles} selectedOptions={employe.employeRoles?.map(item => item.role)}
                                                 setSelectedOptions={setSelectedOptions}/>
                             )}
 

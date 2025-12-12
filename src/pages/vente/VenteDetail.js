@@ -161,7 +161,8 @@ const VenteDetail = () => {
                     <p><strong>Date de mise à jour :</strong> {formatDate(vente.updatedAt)}</p>
                     <p className="text-success"><strong>Etat :</strong> {vente.etat.libelle}</p>
                     <p><strong>Reste à payer :</strong> {vente.resteAPayer}</p>
-                    <Button variant="danger" className='col-3' onClick={() => setShowModalRetourClient(true)}>Retour Client</Button>
+                    {vente.resteAPayer < vente.montantTotal &&
+                    <Button variant="danger" className='col-3' onClick={() => setShowModalRetourClient(true)}>Retour Client</Button> }
                 </div>
                 <br/>
                 <h3> Lignes de la vente</h3>
