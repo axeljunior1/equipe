@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {Button, Card, Col, Modal, Row} from "react-bootstrap";
+import {Alert, Button, Card, Col, Modal, Row} from "react-bootstrap";
 import DataTableComp from "../../components/DataTableComp";
 import PaginationComp from "../../components/PaginationComp";
 import {formatDate} from "../../utils/dateUtils";
@@ -24,12 +24,12 @@ const AchatDetail = () => {
     const {achats: achat, error, loading, fetchById} = useAchat()
     const {
         achats: lignesAchats,
-        errorAL,
-        loadingAL,
+        error : errorAL,
+        loading : loadingAL,
         fetchAchatLines,
         remove,
         totalPages: totalPagesAL,
-        totalElements: totalElementsAL
+        totalElements: totalElementsAL, validById
     } = useAchat()
     const {error: errorLA, loading: loadingLA, create: createLA, remove: removeLA} = useLigneAchat()
     const [formErrors, setFormErrors] = useState({});
@@ -179,7 +179,8 @@ const AchatDetail = () => {
                                                     className='text-decoration-none'> {achat['employe']?.id} - {achat['employe']?.nom}</Link>
         </p>,
         <p key={2}><strong>Montant :</strong> <span className="text-danger"> {achat.montantTotal} </span></p>,
-        <p key={3}><strong>Date de Création :</strong> {formatDate(achat['dateCreation'])}</p>
+        <p key={3}><strong>Date de Création :</strong> {formatDate(achat['dateCreation'])}</p>,
+        <p key={4}><strong>Etat :</strong> <span className="text-success"> {achat?.etat?.libelle} </span></p>
     ]
 
 
@@ -214,6 +215,11 @@ const AchatDetail = () => {
     };
 
 
+    const footerList = [
+        <Button className="ms-3" variant={"primary"} onClick={() => validById(id)}> Valider l'achat</Button>,
+    ]
+
+
     if (loading || loadingAL || loadingLA) {
         return <div>Loading...</div>
     }
@@ -224,17 +230,12 @@ const AchatDetail = () => {
     }
 
 
-    if (error || errorAL || errorLA) {
-        return <h1 className="text-danger"> {error || errorAL || errorLA} </h1>;
-    }
-
-
     return (
         <div className="">
 
-            {error &&
-                <ErrorAlert error={error}/>
-            }
+            {error && <Alert variant="danger">{error}</Alert>}
+            {errorAL && <Alert variant="danger">{errorAL}</Alert>}
+            {errorLA && <Alert variant="danger">{errorLA}</Alert>}
 
 
             <Card className="mb-4 border-0 bg-body-secondary">
@@ -250,7 +251,7 @@ const AchatDetail = () => {
 
                 <DetailsComp horizontal={true}
                              lines={lines}
-                             footerList={[]}
+                             footerList={footerList}
                 />
 
                 <Card className="my-4 shadow-lg border-0 bg-body-secondary ">

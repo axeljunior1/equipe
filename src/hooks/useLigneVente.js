@@ -20,7 +20,7 @@ export default function useLigneVente() {
     const [totalPages, setTotalPages] = useState(number);
 
 
-    // Récupérer tous les ligneVentes par id
+    // Récupérer toutes les ligneVentes par id
     const fetchById = async (id) => {
         setLoading(true);
         setError(null);
@@ -115,13 +115,16 @@ export default function useLigneVente() {
         }
     };
 
-    // Supprimer un ligneVente
-    const remove = async (id) => {
+    // Supprimer une ligneVente
+    const remove = async (id, vente_id) => {
         setLoading(true);
         setError(null);
         try {
             await deleteLigneVente(id);
-            setLigneVentes(ligneVentes.filter(ligneVente => ligneVente.id !== id)); // Retirer l'employé supprimé de la liste
+            setLigneVentes(ligneVentes.filter(ligneVente => ligneVente.id !== id)); // Retirer la ligne supprimé de la liste
+            if (vente_id){
+                await fetchById(vente_id)
+            }
         } catch (err) {
             setError(err.response?.data?.message || "Erreur lors de la suppression du ligneVente");
         } finally {

@@ -8,9 +8,9 @@ import AlertComp from "../../components/AlertComp";
 import useVente from "../../hooks/useVentes";
 import * as PropTypes from "prop-types";
 import Paiement from "../../components/PaiementList";
-import apiCrudService from "../../services/ApiCrudService";
 import useLigneVente from "../../hooks/useLigneVente";
 import RetourClientPreForm from "../retours/RetourClientPreForm";
+import "./Vente.css";
 
 
 Paiement.propTypes = {data: PropTypes.any};
@@ -19,7 +19,7 @@ const VenteDetail = () => {
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false); // Contrôle d'affichage du modal
     const [showModalRetourClient, setShowModalRetourClient] = useState(false); // Contrôle d'affichage du modal
-    const {ventes: vente, error, loading, fetchById, fermerVente : closeVente} = useVente()
+    const {ventes: vente, error, loading, fetchById, fermerVente : closeVente, annuler, rembourser} = useVente()
     const {ventes: lignesVentes, error: errorVL, loading: loadingVL, fetchVenteLines, remove} = useVente()
     const {error: errorLV, loading: loadingLV, remove: removeLV} = useLigneVente()
 
@@ -65,9 +65,13 @@ const VenteDetail = () => {
     }
 
     const anulerVente = async () => {
-        await apiCrudService.get(`ventes/${vente.id}/annuler`);
+        annuler(id)
         navigate('/ventes')
 
+    }
+
+    const anulerVenteRemboursement = async () => {
+        rembourser(id)
     }
 
     const fermerVente = async () => {
@@ -107,9 +111,9 @@ const VenteDetail = () => {
 
 
 
-    const handleDeleteLigne = async (e, id) => {
+    const handleDeleteLigne = async (e, id_ligne) => {
         e.preventDefault();
-        removeLV(id)
+        removeLV(id_ligne, id);
 
         await fetchVente();
     }
@@ -144,7 +148,7 @@ const VenteDetail = () => {
                 />
             )}
 
-            {error && <Alert className={'mt-3'} variant="danger" dismissible>{error}</Alert> }
+            {error && <Alert className={'alert-sticky mt-3'} variant="danger" dismissible>{error}</Alert> }
             {errorVL && <Alert className={'mt-3'} variant="danger" dismissible>{errorVL}</Alert> }
             {errorLV && <Alert className={'mt-3'} variant="danger" dismissible>{errorLV}</Alert> }
 
@@ -161,7 +165,7 @@ const VenteDetail = () => {
                     <p><strong>Date de mise à jour :</strong> {formatDate(vente.updatedAt)}</p>
                     <p className="text-success"><strong>Etat :</strong> {vente.etat.libelle}</p>
                     <p><strong>Reste à payer :</strong> {vente.resteAPayer}</p>
-                    {vente.resteAPayer < vente.montantTotal &&
+                    {vente.resteAPayer == 0  &&
                     <Button variant="danger" className='col-3' onClick={() => setShowModalRetourClient(true)}>Retour Client</Button> }
                 </div>
                 <br/>
@@ -189,13 +193,14 @@ const VenteDetail = () => {
                                 <td>{ligne.quantite}</td>
                                 <td>{ligne.formatVenteLibelle}</td>
                                 <td className="text-center align-middle">
+                                    {vente.etat.libelle === 'EN_ATTENTE_PAIEMENT' &&
                                     <Button
                                         variant="outline-danger"
-                                        className={`w-100 ${vente.etat.libelle === 'EN_ATTENTE_PAIEMENT' ? '' : 'disabled'}`}
+                                        className={`w-100`}
                                         onClick={(e) => handleDeleteLigne(e, ligne.id)}
                                     >
                                         Supprimer 🚮
-                                    </Button>
+                                    </Button>}
                                 </td>
 
                             </tr>
@@ -229,6 +234,11 @@ const VenteDetail = () => {
                     {vente.etat.libelle === 'EN_ATTENTE_PAIEMENT' && (
                     <Col xs={"3"}>
                         <Button variant={"secondary"} className='w-100' onClick={anulerVente}>Annuler</Button>
+                    </Col>
+                    )}
+                    {vente.etat.libelle === 'PAIEMENT_PARTIEL' && (
+                    <Col xs={"3"}>
+                        <Button variant={"secondary"} className='w-100' onClick={anulerVenteRemboursement}>Annuler et rembourser le client</Button>
                     </Col>
                     )}
                 </Row>

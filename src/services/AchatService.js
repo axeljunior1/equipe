@@ -10,6 +10,10 @@ export const getAchatById = async (id) => {
     return await axiosInstance.get(`${BASE_URL}/${id}`);
 }
 
+export const validAchatById = async (id) => {
+    return await axiosInstance.get(`${BASE_URL}/${id}/valider`);
+}
+
 export const getAchatLines = async (id, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
     return await axiosInstance.get(`${BASE_URL}/${id}/lignes`);
 }
@@ -33,6 +37,7 @@ export const getAchatDyn = async (params, page = 0, size = DEFAULT_PAGINATION_SI
     });
 
 }
+
 
 
 export const getAchats = async ( page = 0, size = DEFAULT_PAGINATION_SIZE) => {

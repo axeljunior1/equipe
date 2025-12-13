@@ -4,12 +4,12 @@ import {DEFAULT_PAGINATION_SIZE} from "../utils/constants";
 import PropTypes from "prop-types";
 
 
-const PaginationComp = ({currentPage, pageSize, handlePageChange, handlePageSizeChange, totalPages, nombreElt}) => {
+const PaginationComp = ({currentPage, pageSize, handlePageChange, handlePageSizeChange, totalPages, nombreElt, nbreElmentsSouhaite = DEFAULT_PAGINATION_SIZE}) => {
 
 
     return (
         <div>
-            {nombreElt > DEFAULT_PAGINATION_SIZE &&
+            {nombreElt > nbreElmentsSouhaite &&
                 <>
                     {/* Pagination controls */}
                     <div className="d-flex justify-content-between">

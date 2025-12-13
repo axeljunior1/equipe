@@ -179,8 +179,8 @@ const MouvementStock = () => {
                         </td>
                         <td>
                             <Link
-                                to={`/${chooseTypeEveOrigine(mouvementStock.typeMouvementCode)}/${mouvementStock.sourceId}`}
-                                className='text-decoration-none'>{mouvementStock.sourceType} - {mouvementStock.sourceId}</Link>
+                                to={`/${chooseTypeEveOrigine(mouvementStock.typeMouvementCode)}/${mouvementStock.idEvenementOrigine}`}
+                                className='text-decoration-none'>{mouvementStock.typeMouvementCode} - {mouvementStock.idEvenementOrigine}</Link>
                         </td>
                         <td>
                             <Link to={`/produits/${mouvementStock.produitId}`}

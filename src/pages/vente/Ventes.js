@@ -1,17 +1,21 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import Table from "react-bootstrap/Table";
 import {Link} from "react-router-dom";
-import {Button} from "react-bootstrap";
+import {Alert, Button} from "react-bootstrap";
 import {formatDate} from "../../utils/dateUtils";
 import useVente from "../../hooks/useVentes";
 import {DEFAULT_PAGINATION_SIZE} from "../../utils/constants";
+import PaginationComp from "../../components/PaginationComp";
 
 function Ventes() {
-    const {ventes, error, loading, fetchAllVentes, remove} = useVente()
+    const {ventes, error, loading, fetchAllVentes, remove, totalElements,
+        totalPages} = useVente()
 
+    const [currentPage, setCurrentPage] = useState(0); // Page actuelle
+    const [pageSize, setPageSize] = useState(DEFAULT_PAGINATION_SIZE); // Taille de la page
 
-    async function fetchVentes(page, size = DEFAULT_PAGINATION_SIZE) {
-        fetchAllVentes()
+    async function fetchVentes(page=currentPage, size = pageSize) {
+        fetchAllVentes(page, size);
     }
 
     useEffect(() => {
@@ -21,6 +25,20 @@ function Ventes() {
 
     const handleDeleteVente = async (id) => {
         remove(id)
+    };
+
+    useEffect(() => {
+        fetchAllVentes(currentPage, pageSize);
+
+    }, [currentPage, pageSize]);
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const handlePageSizeChange = (e) => {
+        setPageSize(Number(e.target.value));
+        setCurrentPage(0); // Reset to first page whenever page size changes
     };
 
     if (loading) {
@@ -42,6 +60,7 @@ function Ventes() {
         <div>
             <h1>Ventes </h1>
 
+            {error && <Alert variant="danger">{error}</Alert>}
 
             <Table striped bordered hover>
                 <thead>
@@ -87,6 +106,19 @@ function Ventes() {
                 ))}
                 </tbody>
             </Table>
+
+            {/* Pagination controls */}
+
+            <PaginationComp className={"mb-5"}
+                            currentPage={currentPage}
+                            handlePageChange={handlePageChange}
+                            totalPages={totalPages}
+                            pageSize={pageSize}
+                            handlePageSizeChange={handlePageSizeChange}
+                            nombreElt={totalElements}
+                            nbreElmentsSouhaite = {pageSize}
+
+            />
         </div>
     );
 }

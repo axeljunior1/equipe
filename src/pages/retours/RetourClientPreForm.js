@@ -86,7 +86,7 @@ const RetourClientPreForm = (props) => {
     return (
         <div>
             <h1>Retour Client</h1>
-            {error && <p className={"text-danger"}> erreur inconnu </p>}
+            {error && <p className={"text-danger"}> {error} </p>}
 
             <Form onSubmit={submitForm} className="mt-5">
 

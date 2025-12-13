@@ -21,6 +21,9 @@ export const fermerVenteById = async (id) => {
 export const annulerVente = async (id) => {
     return await axiosInstance.get(`${BASE_URL}/${id}/annuler`);
 }
+export const rembourserVente = async (id) => {
+    return await axiosInstance.get(`${BASE_URL}/${id}/rembourser`);
+}
 
 export const getVenteLines = async (id, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
     return await axiosInstance.get(`${BASE_URL}/${id}/lignes`);

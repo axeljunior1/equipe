@@ -74,6 +74,7 @@ function Achats() {
                     <th></th>
                     <th>Nom</th>
                     <th>Montant</th>
+                    <th>Etat</th>
                     <th>Date de création/modification</th>
                     <th>Employé</th>
                     <th>Supprimer ? 🚮</th>
@@ -87,6 +88,7 @@ function Achats() {
                             <Link to={`/achats/${achat.id}`} className='text-decoration-none'> Achat - {achat.id}</Link>
                         </td>
                         <td>{achat.montantTotal}</td>
+                        <td>{achat.etat.libelle}</td>
                         <td>{formatDate(achat['dateCreation'])}</td>
                         <td>
                             <Link to={`/employes/${achat.employeId}`} className='text-decoration-none'>{achat['employe'].id} - {achat['employe'].nom}</Link>

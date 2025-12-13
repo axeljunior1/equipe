@@ -7,7 +7,7 @@ import {
     updateAchat,
     deleteAchat,
     getAchatById,
-    getAchats, getAchatLines
+    getAchats, getAchatLines, validAchatById
 } from "../services/AchatService";
 import {number} from "sockjs-client/lib/utils/random";
 import {DEFAULT_PAGINATION_SIZE} from "../utils/constants";
@@ -27,6 +27,20 @@ export default function useAchat() {
         try {
             const response = await getAchatById(id);
             setAchats(response.data);
+        } catch (err) {
+            setError(err.response?.data?.message || "Erreur lors de la récupération de achat");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Récupérer tous les achats par id
+    const validById = async (id) => {
+        setLoading(true);
+        setError(null);
+        try {
+            await validAchatById(id);
+            fetchById(id)
         } catch (err) {
             setError(err.response?.data?.message || "Erreur lors de la récupération de achat");
         } finally {
@@ -149,7 +163,19 @@ export default function useAchat() {
     };
 
     return {
-        achats, loading, error, fetchAllAchats,fetchAchatLines, fetchById, fetchByMotCle, fetchByParams, create, update, remove, totalElements,
-        totalPages
+        achats,
+        loading,
+        error,
+        fetchAllAchats,
+        fetchAchatLines,
+        fetchById,
+        fetchByMotCle,
+        fetchByParams,
+        create,
+        update,
+        remove,
+        totalElements,
+        totalPages,
+        validById
     };
 }

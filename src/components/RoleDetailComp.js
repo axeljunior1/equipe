@@ -20,8 +20,8 @@ const RoleDetailComp = (props) => {
 
 
     const handleDeleteRole = async (id) => {
-        remove("roles", id);
-        navigate("/roles?showAlertSupprRole=true");
+        remove(id);
+        navigate("/roles");
     }
 
 

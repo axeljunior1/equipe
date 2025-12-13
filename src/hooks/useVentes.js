@@ -1,6 +1,8 @@
 // hooks/useProduct.js
 import {useState} from "react";
 import {
+    annulerVente,
+    rembourserVente,
     createVente,
     deleteVente,
     fermerVenteById,
@@ -9,7 +11,8 @@ import {
     getVenteDyn,
     getVenteLines,
     getVentes,
-    updateVente, validerVente
+    updateVente,
+    validerVente
 } from "../services/VenteService";
 import {number} from "sockjs-client/lib/utils/random";
 import {DEFAULT_PAGINATION_SIZE} from "../utils/constants";
@@ -177,8 +180,53 @@ export default function useVente() {
         }
     };
 
+
+    // Récupérer tous les ventes par id
+    const annuler = async (id) => {
+        setLoading(true);
+        setError(null);
+        try {
+            await annulerVente(id);
+            fetchById(id)
+        } catch (err) {
+            setError(err.response?.data?.message || "Erreur lors de la récupération de vente");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    // Récupérer tous les ventes par id
+    const rembourser = async (id) => {
+        setLoading(true);
+        setError(null);
+        try {
+            await rembourserVente(id);
+            fetchById(id)
+        } catch (err) {
+            setError(err.response?.data?.message || "Erreur lors de la récupération de vente");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return {
-        ventes, loading, error, fetchAllVentes,fetchVenteLines, fetchById, fetchByMotCle, fetchByParams, validerPanier, create, update, remove, totalElements,
-        totalPages,fermerVente
+        ventes,
+        loading,
+        error,
+        fetchAllVentes,
+        fetchVenteLines,
+        fetchById,
+        fetchByMotCle,
+        fetchByParams,
+        validerPanier,
+        create,
+        update,
+        remove,
+        totalElements,
+        totalPages,
+        fermerVente,
+        annuler,
+        rembourser
     };
 }
