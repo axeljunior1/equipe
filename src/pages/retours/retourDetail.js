@@ -190,13 +190,13 @@ const RetourDetail = () => {
     const validerRetour = async () => {
         try {
             setLoading(true);
-            setError("");
+            setError(null);
             const response = await apiCrudService.get(`retours/${id}/valider`);
             console.log(response);
             await fetchRetour(id)
 
         } catch (err) {
-            setError(err.message);
+            setError(err || "Erreur lors de la validation du retour");
         } finally {
             setLoading(false);
         }
@@ -206,13 +206,14 @@ const RetourDetail = () => {
     const rejeterRetour = async () => {
         try {
             setLoading(true);
-            setError("");
+            setError(null);
             const response = await apiCrudService.get(`retours/${id}/rejeter`);
             console.log(response);
             await fetchRetour(id)
 
         } catch (err) {
-            setError(err.message);
+            setError(err || "Erreur lors de la validation du retour");
+
         } finally {
             setLoading(false);
         }
