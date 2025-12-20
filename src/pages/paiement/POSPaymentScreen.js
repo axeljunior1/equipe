@@ -3,6 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import apiCrudService from "../../services/ApiCrudService";
 import {useNavigate, useParams} from "react-router-dom";
 import useModePaiement from "../../hooks/useModePaiement";
+import {Alert} from "react-bootstrap";
 
 
 const POSPaymentScreen = (props) => {
@@ -10,6 +11,7 @@ const POSPaymentScreen = (props) => {
     const [loading, setLoading] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState("");
     const [montantPaiement, setMontantPaiement] = useState("");
+    const [idAvoir, setIdAvoir] = useState("");
     const {id} = useParams();
     const navigate = useNavigate();
     const {modePaiements, error : errorMP, loading: loadingMP, fetchAll} = useModePaiement();
@@ -60,16 +62,29 @@ const POSPaymentScreen = (props) => {
             setError("Veuillez choisir un mode de paiement");
             return;
         }
+        if ( paymentMethod == "5" &&( !idAvoir || idAvoir === "")) {
+            setError("Veuillez renseigner l'idAvoir si le mode de paiement est avoir");
+            return;
+        }
         setError("");
         setLoading(true);
         try {
-            await apiCrudService.post(`ventes/payer/${id}`, {
-                montantPaiement: montantPaiement,
-                modePaiementId: paymentMethod
-            })
+
+            if(paymentMethod === "5"){
+                await apiCrudService.post(`ventes/payer/${id}/avoir`, {
+                    montantPaiement: montantPaiement,
+                    idAvoir: idAvoir
+                })
+            }else{
+                await apiCrudService.post(`ventes/payer/${id}`, {
+                    montantPaiement: montantPaiement,
+                    modePaiementId: paymentMethod
+                })
+            }
 
 
             navigate(`/ventes/${id}?pShowAlertPaiement=true`)
+
         } catch (err) {
             setError(err)
         } finally {
@@ -99,11 +114,7 @@ const POSPaymentScreen = (props) => {
 
     return (
         <div className="container mt-4">
-            {error && (
-                <p className="text-danger">
-                    Erreur : {error}
-                </p>
-            )}
+            {error && <Alert variant="danger">{error}</Alert>}
 
 
             <h2 className="mb-3">POS - Paiement : {montantPaiement} </h2>
@@ -115,7 +126,7 @@ const POSPaymentScreen = (props) => {
                     value={paymentMethod}
                     onChange={(e) => setPaymentMethod(e.target.value)}
                 >
-                    <option value=""  disabled hidden selected >Choisir un mode de paiement</option>
+                    <option value=""  disabled hidden >Choisir un mode de paiement</option>
                     {modePaiements && modePaiements.length > 0 && modePaiements.map((modePaiement) => {
                         return (
                             <option key={modePaiement.id} value={modePaiement.id}>
@@ -125,6 +136,24 @@ const POSPaymentScreen = (props) => {
                     })}
                 </select>
             </div>
+
+            {
+                paymentMethod == "5" && <div className="mb-3">
+
+                    <label className="form-label">idAvoir</label>
+                    <input
+                        type="number"
+                        className="form-control"
+                        name={"idAvoir"}
+                        id={"idAvoir"}
+                        required
+                        value={idAvoir}
+                        onChange={(e) => setIdAvoir( e.target.value)}
+                    />
+
+                </div>
+
+            }
 
             <div className="mb-3">
                 <label className="form-label">Montant à payer</label>
@@ -144,9 +173,6 @@ const POSPaymentScreen = (props) => {
                 </button>
                 <button className="btn btn-warning " onClick={prisACredit}>
                     Pris à crédit
-                </button>
-                <button className="btn btn-danger disabled" onClick={() => null}>
-                    Refuser
                 </button>
             </div>
         </div>

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import Table from "react-bootstrap/Table";
-import {Alert, Button, Col, Modal, Row} from "react-bootstrap";
+import {Alert, Button, Card, Col, ListGroup, Modal, Row} from "react-bootstrap";
 import {formatDate} from "../../utils/dateUtils";
 import ProduitListe from "../produit/ProduitsListe";
 import AlertComp from "../../components/AlertComp";
@@ -153,21 +153,44 @@ const VenteDetail = () => {
             {errorLV && <Alert className={'mt-3'} variant="danger" dismissible>{errorLV}</Alert> }
 
             <h1><strong>Détail de la vente</strong></h1>
+
             <div className="card p-4 shadow">
                 <h3 className="card-title text-center">Vente : {vente.id}</h3>
-                <div className="card-body">
-                    <p><strong>Employé :</strong>
-                        <Link to={`/employes/${vente.employe.id}`}
-                              className='text-decoration-none'> {vente.employe.id} - {vente.employe.prenom}</Link>
-                    </p>
-                    <p><strong>Montant :</strong> {vente.montantTotal}</p>
-                    <p><strong>Date de Création :</strong> {formatDate(vente.createdAt)}</p>
-                    <p><strong>Date de mise à jour :</strong> {formatDate(vente.updatedAt)}</p>
-                    <p className="text-success"><strong>Etat :</strong> {vente.etat.libelle}</p>
-                    <p><strong>Reste à payer :</strong> {vente.resteAPayer}</p>
-                    {vente.resteAPayer == 0  &&
-                    <Button variant="danger" className='col-3' onClick={() => setShowModalRetourClient(true)}>Retour Client</Button> }
-                </div>
+                <Card.Body>
+                    <ListGroup variant="flush">
+                        <ListGroup.Item>
+                            <strong>Employé :</strong>{' '}
+                            <Link to={`/employes/${vente.employe.id}`} className="text-decoration-none">
+                                {vente.employe.prenom}
+                            </Link>
+                        </ListGroup.Item>
+
+                        <ListGroup.Item>
+                            <strong>Montant :</strong> {vente.montantTotal} €
+                        </ListGroup.Item>
+
+                        <ListGroup.Item>
+                            <strong>Création :</strong> {formatDate(vente.createdAt)}
+                        </ListGroup.Item>
+
+                        <ListGroup.Item>
+                            <strong>Maj :</strong> {formatDate(vente.updatedAt)}
+                        </ListGroup.Item>
+
+                        <ListGroup.Item className="text-success fw-semibold">
+                            État : {vente.etat.libelle}
+                        </ListGroup.Item>
+
+                        <ListGroup.Item>
+                            <strong>Reste à payer :</strong> {vente.resteAPayer} €
+                        </ListGroup.Item>
+                        <ListGroup.Item>
+                            {vente.resteAPayer == 0  && <Button variant="danger" className='col-3' onClick={() => setShowModalRetourClient(true)}>Retour Client</Button> }
+
+                        </ListGroup.Item>
+                    </ListGroup>
+                </Card.Body>
+
                 <br/>
                 <h3> Lignes de la vente</h3>
                 {lignesVentes && lignesVentes.length > 0 ? (
