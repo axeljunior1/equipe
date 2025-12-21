@@ -51,6 +51,8 @@ function Achats() {
     }
 
 
+
+
     return (
         <div>
 
@@ -68,7 +70,8 @@ function Achats() {
             <HeaderBtnElementComp titreFil='' variant='outline-primary' onClick={handleCreateAchat}
                                   valueBtn='Faire une entree en stock' />
 
-            <Table striped bordered hover>
+            {achats.length > 0 &&
+                <Table striped bordered hover>
                 <thead>
                 <tr>
                     <th></th>
@@ -88,7 +91,7 @@ function Achats() {
                             <Link to={`/achats/${achat.id}`} className='text-decoration-none'> Achat - {achat.id}</Link>
                         </td>
                         <td>{achat.montantTotal}</td>
-                        <td>{achat.etat.libelle}</td>
+                        <td>{achat.etat?.libelle}</td>
                         <td>{formatDate(achat['dateCreation'])}</td>
                         <td>
                             <Link to={`/employes/${achat.employeId}`} className='text-decoration-none'>{achat['employe'].id} - {achat['employe'].nom}</Link>
@@ -100,6 +103,7 @@ function Achats() {
                 ))}
                 </tbody>
             </Table>
+            }
         </div>
     );
 }

@@ -216,8 +216,10 @@ const AchatDetail = () => {
 
 
     const footerList = [
-        <Button className="ms-3" variant={"primary"} onClick={() => validById(id)}> Valider l'achat</Button>,
-    ]
+        <>
+            {achat && achat.etat?.libelle !=="VALIDEE" &&
+                <Button className="ms-3" variant={"primary"} onClick={() => validById(id)}> Valider l'achat</Button>}</>
+            ];
 
 
     if (loading || loadingAL || loadingLA) {
@@ -281,9 +283,9 @@ const AchatDetail = () => {
                 />
 
 
-                <AchatAddLineForm onSubmit={handleSubmitFormAAddLine} formAddLigne={formAddLigne}
-                                  onChange={handleInputChange} formErrors={formErrors}
-                                  onClick={() => setShowModal(true)}/>
+                {achat.etat?.libelle !== "VALIDEE" && <AchatAddLineForm onSubmit={handleSubmitFormAAddLine} formAddLigne={formAddLigne}
+                                   onChange={handleInputChange} formErrors={formErrors}
+                                   onClick={() => setShowModal(true)}/>}
                 <hr/>
 
 
