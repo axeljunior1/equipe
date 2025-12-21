@@ -187,7 +187,7 @@ export default function useVente() {
         setError(null);
         try {
             await annulerVente(id);
-            fetchById(id)
+            await fetchById(id)
         } catch (err) {
             setError(err.response?.data?.message || "Erreur lors de la récupération de vente");
         } finally {

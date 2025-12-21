@@ -66,7 +66,6 @@ const VenteDetail = () => {
 
     const anulerVente = async () => {
         annuler(id)
-        navigate('/ventes')
 
     }
 
