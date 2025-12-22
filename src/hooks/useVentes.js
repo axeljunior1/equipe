@@ -12,7 +12,8 @@ import {
     getVenteLines,
     getVentes,
     updateVente,
-    validerVente
+    validerVente,
+    searchVentes
 } from "../services/VenteService";
 import {number} from "sockjs-client/lib/utils/random";
 import {DEFAULT_PAGINATION_SIZE} from "../utils/constants";
@@ -130,6 +131,22 @@ export default function useVente() {
         }
     };
 
+    // Créer un vente
+    const searchVente = async (venteData, page = 0 , size = DEFAULT_PAGINATION_SIZE) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await searchVentes(venteData, page, size);
+            setVentes(response.data.content);
+            setTotalPages(response.data.totalPages);
+            setTotalElements(response.data.totalElements);
+        } catch (err) {
+            setError(err.response?.data?.message || "Erreur lors de la recherche");
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
 
     const validerPanier = async (caisse) => {
@@ -227,6 +244,7 @@ export default function useVente() {
         totalPages,
         fermerVente,
         annuler,
-        rembourser
+        rembourser,
+        searchVente
     };
 }

@@ -42,24 +42,27 @@ const SearchCritereComp = ({
 
     return (
         <div>
-            <form className="my-3" onSubmit={handleSubmitSearch}>
-                <Row>
-                    <Col xs="auto">
-                        <Button type="submit" className="mb-md-0 mb-xs-2">
-                            Recherche
-                        </Button>
-                    </Col>
-                    <Col>
-                        <input
-                            type="text"
-                            value={searchInput}
-                            onChange={handleSearchInput}
-                            placeholder="Recherche"
-                            className="form-control mr-sm-2"
-                        />
-                    </Col>
-                </Row>
-            </form>
+            {
+                searchInput &&
+                <form className="my-3" onSubmit={handleSubmitSearch}>
+                    <Row>
+                        <Col xs="auto">
+                            <Button type="submit" className="mb-md-0 mb-xs-2">
+                                Recherche
+                            </Button>
+                        </Col>
+                        <Col>
+                            <input
+                                type="text"
+                                value={searchInput}
+                                onChange={handleSearchInput}
+                                placeholder="Recherche"
+                                className="form-control mr-sm-2"
+                            />
+                        </Col>
+                    </Row>
+                </form>
+            }
 
             {cols && cols.length > 0 && (
                 <Accordion className="my-5" defaultActiveKey="0">
@@ -93,6 +96,12 @@ const SearchCritereComp = ({
                                                     />
                                                 </Col>
                                             );
+                                        }else if(col.type === 'full'){
+                                            return (
+                                                <Col key={index} xs={12} sm={12} md={6} lg={4} xxl={3}>
+                                                    {col.render}
+                                                </Col>
+                                            )
                                         }
                                         return null;
                                     })}

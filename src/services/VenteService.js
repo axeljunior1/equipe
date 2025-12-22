@@ -6,6 +6,11 @@ const BASE_URL = '/ventes';
 
 
 
+
+export const searchVentes = async (data, page = 0, size = DEFAULT_PAGINATION_SIZE) => {
+    return await axiosInstance.post(`${BASE_URL}/search`, data, {params: {page: page, size: size}});
+}
+
 export const getVenteById = async (id) => {
     return await axiosInstance.get(`${BASE_URL}/${id}`);
 }
